@@ -1,5 +1,5 @@
 
-(deftheme blunted "The Blunted color theme -- a more sensible version of the Emacs default light theme.")
+(deftheme blunted "The Blunted color theme -- a muted version of the Emacs default light theme.")
 
 (let ((class '((class color) (min-colors 89)))
       ;; Blunted palette
@@ -28,7 +28,7 @@
 
    ;;; basic coloring
    `(default ((,class (:foreground ,blunted-min :background ,blunted-max))))
-   `(cursor ((,class (:foreground ,blunted-grey-1))))
+   `(cursor ((,class (:background ,blunted-grey-1))))
    `(escape-glyph-face ((,class (:foreground ,blunted-function-name))))
    `(fringe ((,class (:foreground ,blunted-grey-1 :background ,blunted-grey-3))))
    `(header-line ((,class (:foreground ,blunted-grey-1
