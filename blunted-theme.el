@@ -5,6 +5,7 @@
       ;; Blunted palette
       ;; colors with +x are lighter, colors with -x are darker
       (blunted-min "#333")
+      (blunted-grey-0 "#888")
       (blunted-grey-1 "#aaa")
       (blunted-grey-2 "#ddd")
       (blunted-grey-3 "#e6e6e6")
@@ -49,7 +50,7 @@
 
    ;;; font lock
    `(font-lock-builtin-face ((,class (:foreground ,blunted-builtin))))
-   `(font-lock-comment-face ((,class (:foreground ,blunted-grey-1))))
+   `(font-lock-comment-face ((,class (:foreground ,blunted-grey-0))))
    `(font-lock-comment-delimiter-face ((,class (:foreground ,blunted-grey-1))))
    `(font-lock-constant-face ((,class (:foreground ,blunted-constant))))
    `(font-lock-doc-face ((,class (:foreground ,blunted-string))))
