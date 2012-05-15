@@ -1,4 +1,3 @@
-
 (deftheme blunted "The Blunted color theme -- a muted version of the Emacs default light theme.")
 
 (let ((class '((class color) (min-colors 89)))
@@ -9,15 +8,15 @@
       (blunted-grey-1 "#aaa")
       (blunted-grey-2 "#ddd")
       (blunted-grey-3 "#e6e6e6")
-      (blunted-max "#f3f3f3")
+      (blunted-max "#f3f3f0")
       (blunted-region "#bdd6ff")
       (blunted-prompt "#23d")
       (blunted-paren-match "#aaffff")
       (blunted-paren-mismatch "#ff7766")
       (blunted-type "#474")
       (blunted-function-name "#23d")
-      (blunted-constant "#288")
-      (blunted-string "#834")
+      (blunted-constant "#28a")
+      (blunted-string "#723")
       (blunted-builtin "#56d")
       (blunted-keyword "#637")
       (blunted-variable-name "#950"))
@@ -31,7 +30,7 @@
    `(default ((,class (:foreground ,blunted-min :background ,blunted-max))))
    `(cursor ((,class (:background ,blunted-grey-1))))
    `(escape-glyph-face ((,class (:foreground ,blunted-function-name))))
-   `(fringe ((,class (:foreground ,blunted-grey-1 :background ,blunted-grey-3))))
+   `(fringe ((,class (:foreground ,blunted-grey-3 :background ,blunted-max))))
    `(header-line ((,class (:foreground ,blunted-grey-1
                                        :background ,blunted-grey-2
                                        :box nil))))
@@ -47,6 +46,7 @@
                            :background ,blunted-grey-2
                            :box nil))))
    `(region ((,class (:background ,blunted-region))))
+   `(vertical-border ((,class (:foreground ,blunted-grey-2))))
 
    ;;; font lock
    `(font-lock-builtin-face ((,class (:foreground ,blunted-builtin))))
@@ -68,8 +68,16 @@
 
    ;;; external
 
+   ;; speedbar
+   `(speedbar-directory-face ((,class (:height 110 :inherit 'variable-pitch :weight bold :foreground ,blunted-constant))))
+   `(speedbar-file-face ((,class (:inherit 'speedbar-directory-face :weight normal :foreground ,blunted-string))))
+   `(speedbar-tag-face ((,class (:inherit 'speedbar-directory-face :weight normal :foreground ,blunted-builtin))))
+   `(speedbar-selected-face ((,class (:inherit 'speedbar-directory-face :weight normal :foreground ,blunted-type))))
+   `(speedbar-highlight-face ((,class (:inherit 'speedbar-directory-face :background ,blunted-region))))
+   `(speedbar-button-face ((,class (:inherit 'fixed-pitch :foreground ,blunted-builtin :weight normal))))
+
    ;; linum-mode
-   `(linum ((,class (:foreground ,blunted-grey-1 :background ,blunted-grey-3))))
+   `(linum ((,class (:foreground ,blunted-grey-1 :background ,blunted-grey-3 :height 110 :box (:line-width 1 :color ,blunted-grey-3)))))
 
    `(paren-face-match ((,class (:foreground ,blunted-max :background ,blunted-paren-match))))
    `(paren-face-mismatch ((,class (:foreground ,blunted-max :background ,blunted-paren-mismatch))))

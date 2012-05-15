@@ -6,21 +6,41 @@
 ;; init packages
 (package-initialize)
 
-;; my theme
-(load-theme 'blunted t)
+(add-to-list 'load-path "~/.emacs.d/")
+(add-to-list 'load-path "~/.emacs.d/tabbar/")
+
+(defvar header-line-inhibit-window-list ())
+(require 'tabbar)
+(setq tabbar-use-images nil)
+
+(set-face-attribute 'variable-pitch nil :family "Lucida Sans")
+(set-face-attribute 'fixed-pitch nil :family "Menlo")
+
+(scroll-bar-mode -1)
+(fringe-mode 'left-only)
+
+;; workaround -- won't require for some reason
+(load-file "~/.emacs.d/sr-speedbar.el")
+
+(setq speedbar-hide-button-brackets-flag t
+      speedbar-show-unknown-files t
+      speedbar-smart-directory-expand-flag t
+      speedbar-use-images nil
+      speedbar-indentation-width 2
+      speedbar-activity-change-focus-flag t
+      sr-speedbar-width-x 12
+      sr-speedbar-auto-refresh nil
+      sr-speedbar-right-side nil)
 
 ;; recent M-x commands a la ido
 (require 'smex)
 (smex-initialize)
 (global-set-key (kbd "M-x") 'smex)
 
-(require 'tabbar)
-(require 'sr-speedbar)
-
 ;; nicer scrolling
 (setq redisplay-dont-pause t)
-(defun up-slightly (amt) "Scroll up a bit"  (scroll-up amt))
-(defun down-slightly (amt) "Scroll down a bit" (scroll-down amt))
+(defun up-slightly (amt) "Scroll up a bit"  (scroll-up-command amt))
+(defun down-slightly (amt) "Scroll down a bit" (scroll-down-command amt))
 (global-set-key [wheel-down] (lambda () (interactive) (up-slightly 1)))
 (global-set-key [wheel-up] (lambda () (interactive) (down-slightly 1)))
 (global-set-key [double-wheel-down] (lambda () (interactive) (up-slightly 2)))
@@ -53,7 +73,6 @@
 
 (global-set-key (kbd "C-x w") 'mark-word-anywhere)
 
-
 ;; sensible defaults
 (setq inhibit-startup-message t
       color-theme-is-global t
@@ -71,7 +90,6 @@
 ;; cua-mode -- only for rectangles, and to have something like delete-selection-mode that's compatible with autopair
 (setq cua-enable-cua-keys nil) ;; only for rectangles
 (cua-mode t)
-
 
 ;; always autoindent new lines 
 (define-key global-map (kbd "RET") 'newline-and-indent)
@@ -119,9 +137,13 @@
 
 ;; line numbers 
 (add-hook 'find-file-hook (lambda () (linum-mode 1)))
+(setq linum-format " %4d ")
 
 ;; nicer line wrapping
 (add-hook 'find-file-hook (lambda () (visual-line-mode 1)))
+
+;; scroll bars
+(add-hook 'find-file-hook (lambda () (setq vertical-scroll-bar 'right)))
 
 ;; kill whole lines with CR
 (setq kill-whole-line t)
@@ -139,7 +161,7 @@
 (blink-cursor-mode -1)
 
 ;; flymake everywhere
-(flymake-mode 1)
+;(flymake-mode 1)
 
 ;; ido
 (setq ido-enable-flex-matching t
@@ -149,6 +171,13 @@
       ido-everywhere t)
 (ido-mode 1)
 
+;; allow disabled commands
+(put 'ido-complete 'disabled nil)
+(put 'ido-exit-minibuffer 'disabled nil)
+(put 'dired-find-alternate-file 'disabled nil)
+(put 'downcase-region 'disabled nil)
+
+;; web view editing
 (require 'multi-web-mode)
 (setq mweb-default-major-mode 'html-mode)
 (setq mweb-tags '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
@@ -156,11 +185,6 @@
                   (css-mode "<style +type=\"text/css\"[^>]*>" "</style>")))
 (setq mweb-filename-extensions '("html" "phtml"))
 (multi-web-global-mode 1)
-
-
-(when window-system
-  ;; * -MAKER-FAMILY-WEIGHT-SLANT-WIDTHTYPE-STYLE-PIXELS-HEIGHT-HORIZ-VERT-SPACING-WIDTH-CHARSET *
-  (setq default-frame-alist '((width . 200)(height . 80)(font . "-apple-Menlo-*-*-*-*-12-*-*-*-*-*-utf-8"))))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -170,15 +194,21 @@
  '(ansi-color-names-vector ["#f3f3f3" "#23d" "#834" "#288" "#56d" "#950" "#56d" "#333"])
  '(custom-safe-themes (quote ("dcfaff781574c2aae079365a8a9f9bdcb206acab1c3c841c00c9b3b4e78aba6d" "591ac6117f76fc697f613eb6d29510a890e1d376c86f40c1aa51b8f97898a781" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "fc5fcb6f1f1c1bc01305694c59a1a861b008c534cae8d0e48e4d5e81ad718bc6" "1e7e097ec8cb1f8c3a912d7e1e0331caeed49fef6cff220be63bd2a6ba4cc365" default)))
  '(fci-rule-color "#ddd")
- '(fringe-mode (quote (nil . 0)) nil (fringe))
- '(nav-width 25))
+ )
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
-(put 'dired-find-alternate-file 'disabled nil)
-(put 'downcase-region 'disabled nil)
-(put 'ido-complete 'disabled nil)
-(put 'ido-exit-minibuffer 'disabled nil)
+
+(when window-system
+  ;; * -MAKER-FAMILY-WEIGHT-SLANT-WIDTHTYPE-STYLE-PIXELS-HEIGHT-HORIZ-VERT-SPACING-WIDTH-CHARSET *
+  (setq initial-frame-alist '((width . 180)
+			      (height . 70)
+			      (line-spacing . 1)
+			      (left-fringe . 6)
+			      (right-fringe . 0)
+			      (font . "-apple-Menlo-*-*-*-*-12-*-*-*-*-*-utf-8")))
+  (load-theme 'blunted t)
+  (sr-speedbar-open))
