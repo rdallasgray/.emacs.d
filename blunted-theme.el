@@ -9,6 +9,7 @@
       (blunted-grey-2 "#ddd")
       (blunted-grey-3 "#e6e6e6")
       (blunted-max "#f3f3f0")
+      (blunted-sidebar "#e2e8ee")
       (blunted-region "#bdd6ff")
       (blunted-prompt "#23d")
       (blunted-paren-match "#aaffff")
@@ -75,6 +76,7 @@
    `(speedbar-selected-face ((,class (:inherit 'speedbar-directory-face :weight normal :foreground ,blunted-type))))
    `(speedbar-highlight-face ((,class (:inherit 'speedbar-directory-face :background ,blunted-region))))
    `(speedbar-button-face ((,class (:inherit 'fixed-pitch :foreground ,blunted-builtin :weight normal))))
+   `(speedbar-separator-face ((,class (:inherit 'speedbar-directory-face))))
 
    ;; linum-mode
    `(linum ((,class (:foreground ,blunted-grey-1 :background ,blunted-grey-3 :height 110 :box (:line-width 1 :color ,blunted-grey-3)))))

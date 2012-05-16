@@ -7,11 +7,6 @@
 (package-initialize)
 
 (add-to-list 'load-path "~/.emacs.d/")
-(add-to-list 'load-path "~/.emacs.d/tabbar/")
-
-(defvar header-line-inhibit-window-list ())
-(require 'tabbar)
-(setq tabbar-use-images nil)
 
 (set-face-attribute 'variable-pitch nil :family "Lucida Sans")
 (set-face-attribute 'fixed-pitch nil :family "Menlo")
@@ -19,8 +14,7 @@
 (scroll-bar-mode -1)
 (fringe-mode 'left-only)
 
-;; workaround -- won't require for some reason
-(load-file "~/.emacs.d/sr-speedbar.el")
+(require 'sr-speedbar)
 
 (setq speedbar-hide-button-brackets-flag t
       speedbar-show-unknown-files t
@@ -28,6 +22,7 @@
       speedbar-use-images nil
       speedbar-indentation-width 2
       speedbar-activity-change-focus-flag t
+      speedbar-update-flag nil
       sr-speedbar-width-x 12
       sr-speedbar-auto-refresh nil
       sr-speedbar-right-side nil)
@@ -191,10 +186,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector ["#f3f3f3" "#23d" "#834" "#288" "#56d" "#950" "#56d" "#333"])
+ '(ansi-color-names-vector ["#f3f3f0" "#23d" "#723" "#28a" "#56d" "#950" "#56d" "#333"])
  '(custom-safe-themes (quote ("dcfaff781574c2aae079365a8a9f9bdcb206acab1c3c841c00c9b3b4e78aba6d" "591ac6117f76fc697f613eb6d29510a890e1d376c86f40c1aa51b8f97898a781" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "fc5fcb6f1f1c1bc01305694c59a1a861b008c534cae8d0e48e4d5e81ad718bc6" "1e7e097ec8cb1f8c3a912d7e1e0331caeed49fef6cff220be63bd2a6ba4cc365" default)))
- '(fci-rule-color "#ddd")
- )
+ '(fci-rule-color "#ddd"))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
