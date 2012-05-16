@@ -27,6 +27,10 @@
       sr-speedbar-auto-refresh nil
       sr-speedbar-right-side nil)
 
+(global-set-key (kbd "C-x C-x") (lambda () (interactive) (if (sr-speedbar-window-p)
+							     (other-window 1)
+							   (sr-speedbar-select-window))))
+
 ;; recent M-x commands a la ido
 (require 'smex)
 (smex-initialize)
@@ -107,6 +111,7 @@
 ;; Use Alt-3 1o insert a #, unbind right alt
 (fset 'insertPound "#")
 (define-key global-map "\M-3" 'insertPound)
+(setq ns-right-alternate-modifier nil)
 
 ;; Don't make me type out 'yes' and 'no'
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -199,8 +204,8 @@
 (when window-system
   ;; * -MAKER-FAMILY-WEIGHT-SLANT-WIDTHTYPE-STYLE-PIXELS-HEIGHT-HORIZ-VERT-SPACING-WIDTH-CHARSET *
   (setq initial-frame-alist '((width . 180)
-			      (height . 70)
-			      (line-spacing . 1)
+			      (height . 70)))
+  (setq default-frame-alist '((line-spacing . 1)
 			      (left-fringe . 6)
 			      (right-fringe . 0)
 			      (font . "-apple-Menlo-*-*-*-*-12-*-*-*-*-*-utf-8")))

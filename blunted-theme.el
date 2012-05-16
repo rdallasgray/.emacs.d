@@ -71,9 +71,9 @@
 
    ;; speedbar
    `(speedbar-directory-face ((,class (:height 110 :inherit 'variable-pitch :weight bold :foreground ,blunted-constant))))
-   `(speedbar-file-face ((,class (:inherit 'speedbar-directory-face :weight normal :foreground ,blunted-string))))
+   `(speedbar-file-face ((,class (:inherit 'speedbar-directory-face :weight normal :foreground ,blunted-function-name))))
    `(speedbar-tag-face ((,class (:inherit 'speedbar-directory-face :weight normal :foreground ,blunted-builtin))))
-   `(speedbar-selected-face ((,class (:inherit 'speedbar-directory-face :weight normal :foreground ,blunted-type))))
+   `(speedbar-selected-face ((,class (:inherit 'speedbar-directory-face :weight normal :foreground ,blunted-keyword))))
    `(speedbar-highlight-face ((,class (:inherit 'speedbar-directory-face :background ,blunted-region))))
    `(speedbar-button-face ((,class (:inherit 'fixed-pitch :foreground ,blunted-builtin :weight normal))))
    `(speedbar-separator-face ((,class (:inherit 'speedbar-directory-face))))
