@@ -4,3 +4,4 @@ var
 url
 ede-projects.el
 custom.el
+*.elc

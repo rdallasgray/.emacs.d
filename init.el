@@ -50,6 +50,8 @@
       sr-speedbar-right-side nil
       sr-speedbar-max-width 21)
 
+(add-hook 'speedbar-mode-hook (lambda () (load-theme-buffer-local 'graphene-speedbar (current-buffer) t)))
+
 ;(global-set-key (kbd "C-x C-x") (lambda () (interactive) (if (sr-speedbar-window-p)
 ;							     (other-window 1)
 ;							   (sr-speedbar-select-window))))
