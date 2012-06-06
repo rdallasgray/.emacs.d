@@ -21,26 +21,16 @@
       (graphene-variable-name "#b50"))
 
   (make-face 'sidebar-face)
-  (set-face-attribute 'sidebar-face nil
-                      :inherit 'variable-pitch :foreground graphene-min :background graphene-sidebar :height 110)
   (set-face-background 'sidebar-face graphene-sidebar)
-
-  (make-face 'sidebar-button-face)
-  (set-face-attribute 'sidebar-button-face nil :foreground graphene-builtin)
-
-  (make-face 'sidebar-selected-face)
-  (set-face-attribute 'sidebar-selected-face nil :inherit 'sidebar-face :foreground graphene-function-name)
+  (add-hook 'speedbar-mode-hook (lambda () (buffer-face-set 'sidebar-face)))
   
-  (make-face 'sidebar-highlight-face)
-  (set-face-attribute 'sidebar-highlight-face nil :inherit 'sidebar-face :background graphene-region)
-
   (custom-theme-set-faces
    'graphene
    `(link ((,class (:foreground ,graphene-constant :underline t :weight bold))))
    `(link-visited ((,class (:foreground ,graphene-constant :underline t :weight normal))))
 
    ;;; basic coloring
-;   `(default ((,class (:foreground ,graphene-min :background ,graphene-max))))
+   `(default ((,class (:foreground ,graphene-min :background ,graphene-max))))
    `(cursor ((,class (:background ,graphene-grey-1))))
    `(escape-glyph-face ((,class (:foreground ,graphene-function-name))))
    `(fringe ((,class (:foreground ,graphene-grey-3 :background nil))))
@@ -49,18 +39,12 @@
    `(warning ((,class (:foreground ,graphene-warning))))
    `(highlight ((,class (:background ,graphene-grey-2))))
    `(shadow ((,class (:foreground ,graphene-grey-1))))
-   `(isearch ((,class (:background ,graphene-region))))
+   `(isearch ((,class (:foreground unspecified :background ,graphene-region))))
    `(query-replace ((,class (:foreground ,graphene-grey-1))))
 
-   `(mode-line
-     ((,class (:foreground ,graphene-max
-                           :background ,graphene-grey-1
-                           :box nil))))
+   `(mode-line ((,class (:foreground ,graphene-max :background ,graphene-grey-1 :box nil))))
    `(mode-line-buffer-id ((,class (:foreground ,graphene-max :weight bold))))
-   `(mode-line-inactive
-     ((,class (:foreground ,graphene-grey-3
-                           :background ,graphene-grey-2
-                           :box nil))))
+   `(mode-line-inactive ((,class (:foreground ,graphene-grey-3 :background ,graphene-grey-2 :box nil))))
    `(region ((,class (:background ,graphene-region))))
    `(vertical-border ((,class (:foreground ,graphene-grey-1))))
 
@@ -82,8 +66,19 @@
 
    `(c-annotation-face ((,class (:inherit font-lock-constant-face))))
 
-   ;; linum-mode
-   `(linum ((,class (:foreground ,graphene-grey-1 :background ,graphene-grey-3 :height 110 :box (:line-width 1 :color ,graphene-grey-3)))))
+   `(speedbar-directory-face ((,class (:foreground unspecified :background unspecified
+                                              :inherit 'variable-pitch :weight bold :height 110))))
+   `(speedbar-file-face ((,class (:foreground unspecified :inherit speedbar-directory-face :weight normal))))
+   `(speedbar-selected-face ((,class (:background unspecified :height unspecified :foreground ,graphene-function-name))))
+   `(speedbar-highlight-face ((,class (:background ,graphene-region))))
+   `(speedbar-button-face ((,class (:foreground ,graphene-builtin :background unspecified))))
+   `(speedbar-tag-face ((,class (:foreground unspecified :inherit speedbar-button-face))))
+   `(speedbar-separator-face ((,class (:foreground unspecified :background unspecified
+                                              :inherit speedbar-directory-face :overline nil))))
+
+ ;; linum-mode
+   `(linum ((,class (:foreground ,graphene-grey-1 :background ,graphene-grey-3 :height 110
+                                 :box (:line-width 1 :color ,graphene-grey-3)))))
 
    `(paren-face-match ((,class (:foreground ,graphene-min :background ,graphene-paren-match))))
    `(paren-face-mismatch ((,class (:foreground ,graphene-max :background ,graphene-warning))))

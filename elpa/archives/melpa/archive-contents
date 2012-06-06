@@ -409,6 +409,9 @@
  (mmm-mode .
 	   [(20120605)
 	    nil "Allow Multiple Major Modes in a buffer [source: github]" tar])
+ (minimap .
+	  [(20110427)
+	   nil "Minimap sidebar for Emacs [source: git]" single])
  (melpa .
 	[(20120202)
 	 nil "special handling for the MELPA repository [source: github]" single])
@@ -796,8 +799,5 @@
 	    nil "An auto-complete source using slime completions [source: github]" single])
  (ac-dabbrev .
 	     [(20091116)
-	      nil "auto-complete.el source for dabbrev [source: wiki]" single])
- (minimap .
-	  [(20110427)
-	   nil "Minimap sidebar for Emacs [source: git]" single]))
+	      nil "auto-complete.el source for dabbrev [source: wiki]" single]))
 

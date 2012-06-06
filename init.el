@@ -50,8 +50,6 @@
       sr-speedbar-right-side nil
       sr-speedbar-max-width 21)
 
-(add-hook 'speedbar-mode-hook (lambda () (load-theme-buffer-local 'graphene-speedbar (current-buffer) t)))
-
 ;(global-set-key (kbd "C-x C-x") (lambda () (interactive) (if (sr-speedbar-window-p)
 ;							     (other-window 1)
 ;							   (sr-speedbar-select-window))))
@@ -97,6 +95,13 @@
 
 (global-set-key (kbd "C-c w") 'mark-word-anywhere)
 
+;; add semicolon at end of line
+(defun insert-semicolon-at-end-of-line ()
+  (interactive)
+  (end-of-line)
+  (insert ";"))
+(global-set-key (kbd "C-;") 'insert-semicolon-at-end-of-line)
+
 ;; sane forward-/backward-word (requires thingatpt)
 ;; DOESN'T WORK WITH CURSOR KEYS 
 (global-set-key "\M-f" 'forward-same-syntax)
@@ -139,7 +144,7 @@
 (define-key global-map (kbd "RET") 'newline-and-indent)
 
 ;; hippie-expand everywhere
-(global-set-key (kbd "M-/") 'hippie-expand)
+;(global-set-key (kbd "M-/") 'hippie-expand)
 (setq hippie-expand-try-functions-list
       '(try-expand-dabbrev
         try-expand-dabbrev-all-buffers
@@ -152,6 +157,9 @@
         try-complete-lisp-symbol-partially
         try-complete-lisp-symbol))
 
+(require 'smart-tab)
+(global-smart-tab-mode 1)
+(setq smart-tab-using-hippie-expand t)
 
 ;; Use Alt-3 1o insert a #, unbind right alt
 (fset 'insert-pound "#")
@@ -175,7 +183,9 @@
 (setq auto-save-default nil)
 
 ;; auto php-mode
-(add-to-list 'auto-mode-alist '("\\.php\\'" . php-mode))
+;(add-to-list 'auto-mode-alist '("\\.php\\'" . php-mode))
+(require 'php+-mode)
+(php+-mode-setup)
 
 ;; auto markdown-mode
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
