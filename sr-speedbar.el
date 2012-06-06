@@ -241,11 +241,11 @@
 ;;; Code:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; User Customization ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defgroup sr-speedbar nil
+(defgroup sr-speedbar nil 
   "Same frame speedbar."
   :group 'speedbar)
 
-(defcustom sr-speedbar-width-x 18
+(defcustom sr-speedbar-width-x 21
   "Initial width of `sr-speedbar-window' under window system."
   :type 'integer
   :group 'sr-speedbar)
@@ -255,7 +255,7 @@
   :type 'integer
   :group 'sr-speedbar)
 
-(defcustom sr-speedbar-max-width 24
+(defcustom sr-speedbar-max-width 21
   "The max width limit that window allowed.
 Default, if hide `sr-speedbar' window will remember
 window width, except the window width larger than

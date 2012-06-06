@@ -1,19 +1,43 @@
+(add-to-list 'load-path "~/.emacs.d")
+
+;; byte-compile .el files on saving
+(add-hook 'emacs-lisp-mode-hook '(lambda ()
+  (add-hook 'after-save-hook 'emacs-lisp-byte-compile t t))
+)
+
 ;; add melpa, marmalade
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(add-to-list 'package-archives  '("marmalade"  . "http://marmalade-repo.org/packages/") t)
+(add-to-list 'package-archives '("marmalade"  . "http://marmalade-repo.org/packages/") t)
+(add-to-list 'package-archives '("tromey" . "http://tromey.com/elpa/") t)
 
 ;; init packages
 (package-initialize)
 
-(add-to-list 'load-path "~/.emacs.d/")
+;; mainly for sudo editing
+(require 'tramp)
 
+;; get flyspell working
+(setq ispell-program-name "/usr/local/bin/ispell")
+
+;; default fonts
 (set-face-attribute 'variable-pitch nil :family "Lucida Sans")
 (set-face-attribute 'fixed-pitch nil :family "Menlo")
 
+;; scroll bars and right fringe off by default (don't want them in speedbar)
 (scroll-bar-mode -1)
 (fringe-mode 'left-only)
 
+;; right scroll bar when visiting file
+(add-hook 'find-file-hook (lambda () (setq vertical-scroll-bar 'right)))
+
+;; no toolbar
+(tool-bar-mode -1)
+
+;; non-blinking cursor
+(blink-cursor-mode -1)
+
+;; docked speedbar
 (require 'sr-speedbar)
 
 (setq speedbar-hide-button-brackets-flag t
@@ -21,22 +45,21 @@
       speedbar-smart-directory-expand-flag t
       speedbar-use-images nil
       speedbar-indentation-width 2
-      speedbar-activity-change-focus-flag t
       speedbar-update-flag nil
-      sr-speedbar-width-x 12
       sr-speedbar-auto-refresh nil
-      sr-speedbar-right-side nil)
+      sr-speedbar-right-side nil
+      sr-speedbar-max-width 21)
 
-(global-set-key (kbd "C-x C-x") (lambda () (interactive) (if (sr-speedbar-window-p)
-							     (other-window 1)
-							   (sr-speedbar-select-window))))
+;(global-set-key (kbd "C-x C-x") (lambda () (interactive) (if (sr-speedbar-window-p)
+;							     (other-window 1)
+;							   (sr-speedbar-select-window))))
 
 ;; recent M-x commands a la ido
 (require 'smex)
 (smex-initialize)
 (global-set-key (kbd "M-x") 'smex)
 
-;; nicer scrolling
+;; nicer scrolling with mouse wheel/trackpad
 (setq redisplay-dont-pause t)
 (defun up-slightly (amt) "Scroll up a bit"  (scroll-up-command amt))
 (defun down-slightly (amt) "Scroll down a bit" (scroll-down-command amt))
@@ -56,7 +79,7 @@
   (activate-mark)
   (beginning-of-visual-line 2))
 
-(global-set-key (kbd "C-x l") 'mark-visual-line-anywhere)
+(global-set-key (kbd "C-c l") 'mark-visual-line-anywhere)
 
 ;; mark a word
 (require 'thingatpt)
@@ -70,7 +93,27 @@
   (activate-mark)
   (end-of-thing 'word))
 
-(global-set-key (kbd "C-x w") 'mark-word-anywhere)
+(global-set-key (kbd "C-c w") 'mark-word-anywhere)
+
+;; sane forward-/backward-word (requires thingatpt)
+;; DOESN'T WORK WITH CURSOR KEYS 
+(global-set-key "\M-f" 'forward-same-syntax)
+
+(global-set-key "\M-b" (lambda() (interactive) (forward-same-syntax -1)))
+
+(defun kill-syntax (&optional arg) "Kill ARG sets of syntax characters after point."
+  (interactive "p")
+  (let ((opoint (point)))
+    (forward-same-syntax arg)
+    (kill-region opoint (point))) )
+
+(global-set-key "\M-d" 'kill-syntax)
+(global-set-key [(meta backspace)] (lambda() (interactive) (kill-syntax -1)))
+
+;; step into CamelCase
+; (global-subword-mode 1) ; have to deal with the above first
+
+
 
 ;; sensible defaults
 (setq inhibit-startup-message t
@@ -87,7 +130,7 @@
 (autopair-global-mode)
 
 ;; cua-mode -- only for rectangles, and to have something like delete-selection-mode that's compatible with autopair
-(setq cua-enable-cua-keys nil) ;; only for rectangles
+(setq cua-enable-cua-keys nil)
 (cua-mode t)
 
 ;; always autoindent new lines 
@@ -97,21 +140,24 @@
 (global-set-key (kbd "M-/") 'hippie-expand)
 (setq hippie-expand-try-functions-list
       '(try-expand-dabbrev
-	try-expand-dabbrev-all-buffers
-	try-expand-dabbrev-from-kill
-	try-complete-file-name-partially
-	try-complete-file-name
-	try-expand-all-abbrevs
-	try-expand-list
-	try-expand-line
-	try-complete-lisp-symbol-partially
-	try-complete-lisp-symbol))
+        try-expand-dabbrev-all-buffers
+        try-expand-dabbrev-from-kill
+        try-complete-file-name-partially
+        try-complete-file-name
+        try-expand-all-abbrevs
+        try-expand-list
+        try-expand-line
+        try-complete-lisp-symbol-partially
+        try-complete-lisp-symbol))
 
 
 ;; Use Alt-3 1o insert a #, unbind right alt
-(fset 'insertPound "#")
-(define-key global-map "\M-3" 'insertPound)
+(fset 'insert-pound "#")
+(define-key global-map "\M-3" 'insert-pound)
 (setq ns-right-alternate-modifier nil)
+
+;; delete files by moving them to the OS X trash
+(setq delete-by-moving-to-trash t)
 
 ;; Don't make me type out 'yes' and 'no'
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -132,8 +178,19 @@
 ;; auto markdown-mode
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 
-;; step into CamelCase
-(global-subword-mode 1)
+;; tabs
+(setq-default tab-width 2)
+(setq-default indent-tabs-mode nil)
+
+; encoding
+(prefer-coding-system 'utf-8)
+(set-language-environment 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+
+; apply syntax highlighting to all buffers
+(global-font-lock-mode t)
 
 ;; line numbers 
 (add-hook 'find-file-hook (lambda () (linum-mode 1)))
@@ -142,26 +199,8 @@
 ;; nicer line wrapping
 (add-hook 'find-file-hook (lambda () (visual-line-mode 1)))
 
-;; scroll bars
-(add-hook 'find-file-hook (lambda () (setq vertical-scroll-bar 'right)))
-
 ;; kill whole lines with CR
 (setq kill-whole-line t)
-
-;; icomplete
-(icomplete-mode 1) 
-
-;; turn off warnings
-(setq warning-minimum-level :error)
-
-;; no toolbar
-(tool-bar-mode -1)
-
-;; non-blinking cursor
-(blink-cursor-mode -1)
-
-;; flymake everywhere
-;(flymake-mode 1)
 
 ;; ido
 (setq ido-enable-flex-matching t
@@ -186,28 +225,16 @@
 (setq mweb-filename-extensions '("html" "phtml"))
 (multi-web-global-mode 1)
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector ["#f3f3f0" "#23d" "#723" "#28a" "#56d" "#950" "#56d" "#333"])
- '(custom-safe-themes (quote ("dcfaff781574c2aae079365a8a9f9bdcb206acab1c3c841c00c9b3b4e78aba6d" "591ac6117f76fc697f613eb6d29510a890e1d376c86f40c1aa51b8f97898a781" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "fc5fcb6f1f1c1bc01305694c59a1a861b008c534cae8d0e48e4d5e81ad718bc6" "1e7e097ec8cb1f8c3a912d7e1e0331caeed49fef6cff220be63bd2a6ba4cc365" default)))
- '(fci-rule-color "#ddd"))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(setq custom-file "~/.emacs.d/custom.el")
+(load custom-file)
 
 (when window-system
-  ;; * -MAKER-FAMILY-WEIGHT-SLANT-WIDTHTYPE-STYLE-PIXELS-HEIGHT-HORIZ-VERT-SPACING-WIDTH-CHARSET *
   (setq initial-frame-alist '((width . 180)
 			      (height . 70)))
   (setq default-frame-alist '((line-spacing . 1)
-			      (left-fringe . 6)
-			      (right-fringe . 0)
-			      (font . "-apple-Menlo-*-*-*-*-12-*-*-*-*-*-utf-8")))
-  (load-theme 'blunted t)
+                              (left-fringe . 6)
+                              (right-fringe . 0)
+                              (internal-border-width . 0)
+                              (font . "-apple-Menlo-*-*-*-*-12-*-*-*-*-*-utf-8")))
+  (load-theme 'graphene t)
   (sr-speedbar-open))
