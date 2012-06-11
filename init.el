@@ -29,7 +29,7 @@
 (fringe-mode 'left-only)
 
 ;; right scroll bar when visiting file
-(add-hook 'find-file-hook (lambda () (setq vertical-scroll-bar 'right)))
+;(add-hook 'find-file-hook (lambda () (setq vertical-scroll-bar 'right)))
 
 ;; no toolbar
 (tool-bar-mode -1)
@@ -120,8 +120,6 @@
 ;; step into CamelCase
 ; (global-subword-mode 1) ; have to deal with the above first
 
-
-
 ;; sensible defaults
 (setq inhibit-startup-message t
       color-theme-is-global t
@@ -144,13 +142,13 @@
 (define-key global-map (kbd "RET") 'newline-and-indent)
 
 ;; hippie-expand everywhere
-;(global-set-key (kbd "M-/") 'hippie-expand)
+
 (setq hippie-expand-try-functions-list
-      '(try-expand-dabbrev
+      '(try-complete-file-name-partially
+        try-complete-file-name
+        try-expand-dabbrev
         try-expand-dabbrev-all-buffers
         try-expand-dabbrev-from-kill
-        try-complete-file-name-partially
-        try-complete-file-name
         try-expand-all-abbrevs
         try-expand-list
         try-expand-line
@@ -182,10 +180,10 @@
 ;; stop creating #autosave# files
 (setq auto-save-default nil)
 
-;; auto php-mode
-;(add-to-list 'auto-mode-alist '("\\.php\\'" . php-mode))
+;; php+, 2-space indent
 (require 'php+-mode)
 (php+-mode-setup)
+(setq php-basic-offset 2)
 
 ;; auto markdown-mode
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
@@ -204,7 +202,7 @@
 ; apply syntax highlighting to all buffers
 (global-font-lock-mode t)
 
-;; line numbers 
+;; line numbers
 (add-hook 'find-file-hook (lambda () (linum-mode 1)))
 (setq linum-format " %4d ")
 
@@ -212,7 +210,7 @@
 (add-hook 'find-file-hook (lambda () (visual-line-mode 1)))
 
 ;; kill whole lines with CR
-(setq kill-whole-line t)
+;(setq kill-whole-line t)
 
 ;; ido
 (setq ido-enable-flex-matching t
@@ -240,13 +238,18 @@
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
 
-(when window-system
-  (setq initial-frame-alist '((width . 180)
-			      (height . 70)))
-  (setq default-frame-alist '((line-spacing . 1)
-                              (left-fringe . 6)
-                              (right-fringe . 0)
-                              (internal-border-width . 0)
-                              (font . "-apple-Menlo-*-*-*-*-12-*-*-*-*-*-utf-8")))
-  (load-theme 'graphene t)
-  (sr-speedbar-open))
+(if window-system (progn
+                    (add-to-list 'initial-frame-alist '(width .  180))
+                    (add-to-list 'initial-frame-alist '(height .  70))
+                    (add-to-list 'default-frame-alist '(line-spacing . 2))
+                    (add-to-list 'default-frame-alist '(font . "-apple-Menlo-*-*-*-*-12-*-*-*-*-*-utf-8"))
+                    (load-theme 'solarized-light t)
+                    (sr-speedbar-open))
+  (progn
+    (menu-bar-mode -1)
+    (load-theme 'solarized-dark)))
+
+(add-to-list 'default-frame-alist '(left-fringe . 6))
+(add-to-list 'default-frame-alist '(right-fringe . 0))
+
+(load-theme 'graphene t)

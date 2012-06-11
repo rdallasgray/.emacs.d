@@ -1,4 +1,4 @@
-;; -*- emacs-lisp -*- <12/06/05 08:58:22 /Users/robertdallasgray/.emacs.d/tramp>
+;; -*- emacs-lisp -*- <12/06/08 10:25:46 /Users/robertdallasgray/.emacs.d/tramp>
 ;; Tramp connection history.  Don't change this file.
 ;; You can delete it, forcing Tramp to reapply the checks.
 
@@ -46,6 +46,29 @@
   ("remote-encoding" tramp-perl-encode-with-module)
   ("remote-decoding" tramp-perl-decode-with-module)
   ("inline-compress" "gzip")
-  ("inline-decompress" "gzip -d"))
- (["su" "root" "localhost" nil]
-  nil))
+  ("inline-decompress" "gzip -d")
+  ("ls" "/bin/ls")
+  ("ls-dired" nil))
+ (["ssh2" nil "192.168.1.152" nil]
+  ("uname" "Linux 2.6.32-38-generic-pae")
+  ("test" "test")
+  ("remote-path"
+   ("/bin" "/usr/bin" "/usr/sbin" "/usr/local/bin"))
+  ("remote-shell" "/bin/sh")
+  ("busybox" nil)
+  ("~" "/home/robertdallasgray")
+  ("ls" "/bin/ls --color=never")
+  ("ls-dired" t)
+  ("stat" "\\stat")
+  ("file-exists" "test -e")
+  ("id" "/usr/bin/id")
+  ("gid-integer" 1000)
+  ("readlink" "\\readlink")
+  ("local-encoding" base64-encode-region)
+  ("local-decoding" base64-decode-region)
+  ("remote-encoding" "base64")
+  ("remote-decoding" "base64 -d -i")
+  ("perl-file-spec" t)
+  ("perl-cwd-realpath" t)
+  ("perl" "\\perl")
+  ("trash" nil)))
