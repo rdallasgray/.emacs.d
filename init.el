@@ -1,9 +1,11 @@
-(add-to-list 'load-path "~/.emacs.d")
+(add-to-list 'load-path "~/.emacs.d/")
+(add-to-list 'load-path "~/.emacs.d/non-elpa/")
+(let ((default-directory "~/.emacs.d/non-elpa/"))
+  (normal-top-level-add-subdirs-to-load-path))
 
 ;; byte-compile .el files on saving
 (add-hook 'emacs-lisp-mode-hook '(lambda ()
-  (add-hook 'after-save-hook 'emacs-lisp-byte-compile t t))
-)
+                                   (add-hook 'after-save-hook 'emacs-lisp-byte-compile t t)))
 
 ;; add melpa, marmalade
 (require 'package)
@@ -24,12 +26,8 @@
 (set-face-attribute 'variable-pitch nil :family "Lucida Sans")
 (set-face-attribute 'fixed-pitch nil :family "Menlo")
 
-;; scroll bars and right fringe off by default (don't want them in speedbar)
+;; scroll bars off by default (don't want them in speedbar)
 (scroll-bar-mode -1)
-(fringe-mode 'left-only)
-
-;; right scroll bar when visiting file
-;(add-hook 'find-file-hook (lambda () (setq vertical-scroll-bar 'right)))
 
 ;; no toolbar
 (tool-bar-mode -1)
@@ -47,12 +45,7 @@
       speedbar-indentation-width 2
       speedbar-update-flag nil
       sr-speedbar-auto-refresh nil
-      sr-speedbar-right-side nil
-      sr-speedbar-max-width 21)
-
-;(global-set-key (kbd "C-x C-x") (lambda () (interactive) (if (sr-speedbar-window-p)
-;							     (other-window 1)
-;							   (sr-speedbar-select-window))))
+      sr-speedbar-right-side nil)
 
 ;; recent M-x commands a la ido
 (require 'smex)
@@ -70,30 +63,17 @@
 (global-set-key [triple-wheel-down] (lambda () (interactive) (up-slightly 4)))
 (global-set-key [triple-wheel-up] (lambda () (interactive) (down-slightly 4)))
 
-;; mark a line 
-(defun mark-visual-line-anywhere ()
-  "Mark an entire visual line, with point anywhere in the line."
+;; quickly create new buffers with s-n
+(defun create-new-buffer ()
   (interactive)
-  (deactivate-mark)
-  (push-mark (beginning-of-visual-line 1))
-  (activate-mark)
-  (beginning-of-visual-line 2))
+  (switch-to-buffer (generate-new-buffer-name "*new*")))
+(global-unset-key (kbd "s-n"))
+(global-set-key (kbd "s-n") 'create-new-buffer)
 
-(global-set-key (kbd "C-c l") 'mark-visual-line-anywhere)
-
-;; mark a word
-(require 'thingatpt)
-
-(defun mark-word-anywhere ()
-  "Mark a word, with point anywhere in the word."
-  (interactive)
-  (deactivate-mark)
-  (unless (thing-at-point 'word) (forward-word)(backward-word))
-  (push-mark (beginning-of-thing 'word))
-  (activate-mark)
-  (end-of-thing 'word))
-
-(global-set-key (kbd "C-c w") 'mark-word-anywhere)
+;; mark word, sexp, line, ...
+(require 'expand-region)
+(global-set-key (kbd "C-=") 'er/expand-region)
+(global-set-key (kbd "C--") 'er/contract-region)
 
 ;; add semicolon at end of line
 (defun insert-semicolon-at-end-of-line ()
@@ -103,22 +83,20 @@
 (global-set-key (kbd "C-;") 'insert-semicolon-at-end-of-line)
 
 ;; sane forward-/backward-word (requires thingatpt)
-;; DOESN'T WORK WITH CURSOR KEYS 
-(global-set-key "\M-f" 'forward-same-syntax)
+;; (global-set-key "\M-f" 'forward-same-syntax)
+;; (global-set-key [(meta right)] 'forward-same-syntax)
 
-(global-set-key "\M-b" (lambda() (interactive) (forward-same-syntax -1)))
+;; (global-set-key "\M-b" (lambda() (interactive) (forward-same-syntax -1)))
+;; (global-set-key [(meta left)] (lambda() (interactive) (forward-same-syntax -1)))
 
-(defun kill-syntax (&optional arg) "Kill ARG sets of syntax characters after point."
-  (interactive "p")
-  (let ((opoint (point)))
-    (forward-same-syntax arg)
-    (kill-region opoint (point))) )
+;; (defun kill-syntax (&optional arg) "Kill ARG sets of syntax characters after point."
+;;   (interactive "p")
+;;   (let ((opoint (point)))
+;;     (forward-same-syntax arg)
+;;     (kill-region opoint (point))))
 
-(global-set-key "\M-d" 'kill-syntax)
-(global-set-key [(meta backspace)] (lambda() (interactive) (kill-syntax -1)))
-
-;; step into CamelCase
-; (global-subword-mode 1) ; have to deal with the above first
+;; (global-set-key "\M-d" 'kill-syntax)
+;; (global-set-key [(meta backspace)] (lambda() (interactive) (kill-syntax -1)))
 
 ;; sensible defaults
 (setq inhibit-startup-message t
@@ -126,23 +104,38 @@
       uniquify-buffer-name-style 'forward)
 
 ;; don't ask me what buffer to kill
-(global-set-key (kbd "C-x k") 
-        '(lambda () (interactive) 
-           (let (kill-buffer-query-functions) (kill-buffer))))
+(defun kill-buffer-with-fire ()
+  (interactive)
+  (let (kill-buffer-query-functions) (kill-buffer)))
+(global-set-key (kbd "C-x k") 'kill-buffer-with-fire)
+(global-set-key (kbd "s-w") 'kill-buffer-with-fire)
+
 
 ;; autopair gives closer-to-textmate functionality than the built-in electric modes
 (require 'autopair)
 (autopair-global-mode)
 
+;; autorevert all buffers
+(global-auto-revert-mode t)
+
 ;; cua-mode -- only for rectangles, and to have something like delete-selection-mode that's compatible with autopair
 (setq cua-enable-cua-keys nil)
 (cua-mode t)
 
+;; newline anywhere (after cua because of C-RET)
+(defun newline-anywhere ()
+  (interactive)
+  (end-of-line)
+  (newline))
+(global-set-key [(meta return)] 'newline-anywhere)
+
 ;; always autoindent new lines 
 (define-key global-map (kbd "RET") 'newline-and-indent)
 
-;; hippie-expand everywhere
+(require 'ace-jump-mode)
+(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
 
+;; hippie-expand everywhere
 (setq hippie-expand-try-functions-list
       '(try-complete-file-name-partially
         try-complete-file-name
@@ -192,25 +185,20 @@
 (setq-default tab-width 2)
 (setq-default indent-tabs-mode nil)
 
-; encoding
+;; encoding
 (prefer-coding-system 'utf-8)
 (set-language-environment 'utf-8)
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (set-selection-coding-system 'utf-8)
 
-; apply syntax highlighting to all buffers
+;; apply syntax highlighting to all buffers
 (global-font-lock-mode t)
 
 ;; line numbers
-(add-hook 'find-file-hook (lambda () (linum-mode 1)))
-(setq linum-format " %4d ")
-
-;; nicer line wrapping
-(add-hook 'find-file-hook (lambda () (visual-line-mode 1)))
-
-;; kill whole lines with CR
-;(setq kill-whole-line t)
+(add-hook 'find-file-hook (lambda () (progn
+                                       (linum-mode 1)
+                                       (setq linum-format " %4d "))))
 
 ;; ido
 (setq ido-enable-flex-matching t
@@ -224,7 +212,10 @@
 (put 'ido-complete 'disabled nil)
 (put 'ido-exit-minibuffer 'disabled nil)
 (put 'dired-find-alternate-file 'disabled nil)
+(put 'autopair-newline 'disabled nil)
+(put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
+(put 'narrow-to-region 'disabled nil)
 
 ;; web view editing
 (require 'multi-web-mode)
@@ -238,18 +229,20 @@
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
 
-(if window-system (progn
-                    (add-to-list 'initial-frame-alist '(width .  180))
-                    (add-to-list 'initial-frame-alist '(height .  70))
-                    (add-to-list 'default-frame-alist '(line-spacing . 2))
-                    (add-to-list 'default-frame-alist '(font . "-apple-Menlo-*-*-*-*-12-*-*-*-*-*-utf-8"))
-                    (load-theme 'solarized-light t)
-                    (sr-speedbar-open))
+(if window-system
+    (progn
+      (add-to-list 'default-frame-alist '(width .  180))
+      (add-to-list 'default-frame-alist '(height .  70))
+      (add-to-list 'default-frame-alist '(line-spacing . 2))
+      (add-to-list 'default-frame-alist '(font . "-apple-Menlo-*-*-*-*-12-*-*-*-*-*-utf-8"))
+      (load-theme 'solarized-light t)
+      (sr-speedbar-open))
   (progn
-    (menu-bar-mode -1)
-    (load-theme 'solarized-dark)))
-
-(add-to-list 'default-frame-alist '(left-fringe . 6))
-(add-to-list 'default-frame-alist '(right-fringe . 0))
+    (load-theme 'solarized-dark t)
+    (menu-bar-mode -1)))
 
 (load-theme 'graphene t)
+(visual-line-mode 1)
+
+;; seems to fix graphical glitches with linum
+(set-fringe-mode '(8 . 0))
