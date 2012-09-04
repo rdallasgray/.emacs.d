@@ -3,6 +3,8 @@
 (let ((default-directory "~/.emacs.d/non-elpa/"))
   (normal-top-level-add-subdirs-to-load-path))
 
+(add-to-list 'custom-theme-load-path "~/.emacs.d/non-elpa/theme/")
+
 ;; byte-compile .el files on saving
 (add-hook 'emacs-lisp-mode-hook '(lambda ()
                                    (add-hook 'after-save-hook 'emacs-lisp-byte-compile t t)))
@@ -11,7 +13,6 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (add-to-list 'package-archives '("marmalade"  . "http://marmalade-repo.org/packages/") t)
-(add-to-list 'package-archives '("tromey" . "http://tromey.com/elpa/") t)
 
 ;; init packages
 (package-initialize)
@@ -21,6 +22,11 @@
 
 ;; get flyspell working
 (setq ispell-program-name "/usr/local/bin/ispell")
+
+;; start flymake, autocomplete in prog modes
+(add-hook 'prog-mode-hook (progn
+                            (lambda () (flymake-mode t))
+                            (lambda () (auto-complete))))
 
 ;; default fonts
 (set-face-attribute 'variable-pitch nil :family "Lucida Sans")
@@ -47,10 +53,26 @@
       sr-speedbar-auto-refresh nil
       sr-speedbar-right-side nil)
 
+(add-hook 'speedbar-reconfigure-keymaps-hook
+          '(lambda ()
+             (define-key speedbar-key-map [S-up] 'speedbar-up-directory)
+             (define-key speedbar-key-map [right] 'speedbar-flush-expand-line)
+             (define-key speedbar-key-map [left] 'speedbar-contract-line)
+             (define-key speedbar-key-map (kbd "<kp-enter>") 'speedbar-item-rename)
+             (define-key speedbar-key-map (kbd "<s-backspace>") 'speedbar-item-delete)
+             (define-key speedbar-key-map (kbd "<s-i>") 'speedbar-item-info)
+             (define-key speedbar-key-map (kbd "<s-r>") 'speedbar-refresh)
+             ))
+
+(add-hook 'speedbar-mode-hook '(lambda () (hl-line-mode 1)))
+
 ;; recent M-x commands a la ido
 (require 'smex)
 (smex-initialize)
 (global-set-key (kbd "M-x") 'smex)
+
+(require 'auto-complete-config)
+(ac-config-default)
 
 ;; nicer scrolling with mouse wheel/trackpad
 (setq redisplay-dont-pause t)
@@ -132,25 +154,22 @@
 ;; always autoindent new lines 
 (define-key global-map (kbd "RET") 'newline-and-indent)
 
-(require 'ace-jump-mode)
-(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
-
 ;; hippie-expand everywhere
-(setq hippie-expand-try-functions-list
-      '(try-complete-file-name-partially
-        try-complete-file-name
-        try-expand-dabbrev
-        try-expand-dabbrev-all-buffers
-        try-expand-dabbrev-from-kill
-        try-expand-all-abbrevs
-        try-expand-list
-        try-expand-line
-        try-complete-lisp-symbol-partially
-        try-complete-lisp-symbol))
+;; (setq hippie-expand-try-functions-list
+;;       '(try-complete-file-name-partially
+;;         try-complete-file-name
+;;         try-expand-dabbrev
+;;         try-expand-dabbrev-all-buffers
+;;         try-expand-dabbrev-from-kill
+;;         try-expand-all-abbrevs
+;;         try-expand-list
+;;         try-expand-line
+;;         try-complete-lisp-symbol-partially
+;;         try-complete-lisp-symbol))
 
-(require 'smart-tab)
-(global-smart-tab-mode 1)
-(setq smart-tab-using-hippie-expand t)
+;; (require 'smart-tab)
+;; (global-smart-tab-mode 1)
+;; (setq smart-tab-using-hippie-expand t)
 
 ;; Use Alt-3 1o insert a #, unbind right alt
 (fset 'insert-pound "#")
