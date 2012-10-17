@@ -10,3 +10,5 @@ ac-comphist.dat.emacs*
 %*
 ac-comphist.dat
 tramp
+.emacs
+graphene
