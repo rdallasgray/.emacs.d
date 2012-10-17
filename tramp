@@ -1,4 +1,4 @@
-;; -*- emacs-lisp -*- <12/08/16 21:06:22 /Users/robertdallasgray/.emacs.d/tramp>
+;; -*- emacs-lisp -*- <12/09/21 14:58:34 /Users/robertdallasgray/.emacs.d/tramp>
 ;; Tramp connection history.  Don't change this file.
 ;; You can delete it, forcing Tramp to reapply the checks.
 
@@ -24,31 +24,6 @@
   ("remote-decoding" tramp-perl-decode-with-module)
   ("inline-compress" "gzip")
   ("inline-decompress" "gzip -d"))
- (["sudo" "root" "localhost" nil]
-  ("uname" "Darwin 11.4.0")
-  ("test" "test")
-  ("remote-path"
-   ("/usr/bin" "/bin" "/usr/sbin" "/sbin" "/usr/local/bin"))
-  ("remote-shell" "/bin/sh")
-  ("busybox" nil)
-  ("stat" nil)
-  ("perl-file-spec" t)
-  ("perl-cwd-realpath" t)
-  ("perl" "\\perl")
-  ("id" "/usr/bin/id")
-  ("gid-integer" 0)
-  ("~root" "/var/root")
-  ("readlink" nil)
-  ("file-exists" "test -e")
-  ("uid-integer" 0)
-  ("local-encoding" base64-encode-region)
-  ("local-decoding" base64-decode-region)
-  ("remote-encoding" tramp-perl-encode-with-module)
-  ("remote-decoding" tramp-perl-decode-with-module)
-  ("inline-compress" "gzip")
-  ("inline-decompress" "gzip -d")
-  ("ls" "/bin/ls")
-  ("ls-dired" nil))
  (["ssh2" nil "192.168.1.152" nil]
   ("uname" "Linux 2.6.32-38-generic-pae")
   ("test" "test")
@@ -72,5 +47,25 @@
   ("perl-cwd-realpath" t)
   ("perl" "\\perl")
   ("trash" nil))
- (["scpc" nil "https" nil]
-  nil))
+ (["sudo" "root" "localhost" nil]
+  ("uname" "Darwin 12.2.0")
+  ("test" "test")
+  ("remote-path"
+   ("/usr/bin" "/bin" "/usr/sbin" "/sbin" "/usr/local/bin"))
+  ("remote-shell" "/bin/sh")
+  ("busybox" nil)
+  ("stat" nil)
+  ("perl-file-spec" t)
+  ("perl-cwd-realpath" t)
+  ("perl" "\\perl")
+  ("id" "/usr/bin/id")
+  ("gid-integer" 0)
+  ("readlink" nil)
+  ("file-exists" "test -e")
+  ("uid-integer" 0)
+  ("local-encoding" base64-encode-region)
+  ("local-decoding" base64-decode-region)
+  ("remote-encoding" tramp-perl-encode-with-module)
+  ("remote-decoding" tramp-perl-decode-with-module)
+  ("inline-compress" "gzip")
+  ("inline-decompress" "gzip -d")))

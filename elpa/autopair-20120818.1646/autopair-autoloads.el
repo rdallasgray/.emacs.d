@@ -4,7 +4,7 @@
 
 
 ;;;### (autoloads (autopair-mode autopair-global-mode) "autopair"
-;;;;;;  "autopair.el" (20548 40049))
+;;;;;;  "autopair.el" (20605 31848))
 ;;; Generated autoloads from autopair.el
 
 (defvar autopair-global-mode nil "\
@@ -35,7 +35,7 @@ Automagically pair braces and quotes like in TextMate.
 
 ;;;***
 
-;;;### (autoloads nil nil ("autopair-pkg.el") (20548 40049 217484))
+;;;### (autoloads nil nil ("autopair-pkg.el") (20605 31848 311173))
 
 ;;;***
 

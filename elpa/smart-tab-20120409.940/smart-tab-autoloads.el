@@ -4,7 +4,7 @@
 
 
 ;;;### (autoloads (smart-tab-mode smart-tab-mode-on smart-tab) "smart-tab"
-;;;;;;  "smart-tab.el" (20548 39110))
+;;;;;;  "smart-tab.el" (20605 31858))
 ;;; Generated autoloads from smart-tab.el
 
 (autoload 'smart-tab "smart-tab" "\
@@ -41,7 +41,7 @@ Null prefix argument turns off the mode.
 
 ;;;***
 
-;;;### (autoloads nil nil ("smart-tab-pkg.el") (20548 39110 552366))
+;;;### (autoloads nil nil ("smart-tab-pkg.el") (20605 31858 421151))
 
 ;;;***
 
