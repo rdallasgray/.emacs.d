@@ -5,10 +5,10 @@ url
 ede-projects.el
 custom.el
 *.elc
-ac-comphist.dat.emacs*
+ac-comphist.dat
 .graphene*
 %*
-ac-comphist.dat
 tramp
-.emacs
+.emacs*
 graphene
+project-persist
