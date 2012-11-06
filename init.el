@@ -14,7 +14,10 @@
 (require 'graphene)
 
 ;; Add de facto prog-mode hooks
-(setq graphene-prog-mode-hooks (append '(coffee-mode-hook css-mode-hook sgml-mode-hook html-mode-hook) graphene-prog-mode-hooks))
+(setq graphene-prog-mode-hooks
+      (append
+       '(coffee-mode-hook css-mode-hook sgml-mode-hook html-mode-hook)
+       graphene-prog-mode-hooks))
 
 ;; Use Alt-3 1o insert a #, unbind right alt
 (fset 'insert-pound "#")
@@ -34,6 +37,7 @@
 
 ;; YAS
 (require 'yasnippet)
+(setq yas-snippet-dirs `(,(expand-file-name "yasnippets" user-emacs-directory)))
 (yas-reload-all)
 (add-hook 'graphene-prog-mode-hook (lambda () (yas-minor-mode)))
 
