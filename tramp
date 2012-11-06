@@ -1,4 +1,4 @@
-;; -*- emacs-lisp -*- <12/09/21 14:58:34 /Users/robertdallasgray/.emacs.d/tramp>
+;; -*- emacs-lisp -*- <12/11/06 07:35:50 /Users/robertdallasgray/.emacs.d/tramp>
 ;; Tramp connection history.  Don't change this file.
 ;; You can delete it, forcing Tramp to reapply the checks.
 
@@ -68,4 +68,6 @@
   ("remote-encoding" tramp-perl-encode-with-module)
   ("remote-decoding" tramp-perl-decode-with-module)
   ("inline-compress" "gzip")
-  ("inline-decompress" "gzip -d")))
+  ("inline-decompress" "gzip -d"))
+ (["scpc" nil "sudo" nil]
+  nil))

@@ -4,7 +4,7 @@
 
 
 ;;;### (autoloads (multi-web-mode) "multi-web-mode" "multi-web-mode.el"
-;;;;;;  (20605 31846))
+;;;;;;  (20630 34371))
 ;;; Generated autoloads from multi-web-mode.el
 
 (autoload 'multi-web-mode "multi-web-mode" "\
@@ -15,7 +15,7 @@ Enables the multi web mode chunk detection and indentation
 ;;;***
 
 ;;;### (autoloads nil nil ("multi-web-mode-pkg.el" "mweb-example-config.el")
-;;;;;;  (20605 31846 619996))
+;;;;;;  (20630 34371 762924))
 
 ;;;***
 

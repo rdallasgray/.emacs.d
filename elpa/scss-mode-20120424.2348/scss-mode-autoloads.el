@@ -3,7 +3,7 @@
 ;;; Code:
 
 
-;;;### (autoloads (scss-mode) "scss-mode" "scss-mode.el" (20604 16347))
+;;;### (autoloads (scss-mode) "scss-mode" "scss-mode.el" (20630 34506))
 ;;; Generated autoloads from scss-mode.el
 
 (autoload 'scss-mode "scss-mode" "\
@@ -17,7 +17,7 @@ Special commands:
 
 ;;;***
 
-;;;### (autoloads nil nil ("scss-mode-pkg.el") (20604 16348 17092))
+;;;### (autoloads nil nil ("scss-mode-pkg.el") (20630 34506 167403))
 
 ;;;***
 
