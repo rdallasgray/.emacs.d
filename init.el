@@ -64,7 +64,7 @@
     ("jslint"
      "--terse"
      "--indent" "2"
-     "nomen"
+     "--nomen"
      "--plusplus"
      "--white"
      "--continue"
