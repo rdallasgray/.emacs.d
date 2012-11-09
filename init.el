@@ -27,6 +27,12 @@
 ;; Don't resize the minibuffer
 (setq resize-mini-windows nil)
 
+;; Sensible window movement
+(global-set-key (kbd "C-x <up>") 'windmove-up)
+(global-set-key (kbd "C-x <down>") 'windmove-down)
+(global-set-key (kbd "C-x <right>") 'windmove-right)
+(global-set-key (kbd "C-x <left>") 'windmove-left)
+
 ;; php+, 2-space indent
 (require 'php+-mode)
 (php+-mode-setup)
