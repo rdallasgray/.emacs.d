@@ -30,7 +30,7 @@
 ;; php+, 2-space indent
 (require 'php+-mode)
 (php+-mode-setup)
-(setq php-basic-offset 2)
+(setq php-basic-offset 4)
 
 ;; Add php+-mode to mweb-tags
 (push '(php+-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>") mweb-tags)
