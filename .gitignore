@@ -5,6 +5,7 @@ url
 ede-projects.el
 custom.el
 *.elc
+*.el~
 ac-comphist.dat
 .graphene*
 %*
