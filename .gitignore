@@ -12,3 +12,4 @@ tramp
 .emacs*
 graphene
 project-persist
+projectile.cache
