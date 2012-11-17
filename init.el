@@ -35,6 +35,11 @@
 ;; Add php+-mode to mweb-tags
 (push '(php+-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>") mweb-tags)
 
+;; CoffeeScript 4-space tabs (for Huzu)
+(setq coffee-tab-width 4)
+(add-hook 'coffee-mode-hook (lambda () (setq-default tab-width 4)))
+(exec-path-from-shell-getenv "COFFEELINT_CONFIG")
+
 ;; YAS
 (require 'yasnippet)
 (setq yas-snippet-dirs `(,(expand-file-name "yasnippets" user-emacs-directory)))
@@ -59,6 +64,7 @@
     ("jslint"
      "--terse"
      "--indent" "2"
+     "--nomen"
      "--plusplus"
      "--white"
      "--continue"
