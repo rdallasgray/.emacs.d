@@ -27,6 +27,12 @@
 ;; Don't resize the minibuffer
 (setq resize-mini-windows nil)
 
+;; Sensible window movement
+(global-set-key (kbd "C-x <up>") 'windmove-up)
+(global-set-key (kbd "C-x <down>") 'windmove-down)
+(global-set-key (kbd "C-x <right>") 'windmove-right)
+(global-set-key (kbd "C-x <left>") 'windmove-left)
+
 ;; php+, 2-space indent
 (require 'php+-mode)
 (php+-mode-setup)
@@ -37,8 +43,9 @@
 
 ;; CoffeeScript 4-space tabs (for Huzu)
 (setq coffee-tab-width 4)
-(add-hook 'coffee-mode-hook (lambda () (setq-default tab-width 4)))
-(exec-path-from-shell-getenv "COFFEELINT_CONFIG")
+(add-hook 'coffee-mode-hook (lambda ()
+                              (setq default-tab-width 4)
+                              (exec-path-from-shell-getenv "COFFEELINT_CONFIG")))
 
 ;; YAS
 (require 'yasnippet)
