@@ -47,6 +47,11 @@
                               (setq default-tab-width 4)
                               (exec-path-from-shell-getenv "COFFEELINT_CONFIG")))
 
+;; Add eco/jeco to mweb-file-extensions
+(setq mweb-filename-extensions
+      (append '("eco" "jeco")
+              mweb-filename-extensions))
+
 ;; YAS
 (require 'yasnippet)
 (setq yas-snippet-dirs `(,(expand-file-name "yasnippets" user-emacs-directory)))
