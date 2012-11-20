@@ -5,6 +5,7 @@ url
 ede-projects.el
 custom.el
 *.elc
+*.el~
 ac-comphist.dat
 .graphene*
 %*
@@ -12,4 +13,5 @@ tramp
 .emacs*
 graphene
 project-persist
+tramp
 projectile.cache

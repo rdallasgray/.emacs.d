@@ -3,8 +3,8 @@
 ;;; Code:
 
 
-;;;### (autoloads nil nil ("rsense-pkg.el" "rsense.el") (20630 34506
-;;;;;;  998269))
+;;;### (autoloads nil nil ("rsense-pkg.el" "rsense.el") (20638 25331
+;;;;;;  667701))
 
 ;;;***
 

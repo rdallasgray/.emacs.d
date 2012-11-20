@@ -3,8 +3,8 @@
 ;;; Code:
 
 
-;;;### (autoloads (nginx-mode) "nginx-mode" "nginx-mode.el" (20630
-;;;;;;  34378))
+;;;### (autoloads (nginx-mode) "nginx-mode" "nginx-mode.el" (20638
+;;;;;;  25339))
 ;;; Generated autoloads from nginx-mode.el
 
 (autoload 'nginx-mode "nginx-mode" "\
@@ -17,7 +17,7 @@ The variable nginx-indent-level controls the amount of indentation.
 
 ;;;***
 
-;;;### (autoloads nil nil ("nginx-mode-pkg.el") (20630 34379 12870))
+;;;### (autoloads nil nil ("nginx-mode-pkg.el") (20638 25339 510050))
 
 ;;;***
 

@@ -4,7 +4,7 @@
 
 
 ;;;### (autoloads (project-persist-mode) "project-persist" "project-persist.el"
-;;;;;;  (20630 34416))
+;;;;;;  (20638 25336))
 ;;; Generated autoloads from project-persist.el
 
 (defvar project-persist-mode nil "\
@@ -23,8 +23,8 @@ A minor mode to allow loading and saving of project settings.
 
 ;;;***
 
-;;;### (autoloads nil nil ("project-persist-pkg.el") (20630 34416
-;;;;;;  563072))
+;;;### (autoloads nil nil ("project-persist-pkg.el") (20638 25336
+;;;;;;  464278))
 
 ;;;***
 

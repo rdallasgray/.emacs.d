@@ -4,7 +4,7 @@
 
 
 ;;;### (autoloads (flyc/show-fly-error-at-point-pretty-soon flyc/show-fly-error-at-point-now)
-;;;;;;  "flymake-cursor" "flymake-cursor.el" (20630 34287))
+;;;;;;  "flymake-cursor" "flymake-cursor.el" (20638 25358))
 ;;; Generated autoloads from flymake-cursor.el
 
 (autoload 'flyc/show-fly-error-at-point-now "flymake-cursor" "\
@@ -29,8 +29,8 @@ second, does the flymake error message (if any) get displayed.
 
 ;;;***
 
-;;;### (autoloads nil nil ("flymake-cursor-pkg.el") (20630 34287
-;;;;;;  457399))
+;;;### (autoloads nil nil ("flymake-cursor-pkg.el") (20638 25358
+;;;;;;  273350))
 
 ;;;***
 
