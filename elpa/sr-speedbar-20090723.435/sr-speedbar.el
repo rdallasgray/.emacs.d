@@ -484,19 +484,25 @@ Otherwise return nil."
 
 (defun sr-speedbar-before-visiting-file-hook ()
   "Function that hook `speedbar-before-visiting-file-hook'."
-  (select-window (previous-window)))
+  (select-window (sr-speedbar-use-window)))
 
 (defun sr-speedbar-before-visiting-tag-hook ()
   "Function that hook `speedbar-before-visiting-tag-hook'."
-  (select-window (previous-window)))
+  (select-window (sr-speedbar-use-window)))
 
 (defun sr-speedbar-visiting-file-hook ()
   "Function that hook `speedbar-visiting-file-hook'."
-  (select-window (previous-window)))
+  (select-window (sr-speedbar-use-window)))
 
 (defun sr-speedbar-visiting-tag-hook ()
   "Function that hook `speedbar-visiting-tag-hook'."
-  (select-window (previous-window)))
+  (select-window (sr-speedbar-use-window)))
+
+(defun sr-speedbar-use-window ()
+  "Which window to place an opened file or tag in."
+  (if (eq (selected-window) 'sr-speedbar-window)
+      (next-window)
+    (selected-window)))
 
 (defun sr-speedbar-kill-buffer-hook ()
   "Function that hook `kill-buffer-hook'."

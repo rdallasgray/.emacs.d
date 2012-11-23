@@ -12,6 +12,10 @@
 (setq warning-minimum-level :error)
 
 (require 'graphene)
+(require 'smart-tab)
+
+;; Only use smart-tab in shell-mode
+(add-hook 'shell-mode-hook (lambda () (smart-tab-mode t)))
 
 ;; Add de facto prog-mode hooks
 (setq graphene-prog-mode-hooks
@@ -47,7 +51,10 @@
                               (setq default-tab-width 4)
                               (exec-path-from-shell-getenv "COFFEELINT_CONFIG")))
 
-;; Add eco/jeco to mweb-file-extensions
+;; Spine .styl css files
+(add-to-list 'auto-mode-alist '("[.]styl$" . css-mode))
+
+;; Add eco/jeco to mweb-filename-extensions
 (setq mweb-filename-extensions
       (append '("eco" "jeco")
               mweb-filename-extensions))
