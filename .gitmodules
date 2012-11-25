@@ -1,0 +1,3 @@
+[submodule "yasnippets/coffee-mode"]
+	path = yasnippets/coffee-mode
+	url = https://github.com/jarrelcobb/yasnippet-coffee-script-snippets
