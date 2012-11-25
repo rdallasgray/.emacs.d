@@ -5,7 +5,7 @@
 
 ;;;### (autoloads (flycheck-mode-off flycheck-mode-on flycheck-mode
 ;;;;;;  flycheck-cleanup flycheck-init) "flycheck" "flycheck.el"
-;;;;;;  (20638 25359))
+;;;;;;  (20658 6360))
 ;;; Generated autoloads from flycheck.el
 
 (autoload 'flycheck-init "flycheck" "\
@@ -21,7 +21,7 @@ function for flymake.
 (defadvice flymake-get-init-function (around flycheck-get-init-function first activate compile) "\
 Get the flymake checker.
 
-Return `flycheck-init-function', if `flycheck-mode' is enabled." (setq ad-return-value (if flycheck-mode (quote flycheck-init) ad-do-it)))
+Return `flycheck-init-function', if variable `flycheck-mode' is enabled." (setq ad-return-value (if flycheck-mode (quote flycheck-init) ad-do-it)))
 
 (autoload 'flycheck-cleanup "flycheck" "\
 Perform cleanup for flycheck.
@@ -32,8 +32,8 @@ Perform cleanup for flycheck.
 Get the cleanup function for the current checker." (setq ad-return-value (if flycheck-mode (quote flycheck-cleanup) ad-do-it)))
 
 (defadvice flymake-mode (around flycheck-flymake-mode activate compile) "\
-`flymake-mode' is incompatible with `flycheck-mode'.
-Signal an error if the latter is active." (if flycheck-mode (error "flymake-mode is incompatible with flycheck-mode. Use either flymake-mode or flycheck-mode") (setq ad-return-value ad-do-it)))
+Variable `flymake-mode' is incompatible with variable `flycheck-mode'.
+Signal an error if the latter is active." (if flycheck-mode (error "Flymake-mode is incompatible with flycheck-mode.  Use either flymake-mode or flycheck-mode") (setq ad-return-value ad-do-it)))
 
 (autoload 'flycheck-mode "flycheck" "\
 Toggle extended on-the-fly syntax checking.
@@ -48,18 +48,18 @@ INCOMPATIBLE with this mode.
 \(fn &optional ARG)" t nil)
 
 (autoload 'flycheck-mode-on "flycheck" "\
-Unconditionally enable `flycheck-mode'.
+Unconditionally enable variable `flycheck-mode'.
 
 \(fn)" nil nil)
 
 (autoload 'flycheck-mode-off "flycheck" "\
-Unconditionally disable `flycheck-mode'.
+Unconditionally disable variable `flycheck-mode'.
 
 \(fn)" nil nil)
 
 ;;;***
 
-;;;### (autoloads nil nil ("flycheck-pkg.el") (20638 25359 486251))
+;;;### (autoloads nil nil ("flycheck-pkg.el") (20658 6360 450727))
 
 ;;;***
 

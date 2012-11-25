@@ -36,15 +36,7 @@
 ;; `flycheck-mode' is intentionally incompatible to `flymake-mode'.  Attempting
 ;; to enable one while the other is active causes an error.
 
-;; `flycheck-mode' provides syntax and style checkers for the following
-;; languages:
-;;
-;; - Emacs Lisp
-;; - Shell scripts (only with `sh-mode')
-;; - Python wither either flake8, pyflakes or pylint
-;; - Ruby with ruby
-;; - CoffeeScript with coffeelint
-;; - TeX/LaTeX with chktex or lacheck
+;; See `flycheck-checkers' for a list of provided checkers.
 
 ;;; Code:
 
@@ -67,7 +59,9 @@
     flycheck-checker-css
     flycheck-checker-emacs-lisp
     flycheck-checker-haml
+    flycheck-checker-html
     flycheck-checker-json
+    flycheck-checker-javascript-jshint
     flycheck-checker-javascript-jslint
     flycheck-checker-php
     flycheck-checker-python-flake8
@@ -75,7 +69,6 @@
     flycheck-checker-python-pyflakes
     flycheck-checker-ruby
     flycheck-checker-php
-    flycheck-checker-sass
     flycheck-checker-sh
     flycheck-checker-tex-chktex
     flycheck-checker-tex-lacheck
@@ -106,6 +99,35 @@ Return the path of the file."
     (make-temp-file (or prefix "flycheck") nil
                     (concat "." (file-name-extension filename)))))
 
+(defun flycheck-find-file-in-tree (filename directory)
+  "Find FILENAME in DIRECTORY and all of its ancestors.
+
+Start looking for a file named FILENAME in DIRECTORY and traverse
+upwards through all of its ancestors up to the file system root
+until the file is found or the root is reached.
+
+Return the absolute path of the file, or nil if the file was not
+found in DIRECTORY or any of its ancestors."
+  (let ((full-path (expand-file-name filename directory)))
+    (cond ((string= directory "/") (when (file-exists-p full-path) full-path))
+          ((file-exists-p full-path) full-path)
+          (let ((parent-directory (file-name-directory
+                                   (directory-file-name
+                                    (file-name-directory full-path)))))
+            ((flycheck-find-file-in-tree filename parent-directory))))))
+
+(defun flycheck-find-file-for-buffer (filename)
+  "Find FILENAME for the current buffer.
+
+First try to find the file in the buffer's directory and any of
+its ancestors (see `flycheck-find-file-in-tree').  If that fails
+try to find the file in the home directory.  If the file is not
+found anywhere return nil."
+  (let* ((directory (file-name-directory buffer-file-name))
+         (filepath (flycheck-find-file-in-tree filename directory)))
+    (or filepath
+        (let ((home-path (expand-file-name "~/.jshintrc")))
+          (when (file-exists-p home-path) home-path)))))
 
 ;; Checker API
 
@@ -136,7 +158,7 @@ Signal an error if PROPERTIES are invalid.  Otherwise return t."
     (error "Checker %S lacks :command" properties))
   (unless (or (plist-get properties :modes)
               (plist-get properties :predicate))
-    (error "Checker %S lacks :modes and :predicate." properties))
+    (error "Checker %S lacks :modes and :predicate" properties))
   t)
 
 (defun flycheck-check-modes (properties)
@@ -263,35 +285,9 @@ function for flymake."
   (around flycheck-get-init-function first activate compile)
   "Get the flymake checker.
 
-Return `flycheck-init-function', if `flycheck-mode' is enabled."
+Return `flycheck-init-function', if variable `flycheck-mode' is enabled."
   (setq ad-return-value (if flycheck-mode
                             'flycheck-init
-                          ad-do-it)))
-
-(defun flycheck-find-all-matches (str)
-  "Return all matched for error line patterns in STR.
-
-This is a judicious override for `flymake-split-output', enabled
-by the advice below, which allows for matching multi-line
-patterns."
-  (let (matches
-        (last-match-end-pos 0))
-    (dolist (pattern flymake-err-line-patterns)
-      (let ((regex (car pattern))
-            (pos 0))
-        (while (string-match regex str pos)
-          (push (match-string 0 str) matches)
-          (setq pos (match-end 0)))
-        (setf last-match-end-pos (max pos last-match-end-pos))))
-    (let ((residual (substring str last-match-end-pos)))
-      (list matches
-            (unless (string= "" residual) residual)))))
-
-(defadvice flymake-split-output
-  (around flycheck-split-output (output) activate protect)
-  "Override `flymake-split-output' to support mult-line error messages."
-  (setq ad-return-value (if flycheck-mode
-                            (flycheck-find-all-matches output)
                           ad-do-it)))
 
 ;;;###autoload
@@ -312,19 +308,19 @@ patterns."
 
 ;;;###autoload
 (defadvice flymake-mode (around flycheck-flymake-mode activate compile)
-  "`flymake-mode' is incompatible with `flycheck-mode'.
+  "Variable `flymake-mode' is incompatible with variable `flycheck-mode'.
 Signal an error if the latter is active."
   (if flycheck-mode
-      (error "flymake-mode is incompatible with flycheck-mode. \
+      (error "Flymake-mode is incompatible with flycheck-mode.  \
 Use either flymake-mode or flycheck-mode")
     (setq ad-return-value ad-do-it)))
 
 (defvar flycheck-mode-line nil
-  "The mode line lighter of flycheck-mode.")
+  "The mode line lighter of variable `flycheck-mode'.")
 
 (defadvice flymake-report-status
   (around flycheck-report-status (e-w &optional status) activate compile)
-  "Update the status of `flycheck-mode'."
+  "Update the status of variable `flycheck-mode'."
   (let ((mode-line (if flycheck-mode " FlyC" " Flymake"))
         (target (if flycheck-mode
                     'flycheck-mode-line
@@ -340,7 +336,7 @@ Use either flymake-mode or flycheck-mode")
 
 (defadvice flymake-report-fatal-status
   (around flycheck-report-fatal-status (status warning) activate compile)
-  "Ignore fatal status warnings in `flycheck-mode'."
+  "Ignore fatal status warnings in variable `flycheck-mode'."
   (if flycheck-mode
       (flymake-log 0 "Fatal status %s, warning %s in flycheck-mode \
 buffer %s" status warning (buffer-name))
@@ -363,7 +359,7 @@ INCOMPATIBLE with this mode."
   :lighter flycheck-mode-line
   :require 'flycheck
   (when flymake-mode
-    (error "flycheck-mode is incompatible with flymake-mode. \
+    (error "Flycheck-mode is incompatible with flymake-mode.  \
 Use either flymake-mode or flycheck-mode"))
   (cond
    (flycheck-mode
@@ -397,12 +393,12 @@ Use either flymake-mode or flycheck-mode"))
 
 ;;;###autoload
 (defun flycheck-mode-on ()
-  "Unconditionally enable `flycheck-mode'."
+  "Unconditionally enable variable `flycheck-mode'."
   (flycheck-mode 1))
 
 ;;;###autoload
 (defun flycheck-mode-off ()
-  "Unconditionally disable `flycheck-mode'."
+  "Unconditionally disable variable `flycheck-mode'."
   (flycheck-mode -1))
 
 
@@ -456,6 +452,45 @@ Use either flymake-mode or flycheck-mode"))
     ("^Syntax error on line \\([0-9]+\\): \\(.*\\)$" nil 1 nil 2)
     :modes haml-mode))
 
+(defvar flycheck-checker-html
+  '(:command
+    ("tidy" "-e" "-q" source)
+    :error-patterns
+    (("line \\([0-9]+\\) column \\([0-9]+\\) - \\(Warning\\|Error\\): \\(.*\\)" nil 1 2 4))
+    :modes html-mode))
+
+(defvar flycheck-jshintrc nil
+  "The path to .jshintrc.
+
+This variable denotes the configuration file for jshint to use
+when checking a buffer with jshint.
+
+The path contained in this variable is expanded via
+`expand-file-name' before being passed to jshint, thus ~ is
+replaced with your $HOME directory.
+
+Use this variable as file local variable to use a specific
+configuration file for a buffer.")
+(put 'flycheck-jshintrc 'safe-local-variable 'stringp)
+
+(defun flycheck-checker-javascript-jshint ()
+  "Check javascript with jshint.
+
+Use .jshintrc from either `flycheck-jshintrc' or – if that
+variable is nil – the buffer's directory, any ancestors thereof
+or the $HOME directory.
+
+If .jshintrc is not found run jshint with default settings."
+  (let ((jshintrc (or flycheck-jshintrc
+                      (flycheck-find-file-for-buffer ".jshintrc"))))
+    `(:command
+      ("jshint"
+       ,@(when jshintrc `("--config" ,(expand-file-name jshintrc)))
+       source)
+      :error-patterns
+      (("^\\(.*\\): line \\([[:digit:]]+\\), col \\([[:digit:]]+\\), \\(.+\\)$" 1 2 3 4))
+      :modes js-mode)))
+
 (defvar flycheck-checker-javascript-jslint
   '(:command
     ("jsl" "-process" source)
@@ -495,15 +530,6 @@ Use either flymake-mode or flycheck-mode"))
 
 (defvar flycheck-checker-ruby
   '(:command ("ruby" "-w" "-c" source) :modes ruby-mode))
-
-(defvar flycheck-checker-sass
-  '(:command
-    ("sass" "-c" source)
-    :error-patterns
-    (("^Syntax error on line \\([0-9]+\\): \\(.*\\)$" nil 1 nil 2)
-     ("^WARNING on line \\([0-9]+\\) of .*?:\r?\n\\(.*\\)$" nil 1 nil 2)
-     ("^Syntax error: \\(.*\\)\r?\n        on line \\([0-9]+\\) of .*?$" nil 2 nil 1))
-    :modes sass-mode))
 
 (defvar flycheck-checker-sh
   '(:command

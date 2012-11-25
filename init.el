@@ -96,6 +96,14 @@
     :modes (javascript-mode js-mode js2-mode)))
 (add-to-list 'flycheck-checkers 'flycheck-checker-js)
 
+;; Advice before autoloading to prevent flycheck borking
+;; Can't figure out how/when to turn removed functionality back on
+(defadvice autoload-find-file (before flycheck-ignore-autoloads activate)
+  "Turn off flycheck when autoloading files."
+  (message "Disabling flycheck (advice)")
+  (remove-hook 'graphene-prog-mode-hook 'flycheck-mode)
+  (flycheck-mode -1))
+
 ;; Mark word, sexp, line, ...
 (require 'expand-region)
 (global-set-key (kbd "C-=")
