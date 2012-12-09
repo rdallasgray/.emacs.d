@@ -75,7 +75,7 @@
 
 ;; Flycheck
 (require 'flycheck)
-(add-hook 'graphene-prog-mode-hook 'flycheck-mode)
+;; (add-hook 'graphene-prog-mode-hook 'flycheck-mode)
 (require 'flymake-cursor)
 
 (defvar flycheck-checker-js
