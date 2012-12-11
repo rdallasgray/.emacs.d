@@ -1,3 +1,6 @@
 [submodule "yasnippets/coffee-mode"]
 	path = yasnippets/coffee-mode
 	url = https://github.com/jarrelcobb/yasnippet-coffee-script-snippets
+[submodule "graphene"]
+	path = graphene
+	url = git@github.com:rdallasgray/graphene.git
