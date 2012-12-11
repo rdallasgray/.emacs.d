@@ -495,7 +495,7 @@
 		[(20120811 1309)
 		 nil "electric editing commands for ruby files [source: github]" single])
  (ruby-compilation .
-		   [(20121111 2051)
+		   [(20121209 2156)
 		    ((inf-ruby
 		      (2 2 1)))
 		    "run a ruby process in a compilation buffer [source: github]" single])
@@ -930,7 +930,7 @@
 	   (1 11)))
 	 "Client for Clojure nREPL [source: github]" single])
  (notmuch .
-	  [(20121206 1713)
+	  [(20121209 1909)
 	   nil "No description available. [source: git]" tar])
  (nginx-mode .
 	     [(20111201 1111)
@@ -1033,6 +1033,9 @@
  (maxframe .
 	   [(20120725 1149)
 	    nil "maximize the emacs frame based on display size [source: github]" single])
+ (markup .
+	 [(20121209 2230)
+	  nil "Simple markup generation helpers. [source: github]" single])
  (markdown-mode+ .
 		 [(20120829 710)
 		  ((markdown-mode
@@ -1215,7 +1218,7 @@
 		[(20120416 46)
 		 nil "No description available. [source: wiki]" single])
  (isearch+ .
-	   [(20121009 2302)
+	   [(20121210 500)
 	    nil "Extensions to `isearch.el'. [source: wiki]" single])
  (ir_black-theme .
 		 [(20120503 1930)
@@ -1373,7 +1376,7 @@
 	    (20120509)))
 	  "helm-sources and some utilities for GNU R. [source: github]" single])
  (helm .
-       [(20121208 1538)
+       [(20121210 718)
 	nil "Helm is an Emacs incremental and narrowing framework [source: github]" tar])
  (header2 .
 	  [(20120823 1956)
@@ -1684,7 +1687,7 @@
 		 (0)))
 	       "let there be <leader> [source: github]" single])
  (evil .
-       [(20121203 832)
+       [(20121210 1006)
 	((undo-tree
 	  (0 5 1)))
 	"Extensible Vi layer for Emacs. [source: git]" tar])
@@ -1748,6 +1751,9 @@
  (elpa-audit .
 	     [(20121121 1747)
 	      nil "Handy functions for inspecting and comparing package archives [source: github]" single])
+ (elmine .
+	 [(20121209 2247)
+	  nil "Redmine API access via elisp. [source: github]" single])
  (elixir-mode .
 	      [(20121125 2251)
 	       nil "Major mode for editing Elixir files [source: github]" single])
@@ -1952,7 +1958,7 @@
 		[(20121128 843)
 		 nil "Highlight certain character columns [source: wiki]" single])
  (color-theme-solarized .
-			[(20120829 2248)
+			[(20121209 1204)
 			 ((color-theme
 			   (6 5 5)))
 			 "Solarized themes for Emacs [source: github]" tar])
