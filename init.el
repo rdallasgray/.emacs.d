@@ -75,7 +75,7 @@
 
 ;; Flycheck
 (require 'flycheck)
-;; (add-hook 'graphene-prog-mode-hook 'flycheck-mode)
+(add-hook 'graphene-prog-mode-hook 'flycheck-mode)
 (require 'flymake-cursor)
 
 (defvar flycheck-checker-js
@@ -96,9 +96,15 @@
     :modes (javascript-mode js-mode js2-mode)))
 (add-to-list 'flycheck-checkers 'flycheck-checker-js)
 
-;; Advice before autoloading to prevent flycheck borking
+;; Advice before autoloading, load-theme to prevent flycheck borking
 ;; Can't figure out how/when to turn removed functionality back on
 (defadvice autoload-find-file (before flycheck-ignore-autoloads activate)
+  "Turn off flycheck when autoloading files."
+  (message "Disabling flycheck (advice)")
+  (remove-hook 'graphene-prog-mode-hook 'flycheck-mode)
+  (flycheck-mode -1))
+
+(defadvice load-theme (before flycheck-ignore-load-theme activate)
   "Turn off flycheck when autoloading files."
   (message "Disabling flycheck (advice)")
   (remove-hook 'graphene-prog-mode-hook 'flycheck-mode)
@@ -129,6 +135,9 @@
 
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
+
+(defun load-shell-theme (buffer)
+  (load-theme-buffer-local 'solarized-dark buffer))
 
 (if window-system
     (progn (message "loading solarized theme")
