@@ -78,24 +78,6 @@
 ;; (add-hook 'graphene-prog-mode-hook 'flycheck-mode)
 (require 'flymake-cursor)
 
-(defvar flycheck-checker-js
-  '(:command
-    ("jslint"
-     "--terse"
-     "--indent" "2"
-     "--nomen"
-     "--plusplus"
-     "--white"
-     "--continue"
-     "--es5"
-     "--maxerr" "100"
-     "--sloppy"
-     "--sub" source)
-    :error-patterns
-    (("^\\(.+\.js\\)\(\\([0-9]+\\)\):\\(.*\\)" 1 2 nil 3))
-    :modes (javascript-mode js-mode js2-mode)))
-(add-to-list 'flycheck-checkers 'flycheck-checker-js)
-
 ;; Advice before autoloading to prevent flycheck borking
 ;; Can't figure out how/when to turn removed functionality back on
 (defadvice autoload-find-file (before flycheck-ignore-autoloads activate)
