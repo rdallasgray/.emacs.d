@@ -77,8 +77,6 @@
 (require 'flycheck)
 (add-hook 'graphene-prog-mode-hook 'flycheck-mode)
 (require 'flymake-cursor)
-;; Correct path to coffeelint config.
-(setq flycheck-coffeelintrc "coffeelint.json")
 
 ;; Mark word, sexp, line, ...
 (require 'expand-region)
