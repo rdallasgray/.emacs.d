@@ -88,7 +88,7 @@
 	       (2 1 1)))
 	     "Writable ack-and-a-half buffer and apply the changes to files [source: github]" single])
  (wgrep .
-	[(20121202 1954)
+	[(20130114 1335)
 	 nil "Writable grep buffer and apply the changes to files [source: github]" single])
  (websocket .
 	    [(20121013 1846)
@@ -123,9 +123,6 @@
  (vcl-mode .
 	   [(20121129 2114)
 	    nil "Syntax highlighting for Varnish Command Language [source: github]" single])
- (vc-darcs .
-	   [(20090617 1305)
-	    nil "a VC backend for darcs [source: darcs]" single])
  (uuid .
        [(20120910 951)
 	nil "UUID's for EmacsLisp [source: github]" single])
@@ -402,7 +399,7 @@
 	   [(20120905 2101)
 	    nil "Support sequential operation which omitted prefix keys. [source: github]" single])
  (smartparens .
-	      [(20130113 315)
+	      [(20130113 1507)
 	       ((dash
 		 (1 0 2)))
 	       "Autoinsert pairs of defined brackets and wrap regions [source: github]" single])
@@ -436,7 +433,7 @@
 	    [(20121227 1032)
 	     nil "Rip Clojure namespaces apart and rebuild them. [source: github]" single])
  (skewer-mode .
-	      [(20130112 1051)
+	      [(20130114 107)
 	       ((simple-httpd
 		 (1 4 0))
 		(js2-mode
@@ -452,7 +449,7 @@
 	       [(20121224 1121)
 		nil "pure elisp HTTP server [source: github]" tar])
  (simp .
-       [(20130112 103)
+       [(20130114 10)
 	nil "Simple project defenition, chiefly for file finding, and grepping [source: github]" tar])
  (sicp .
        [(20121012 1733)
@@ -622,7 +619,7 @@
 	   [(20121128 2314)
 	    nil "Run commands quickly [source: github]" single])
  (quickref .
-	   [(20130108 1213)
+	   [(20130113 1700)
 	    ((dash
 	      (1 0 3))
 	     (s
@@ -650,7 +647,7 @@
 		[(20091217 1955)
 		 nil "major mode for editing protocol buffers. [source: svn]" single])
  (projectile .
-	     [(20130107 1010)
+	     [(20130114 18)
 	      ((s
 		(1 0 0))
 	       (dash
@@ -838,7 +835,7 @@
 	      [(20121130 1746)
 	       nil "switch between named \"perspectives\" of the editor [source: github]" single])
  (persp-mode .
-	     [(20130109 1553)
+	     [(20130114 839)
 	      ((workgroups
 		(0 2 0)))
 	      "\"perspectives\" shared between frames [source: github]" single])
@@ -1114,7 +1111,7 @@
 		    (20111229)))
 		  "extra functions for markdown-mode [source: github]" tar])
  (markdown-mode .
-		[(20121007 2146)
+		[(20130113 1032)
 		 nil "Emacs Major mode for Markdown-formatted text files [source: github]" single])
  (mark-multiple .
 		[(20121118 1654)
@@ -1230,7 +1227,7 @@
 		   [(20110605 1744)
 		    nil "incremental search for the kill ring [source: github]" tar])
  (keymap-utils .
-	       [(20130106 1820)
+	       [(20130113 2310)
 		((cl-lib
 		  (0 2)))
 		"keymap utilities [source: github]" single])
@@ -1294,7 +1291,7 @@
 	  (1 4)))
 	"a Python auto-completion for Emacs [source: github]" tar])
  (javadoc-lookup .
-		 [(20130112 1757)
+		 [(20130113 1542)
 		  nil "Javadoc Emacs integration with Maven [source: github]" tar])
  (jaunte .
 	 [(20120212 134)
@@ -1376,7 +1373,7 @@
 		[(20130111 1820)
 		 nil "Major mode API client for status.net open microblogging [source: github]" tar])
  (icicles .
-	  [(20130107 426)
+	  [(20130114 103)
 	   nil "Minibuffer input completion and cycling. [source: wiki]" tar])
  (ibuffer-vc .
 	     [(20121217 826)
@@ -1447,7 +1444,7 @@
 		 (20120811)))
 	       "Migemo plug-in for helm [source: github]" single])
  (helm-ls-git .
-	      [(20130113 905)
+	      [(20130113 1755)
 	       nil "list git files. [source: github]" single])
  (helm-gtags .
 	     [(20130107 1439)
@@ -1481,7 +1478,7 @@
 	    (20120509)))
 	  "helm-sources and some utilities for GNU R. [source: github]" single])
  (helm .
-       [(20130113 1144)
+       [(20130114 1231)
 	nil "Helm is an Emacs incremental and narrowing framework [source: github]" tar])
  (header2 .
 	  [(20121228 2051)
@@ -1498,7 +1495,7 @@
 	   (1 2)))
 	 "Emacs client for hastebin (http://hastebin.com/about.md) [source: github]" single])
  (haskell-mode .
-	       [(20121229 210)
+	       [(20130112 2208)
 		nil "A Haskell editing mode [source: github]" tar])
  (hardhat .
 	  [(20121126 1228)
@@ -1534,7 +1531,7 @@
 		    [(20120821 1835)
 		     nil "Mode for the dot-language used by graphviz (att). [source: github]" single])
  (graphene .
-	   [(20130112 1739)
+	   [(20130113 1840)
 	    ((auto-complete
 	      (20120909))
 	     (ac-dabbrev
@@ -1737,7 +1734,7 @@
 		    (0 1)))
 		  "A flymake handler for coffee script [source: github]" single])
  (flycheck .
-	   [(20130112 1628)
+	   [(20130113 1608)
 	    ((s
 	      (1 3 0))
 	     (dash
@@ -1834,15 +1831,15 @@
 		   (0 1)))
 		 "Move the region in 4 directions, in a way similar to Eclipse's [source: github]" single])
  (es-lib .
-	 [(20130112 1658)
+	 [(20130114 742)
 	  nil "A collection of emacs utilities [source: github]" tar])
  (es-edit-color-stamp .
-		      [(20130112 2151)
+		      [(20130114 743)
 		       ((es-lib
 			 (0 2)))
 		       "Edit a hex color stamp, using a QT or the internal color picker [source: github]" tar])
  (es-auto-auto-indent .
-		      [(20130113 935)
+		      [(20130113 1859)
 		       ((es-lib
 			 (0 1)))
 		       "Indents code as you type [source: github]" single])
@@ -1890,7 +1887,7 @@
 	   [(20120413 1107)
 	    nil "Emacs window session manager [source: github]" single])
  (elpy .
-       [(20121205 1404)
+       [(20130114 38)
 	((pymacs
 	  (0 25))
 	 (auto-complete
@@ -2194,6 +2191,9 @@
  (centered-cursor-mode .
 		       [(20100310 1348)
 			nil "cursor stays vertically centered [source: wiki]" single])
+ (carton .
+	 [(20121109 1753)
+	  nil "Emacs dependency management made easy [source: github]" single])
  (caml .
        [(20121015 1250)
 	nil "OCaml code editing commands for Emacs [source: svn]" tar])
@@ -2258,7 +2258,7 @@
 		(3 0)))
 	      "vCard import/export for BBDB [source: github]" tar])
  (bbdb .
-       [(20121230 40)
+       [(20130113 1649)
 	nil "core of BBDB [source: git]" tar])
  (bash-completion .
 		  [(20111120 1539)
@@ -2371,5 +2371,8 @@
 	    "auto-complete sources for Clojure using nrepl completions [source: github]" single])
  (ac-dabbrev .
 	     [(20091116 1626)
-	      nil "auto-complete.el source for dabbrev [source: wiki]" single]))
+	      nil "auto-complete.el source for dabbrev [source: wiki]" single])
+ (vc-darcs .
+	   [(20090617 1305)
+	    nil "a VC backend for darcs [source: darcs]" single]))
 
