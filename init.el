@@ -13,6 +13,10 @@
 
 (require 'graphene)
 (require 'smart-tab)
+(require 'uniquify)
+
+;; Uniquify buffers
+(setq uniquify-buffer-name-style 'forward)
 
 ;; Only use smart-tab in shell-mode
 (add-hook 'shell-mode-hook (lambda () (smart-tab-mode t)))
@@ -20,7 +24,7 @@
 ;; Add de facto prog-mode hooks
 (setq graphene-prog-mode-hooks
       (append
-       '(coffee-mode-hook css-mode-hook sgml-mode-hook html-mode-hook)
+       '(coffee-mode-hook sws-mode-hook css-mode-hook sgml-mode-hook html-mode-hook)
        graphene-prog-mode-hooks))
 
 ;; Use Alt-3 1o insert a #, unbind right alt
@@ -37,27 +41,19 @@
 (global-set-key (kbd "C-x <right>") 'windmove-right)
 (global-set-key (kbd "C-x <left>") 'windmove-left)
 
-;; php+, 2-space indent
-(require 'php+-mode)
-(php+-mode-setup)
-(setq php-basic-offset 4)
-
-;; Add php+-mode to mweb-tags
-(push '(php+-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>") mweb-tags)
-
 ;; CoffeeScript 4-space tabs (for Huzu)
 (setq coffee-tab-width 4)
 (add-hook 'coffee-mode-hook (lambda ()
                               (setq default-tab-width 4)
                               (exec-path-from-shell-getenv "COFFEELINT_CONFIG")))
 
-;; Spine .styl css files
-(add-to-list 'auto-mode-alist '("[.]styl$" . css-mode))
-
 ;; Add eco/jeco to mweb-filename-extensions
 (setq mweb-filename-extensions
       (append '("eco" "jeco")
               mweb-filename-extensions))
+
+; AC
+(setq ac-disable-faces nil)
 
 ;; YAS
 (require 'yasnippet)
@@ -76,6 +72,7 @@
 ;; Flycheck
 (require 'flycheck)
 (add-hook 'graphene-prog-mode-hook 'flycheck-mode)
+(setq flycheck-highlighting-mode nil)
 (require 'flymake-cursor)
 
 ;; Mark word, sexp, line, ...
@@ -87,6 +84,9 @@
 
 ;; auto markdown-mode
 (push '("\\.md\\'" . markdown-mode) auto-mode-alist)
+
+;; auto stylus-mode
+(push '("\\.styl\\'" . jade-mode) auto-mode-alist)
 
 ;; don't compile sass/scss on saving
 (setq scss-compile-at-save nil)
@@ -105,7 +105,6 @@
 (load custom-file)
 
 (if window-system
-    (progn (message "loading solarized theme")
-           (load-theme 'solarized-light))
+    (load-theme 'solarized-light)
   ;; Dark theme in text mode
   (load-theme 'solarized-dark t))
