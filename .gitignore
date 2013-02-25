@@ -16,3 +16,4 @@ tramp
 projectile.cache
 session.*
 elpa
+.mc*
