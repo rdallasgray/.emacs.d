@@ -4,3 +4,7 @@
 [submodule "graphene"]
 	path = graphene
 	url = git@github.com:rdallasgray/graphene.git
+
+[submodule "pallet"]
+	path = pallet
+	url = git@github.com:rdallasgray/pallet.git
