@@ -15,5 +15,5 @@ project-persist
 tramp
 projectile.cache
 session.*
-elpa/
+elpa
 .mc*
