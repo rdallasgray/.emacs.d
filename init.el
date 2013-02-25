@@ -1,5 +1,6 @@
 (add-to-list 'load-path "~/.emacs.d/")
 (add-to-list 'load-path "~/.emacs.d/graphene/")
+(add-to-list 'load-path "~/.emacs.d/pallet/")
 
 ;; add melpa, marmalade
 (require 'package)
@@ -12,6 +13,7 @@
 (setq warning-minimum-level :error)
 
 (require 'graphene)
+(require 'pallet)
 (require 'smart-tab)
 (require 'uniquify)
 
