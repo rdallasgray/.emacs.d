@@ -17,3 +17,4 @@ projectile.cache
 session.*
 elpa
 .mc*
+/abbrev_defs
