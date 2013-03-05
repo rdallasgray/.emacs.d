@@ -57,11 +57,6 @@
 ; AC
 (setq ac-disable-faces nil)
 
-;; Dark shell-mode
-(add-hook 'shell-mode-hook
-          (lambda ()
-            (load-theme-buffer-local 'solarized-dark)))
-
 ;; YAS
 (require 'yasnippet)
 (setq yas-snippet-dirs `(,(expand-file-name "yasnippets" user-emacs-directory)))

@@ -18,3 +18,5 @@ session.*
 elpa
 .mc*
 /projectile-bookmarks.eld
+/abbrev_defs
+/flycheck-*
