@@ -20,6 +20,7 @@
 (depends-on "htmlize")
 (depends-on "idomenu")
 (depends-on "iedit")
+(depends-on "imenu-anywhere")
 (depends-on "impatient-mode")
 (depends-on "jade-mode")
 (depends-on "load-theme-buffer-local")
