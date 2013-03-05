@@ -18,3 +18,4 @@ session.*
 elpa
 .mc*
 /abbrev_defs
+/flycheck-*
