@@ -1,6 +1,7 @@
 (add-to-list 'load-path "~/.emacs.d/")
 (add-to-list 'load-path "~/.emacs.d/graphene/")
 (add-to-list 'load-path "~/.emacs.d/pallet/")
+(add-to-list 'load-path "~/.emacs.d/readline-complete/")
 
 ;; add melpa, marmalade
 (require 'package)
@@ -17,11 +18,20 @@
 (require 'smart-tab)
 (require 'uniquify)
 
+;; AC for shell-mode
+(setq explicit-shell-file-name "bash")
+(setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
+(setq comint-process-echoes t)
+
+(require 'readline-complete)
+(add-to-list 'ac-modes 'shell-mode)
+(add-hook 'shell-mode-hook 'ac-rlc-setup-sources)
+
 ;; Uniquify buffers
 (setq uniquify-buffer-name-style 'forward)
 
 ;; Only use smart-tab in shell-mode
-(add-hook 'shell-mode-hook (lambda () (smart-tab-mode t)))
+;;(add-hook 'shell-mode-hook (lambda () (smart-tab-mode t)))
 
 ;; Add de facto prog-mode hooks
 (setq graphene-prog-mode-hooks
