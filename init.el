@@ -57,12 +57,6 @@
 ; AC
 (setq ac-disable-faces nil)
 
-;; YAS
-(require 'yasnippet)
-(setq yas-snippet-dirs `(,(expand-file-name "yasnippets" user-emacs-directory)))
-(yas-reload-all)
-(add-hook 'graphene-prog-mode-hook (lambda () (yas-minor-mode)))
-
 ;; RSense
 (setq rsense-home "/usr/local/Cellar/rsense/0.3/libexec")
 (add-to-list 'load-path (concat rsense-home "/etc"))
