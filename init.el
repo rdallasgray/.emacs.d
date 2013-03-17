@@ -19,7 +19,7 @@
 
 (if (eq system-type 'windows-nt)
     (require 'smart-tab)
-    (add-hook 'shell-mode-hook (lambda () (smart-tab-mode t)))    
+    (add-hook 'shell-mode-hook (lambda () (smart-tab-mode t)))
   ;; AC for shell-mode
   (setq explicit-shell-file-name "bash")
   (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
@@ -85,6 +85,10 @@
                 'er/expand-region)
 (global-set-key (kbd "C--")
                 'er/contract-region)
+
+;; Easier sexp navigation
+(global-set-key (kbd "M-n") 'forward-sexp)
+(global-set-key (kbd "M-p") 'backward-sexp)
 
 ;; auto markdown-mode
 (push '("\\.md\\'" . markdown-mode) auto-mode-alist)
