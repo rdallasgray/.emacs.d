@@ -86,9 +86,25 @@
 (global-set-key (kbd "C--")
                 'er/contract-region)
 
+;; No visible region on C-x C-x
+(defun exchange-point-and-mark-no-region ()
+  "Suppress region visibility when exchanging point and mark."
+  (interactive)
+  (exchange-point-and-mark)
+  (deactivate-mark nil))
+
+(define-key global-map [remap exchange-point-and-mark] 'exchange-point-and-mark-no-region)
+
+;; visible-mark-mode
+(require 'visible-mark)
+(setq visible-mark-max 16)
+(global-visible-mark-mode t)
+
 ;; Easier sexp navigation
 (global-set-key (kbd "M-n") 'forward-sexp)
+(global-set-key (kbd "M-<down>") 'forward-sexp)
 (global-set-key (kbd "M-p") 'backward-sexp)
+(global-set-key (kbd "M-<up>") 'backward-sexp)
 
 ;; auto markdown-mode
 (push '("\\.md\\'" . markdown-mode) auto-mode-alist)
