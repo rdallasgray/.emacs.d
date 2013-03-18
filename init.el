@@ -1,6 +1,6 @@
 (add-to-list 'load-path "~/.emacs.d/")
 (add-to-list 'load-path "~/.emacs.d/graphene/")
-;;(add-to-list 'load-path "~/.emacs.d/pallet/")
+(add-to-list 'load-path "~/.emacs.d/pallet/")
 (add-to-list 'load-path "~/.emacs.d/readline-complete/")
 
 ;; add melpa, marmalade
