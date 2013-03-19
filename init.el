@@ -97,7 +97,9 @@
 
 ;; visible-mark-mode
 (require 'visible-mark)
-(setq visible-mark-max 16)
+(setq visible-mark-max 16
+      visible-mark-inhibit-trailing-overlay nil
+      global-visible-mark-mode-exclude-alist '("*.*"))
 (global-visible-mark-mode t)
 
 ;; Easier sexp navigation
