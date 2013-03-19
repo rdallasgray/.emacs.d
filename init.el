@@ -98,9 +98,7 @@
 ;; visible-mark-mode
 (require 'visible-mark)
 (setq visible-mark-max 16
-      visible-mark-inhibit-trailing-overlay nil
-      global-visible-mark-mode-exclude-alist '("*.*"))
-(global-visible-mark-mode t)
+      visible-mark-inhibit-trailing-overlay nil)
 
 ;; Easier sexp navigation
 (global-set-key (kbd "M-n") 'forward-sexp)
