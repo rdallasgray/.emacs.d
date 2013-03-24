@@ -2,6 +2,7 @@
 (source "melpa" "http://melpa.milkbox.net/packages/")
 (source "gnu" "http://elpa.gnu.org/packages/")
 
+(depends-on "ph")
 (depends-on "ack-and-a-half")
 (depends-on "auto-complete")
 (depends-on "carton")
@@ -20,8 +21,8 @@
 (depends-on "popup")
 (depends-on "projectile")
 (depends-on "rsense")
-(depends-on "s")
 (depends-on "scss-mode")
 (depends-on "smex")
 (depends-on "sws-mode")
 (depends-on "visible-mark")
+(depends-on "paredit")
