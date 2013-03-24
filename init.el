@@ -18,8 +18,9 @@
 (require 'uniquify)
 
 (if (eq system-type 'windows-nt)
-    (require 'smart-tab)
-    (add-hook 'shell-mode-hook (lambda () (smart-tab-mode t)))
+    (progn 
+      (require 'smart-tab)
+      (add-hook 'shell-mode-hook (lambda () (smart-tab-mode t))))
   ;; AC for shell-mode
   (setq explicit-shell-file-name "bash")
   (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
@@ -72,6 +73,10 @@
 
 (add-hook 'ruby-mode-hook
           (lambda () (add-to-list 'ac-sources 'ac-source-rsense)))
+
+;; imenu
+(require 'imenu-anywhere)
+(global-set-key (kbd "C-c t") 'imenu-anywhere)
 
 ;; Flycheck
 (require 'flycheck)

@@ -3,6 +3,8 @@
 (source "gnu" "http://elpa.gnu.org/packages/")
 
 (depends-on "ph")
+(depends-on "magit")
+(depends-on "smart-tab")
 (depends-on "ack-and-a-half")
 (depends-on "auto-complete")
 (depends-on "carton")
