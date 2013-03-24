@@ -74,6 +74,10 @@
 (add-hook 'ruby-mode-hook
           (lambda () (add-to-list 'ac-sources 'ac-source-rsense)))
 
+;; imenu
+(require 'imenu-anywhere)
+(global-set-key (kbd "C-c t") 'imenu-anywhere)
+
 ;; Flycheck
 (require 'flycheck)
 (add-hook 'graphene-prog-mode-hook 'flycheck-mode)
