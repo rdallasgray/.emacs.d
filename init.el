@@ -75,8 +75,10 @@
           (lambda () (add-to-list 'ac-sources 'ac-source-rsense)))
 
 ;; imenu
+(require 'idomenu)
 (require 'imenu-anywhere)
-(global-set-key (kbd "C-c t") 'imenu-anywhere)
+(global-set-key (kbd "C-c t") 'idomenu)
+(global-set-key (kbd "C-c T") 'imenu-anywhere)
 
 ;; Flycheck
 (require 'flycheck)
