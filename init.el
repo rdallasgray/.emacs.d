@@ -80,6 +80,13 @@
 (global-set-key (kbd "C-c t") 'idomenu)
 (global-set-key (kbd "C-c T") 'imenu-anywhere)
 
+;; multi-occur
+(defun multi-occur-in-open-buffers (regexp &optional allbufs)
+  "Occur in all open buffers."
+  (interactive (occur-read-primary-args))
+  (multi-occur-in-matching-buffers ".*" regexp))
+(global-set-key (kbd "M-s O") 'multi-occur-in-open-buffers)
+
 ;; Flycheck
 (require 'flycheck)
 (add-hook 'graphene-prog-mode-hook 'flycheck-mode)
