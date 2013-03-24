@@ -3,20 +3,15 @@
 (add-to-list 'load-path "~/.emacs.d/pallet/")
 (add-to-list 'load-path "~/.emacs.d/readline-complete/")
 
-;; add melpa, marmalade
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(add-to-list 'package-archives '("marmalade"  . "http://marmalade-repo.org/packages/") t)
-
 ;; init packages
 (package-initialize)
 
+(require 'pallet)
+(require 'graphene)
+
 (setq warning-minimum-level :error)
 
-(require 'graphene)
-(require 'pallet)
-(require 'uniquify)
-
+;; Shell completion if not on Windows
 (if (eq system-type 'windows-nt)
     (progn 
       (require 'smart-tab)
@@ -30,12 +25,18 @@
   (add-hook 'shell-mode-hook 'ac-rlc-setup-sources))
 
 ;; Uniquify buffers
+(require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
 
 ;; Add de facto prog-mode hooks
 (setq graphene-prog-mode-hooks
       (append
-       '(coffee-mode-hook sws-mode-hook css-mode-hook sgml-mode-hook html-mode-hook)
+       '(csharp-mode-hook
+         coffee-mode-hook
+         sws-mode-hook
+         css-mode-hook
+         sgml-mode-hook
+         html-mode-hook)
        graphene-prog-mode-hooks))
 
 ;; Use Alt-3 1o insert a #, unbind right alt
@@ -143,6 +144,4 @@
 (load custom-file)
 
 (if window-system
-    (load-theme 'solarized-light)
-  ;; Dark theme in text mode
-  (load-theme 'solarized-dark t))
+    (load-theme 'solarized-light))
