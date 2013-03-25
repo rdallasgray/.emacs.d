@@ -20,7 +20,6 @@
 (depends-on "popup")
 (depends-on "projectile")
 (depends-on "rsense")
-(depends-on "s")
 (depends-on "scss-mode")
 (depends-on "smex")
 (depends-on "sws-mode")
