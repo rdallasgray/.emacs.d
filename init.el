@@ -3,23 +3,19 @@
 (add-to-list 'load-path "~/.emacs.d/pallet/")
 (add-to-list 'load-path "~/.emacs.d/readline-complete/")
 
-;; add melpa, marmalade
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(add-to-list 'package-archives '("marmalade"  . "http://marmalade-repo.org/packages/") t)
-
 ;; init packages
 (package-initialize)
 
+(require 'pallet)
+(require 'graphene)
+
 (setq warning-minimum-level :error)
 
-(require 'graphene)
-(require 'pallet)
-(require 'uniquify)
-
+;; Shell completion if not on Windows
 (if (eq system-type 'windows-nt)
-    (require 'smart-tab)
-    (add-hook 'shell-mode-hook (lambda () (smart-tab-mode t)))
+    (progn 
+      (require 'smart-tab)
+      (add-hook 'shell-mode-hook (lambda () (smart-tab-mode t))))
   ;; AC for shell-mode
   (setq explicit-shell-file-name "bash")
   (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
@@ -29,12 +25,18 @@
   (add-hook 'shell-mode-hook 'ac-rlc-setup-sources))
 
 ;; Uniquify buffers
+(require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
 
 ;; Add de facto prog-mode hooks
 (setq graphene-prog-mode-hooks
       (append
-       '(coffee-mode-hook sws-mode-hook css-mode-hook sgml-mode-hook html-mode-hook)
+       '(csharp-mode-hook
+         coffee-mode-hook
+         sws-mode-hook
+         css-mode-hook
+         sgml-mode-hook
+         html-mode-hook)
        graphene-prog-mode-hooks))
 
 ;; Use Alt-3 1o insert a #, unbind right alt
@@ -73,6 +75,19 @@
 (add-hook 'ruby-mode-hook
           (lambda () (add-to-list 'ac-sources 'ac-source-rsense)))
 
+;; imenu
+(require 'idomenu)
+(require 'imenu-anywhere)
+(global-set-key (kbd "C-c t") 'idomenu)
+(global-set-key (kbd "C-c T") 'imenu-anywhere)
+
+;; multi-occur
+(defun multi-occur-in-open-buffers (regexp &optional allbufs)
+  "Occur in all open buffers."
+  (interactive (occur-read-primary-args))
+  (multi-occur-in-matching-buffers ".*" regexp))
+(global-set-key (kbd "M-s O") 'multi-occur-in-open-buffers)
+
 ;; Flycheck
 (require 'flycheck)
 (add-hook 'graphene-prog-mode-hook 'flycheck-mode)
@@ -98,9 +113,7 @@
 ;; visible-mark-mode
 (require 'visible-mark)
 (setq visible-mark-max 16
-      visible-mark-inhibit-trailing-overlay nil
-      global-visible-mark-mode-exclude-alist '("*.*"))
-(global-visible-mark-mode t)
+      visible-mark-inhibit-trailing-overlay nil)
 
 ;; Easier sexp navigation
 (global-set-key (kbd "M-n") 'forward-sexp)
@@ -131,6 +144,4 @@
 (load custom-file)
 
 (if window-system
-    (load-theme 'solarized-light)
-  ;; Dark theme in text mode
-  (load-theme 'solarized-dark t))
+    (load-theme 'solarized-light))
