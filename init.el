@@ -57,7 +57,13 @@
 (setq coffee-tab-width 4)
 (add-hook 'coffee-mode-hook (lambda ()
                               (setq default-tab-width 4)
-                              (exec-path-from-shell-getenv "COFFEELINT_CONFIG")))
+                              (exec-path-from-shell-copy-env "COFFEELINT_CONFIG")))
+
+;; Get rid of CoffeeREPL garbage
+(add-to-list
+         'comint-preoutput-filter-functions
+         (lambda (output)
+           (replace-regexp-in-string "\\[[0-9]+[GKJ]" "" output)))
 
 ;; Add eco/jeco to mweb-filename-extensions
 (setq mweb-filename-extensions
