@@ -1,3 +1,4 @@
+
 (add-to-list 'load-path "~/.emacs.d/")
 (add-to-list 'load-path "~/.emacs.d/graphene/")
 (add-to-list 'load-path "~/.emacs.d/pallet/")
@@ -74,12 +75,12 @@
 (setq ac-disable-faces nil)
 
 ;; RSense
-(setq rsense-home "/usr/local/Cellar/rsense/0.3/libexec")
-(add-to-list 'load-path (concat rsense-home "/etc"))
-(require 'rsense)
+;; (setq rsense-home "/usr/local/Cellar/rsense/0.3/libexec")
+;; (add-to-list 'load-path (concat rsense-home "/etc"))
+;; (require 'rsense)
 
-(add-hook 'ruby-mode-hook
-          (lambda () (add-to-list 'ac-sources 'ac-source-rsense)))
+;; (add-hook 'ruby-mode-hook
+;;           (lambda () (add-to-list 'ac-sources 'ac-source-rsense)))
 
 ;; imenu
 (require 'idomenu)
@@ -93,6 +94,15 @@
   (interactive (occur-read-primary-args))
   (multi-occur-in-matching-buffers ".*" regexp))
 (global-set-key (kbd "M-s O") 'multi-occur-in-open-buffers)
+
+;; yasnippet
+(require 'yasnippet)
+(setq yas-snippet-dirs '("~/.emacs.d/yasnippets"))
+(yas-reload-all)
+(add-hook 'graphene-prog-mode-hook
+          '(lambda()
+             (add-to-list 'ac-sources 'ac-source-yasnippet)
+             (yas-minor-mode)))
 
 ;; Flycheck
 (require 'flycheck)

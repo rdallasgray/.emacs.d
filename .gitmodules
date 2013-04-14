@@ -1,10 +1,10 @@
 [submodule "graphene"]
 	path = graphene
 	url = git@github.com:rdallasgray/graphene.git
-
 [submodule "pallet"]
 	path = pallet
 	url = git@github.com:rdallasgray/pallet.git
 [submodule "readline-complete"]
 	path = readline-complete
 	url = https://github.com/monsanto/readline-complete.el.git
+
