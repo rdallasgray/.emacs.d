@@ -1,7 +1,7 @@
 
 (add-to-list 'load-path "~/.emacs.d/")
-(add-to-list 'load-path "~/.emacs.d/graphene/")
-(add-to-list 'load-path "~/.emacs.d/pallet/")
+(add-to-list 'load-path "~/.emacs.d/graphene/lib")
+(add-to-list 'load-path "~/.emacs.d/pallet/lib")
 (add-to-list 'load-path "~/.emacs.d/readline-complete/")
 
 ;; init packages
@@ -56,6 +56,10 @@
     (delete-window)))
 
 (global-set-key (kbd "C-x C-k") 'kill-buffer-and-window)
+
+;; Precise scrolling
+(global-set-key (kbd "C-S-v") (lambda () (interactive) (scroll-up-command 1)))
+(global-set-key (kbd "M-S-v") (lambda () (interactive) (scroll-down-command 1)))
 
 ;; Sensible window movement
 (global-set-key (kbd "C-x <up>") 'windmove-up)
