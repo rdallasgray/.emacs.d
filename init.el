@@ -48,6 +48,15 @@
 ;; Don't resize the minibuffer
 (setq resize-mini-windows nil)
 
+;; Kill it with fire
+(defun kill-buffer-and-window ()
+  (interactive)
+  (progn
+    (kill-buffer)
+    (delete-window)))
+
+(global-set-key (kbd "C-x C-k") 'kill-buffer-and-window)
+
 ;; Sensible window movement
 (global-set-key (kbd "C-x <up>") 'windmove-up)
 (global-set-key (kbd "C-x <down>") 'windmove-down)
