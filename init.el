@@ -48,24 +48,15 @@
 ;; Don't resize the minibuffer
 (setq resize-mini-windows nil)
 
-;; Kill it with fire
-(defun kill-buffer-and-window ()
-  (interactive)
-  (progn
-    (kill-buffer)
-    (delete-window)))
-
-(global-set-key (kbd "C-x C-k") 'kill-buffer-and-window)
-
-;; Precise scrolling
-(global-set-key (kbd "C-S-v") (lambda () (interactive) (scroll-up-command 1)))
-(global-set-key (kbd "M-S-v") (lambda () (interactive) (scroll-down-command 1)))
-
 ;; Sensible window movement
 (global-set-key (kbd "C-x <up>") 'windmove-up)
 (global-set-key (kbd "C-x <down>") 'windmove-down)
 (global-set-key (kbd "C-x <right>") 'windmove-right)
 (global-set-key (kbd "C-x <left>") 'windmove-left)
+
+;; Scroll up and down a line at a time
+(global-set-key (kbd "C-S-v") 'scroll-up-line)
+(global-set-key (kbd "M-V") 'scroll-down-line)
 
 ;; CoffeeScript 4-space tabs (for Huzu)
 (setq coffee-tab-width 4)
@@ -84,7 +75,7 @@
       (append '("eco" "jeco")
               mweb-filename-extensions))
 
-; AC
+; AC everywhere
 (setq ac-disable-faces nil)
 
 ;; RSense
