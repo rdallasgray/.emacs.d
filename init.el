@@ -99,14 +99,14 @@
   (multi-occur-in-matching-buffers ".*" regexp))
 (global-set-key (kbd "M-s O") 'multi-occur-in-open-buffers)
 
-;; yasnippet
-(require 'yasnippet)
-(setq yas-snippet-dirs '("~/.emacs.d/yasnippets"))
-(yas-reload-all)
-(add-hook 'graphene-prog-mode-hook
-          '(lambda()
-             (add-to-list 'ac-sources 'ac-source-yasnippet)
-             (yas-minor-mode)))
+;; ;; yasnippet
+;; (require 'yasnippet)
+;; (setq yas-snippet-dirs '("~/.emacs.d/yasnippets"))
+;; (yas-reload-all)
+;; (add-hook 'graphene-prog-mode-hook
+;;           '(lambda()
+;;              (add-to-list 'ac-sources 'ac-source-yasnippet)
+;;              (yas-minor-mode)))
 
 ;; Flycheck
 (require 'flycheck)
