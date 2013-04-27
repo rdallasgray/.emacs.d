@@ -3,9 +3,6 @@
 (add-to-list 'load-path "~/.emacs.d/pallet/lib")
 (add-to-list 'load-path "~/.emacs.d/readline-complete/")
 
-;; init packages
-(package-initialize)
-
 (require 'pallet)
 (require 'graphene)
 
@@ -29,23 +26,12 @@
 (setq uniquify-buffer-name-style 'forward)
 
 ;; Add de facto prog-mode hooks
-(setq graphene-prog-mode-hooks
-      (append
-       '(csharp-mode-hook
-         coffee-mode-hook
-         sws-mode-hook
-         css-mode-hook
-         sgml-mode-hook
-         html-mode-hook)
-       graphene-prog-mode-hooks))
+(push 'sws-mode-hook graphene-prog-mode-hooks)
 
 ;; Use Alt-3 1o insert a #, unbind right alt
 (fset 'insert-pound "#")
 (define-key global-map "\M-3" 'insert-pound)
 (setq ns-right-alternate-modifier nil)
-
-;; Don't resize the minibuffer
-(setq resize-mini-windows nil)
 
 ;; Sensible window movement
 (global-set-key (kbd "C-x <up>") 'windmove-up)
@@ -59,9 +45,10 @@
 
 ;; CoffeeScript 4-space tabs (for Huzu)
 (setq coffee-tab-width 4)
-(add-hook 'coffee-mode-hook (lambda ()
-                              (setq default-tab-width 4)
-                              (exec-path-from-shell-copy-env "COFFEELINT_CONFIG")))
+(add-hook 'coffee-mode-hook
+          (lambda ()
+            (setq default-tab-width 4)
+            (exec-path-from-shell-copy-env "COFFEELINT_CONFIG")))
 
 ;; Get rid of CoffeeREPL garbage
 (add-to-list
