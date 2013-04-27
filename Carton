@@ -24,6 +24,7 @@
 (depends-on "pallet")
 (depends-on "paredit")
 (depends-on "php-mode")
+(depends-on "pos-tip")
 (depends-on "project-persist")
 (depends-on "quickrun")
 (depends-on "restclient")
