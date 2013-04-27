@@ -7,6 +7,3 @@
 [submodule "readline-complete"]
 	path = readline-complete
 	url = https://github.com/monsanto/readline-complete.el.git
-[submodule "yasnippets/ruby-mode"]
-	path = yasnippets/ruby-mode
-	url = https://github.com/bmaland/yasnippet-ruby-mode

@@ -100,13 +100,13 @@
 (global-set-key (kbd "M-s O") 'multi-occur-in-open-buffers)
 
 ;; yasnippet
-(require 'yasnippet)
-(setq yas-snippet-dirs '("~/.emacs.d/yasnippets"))
-(yas-reload-all)
-(add-hook 'graphene-prog-mode-hook
-          '(lambda()
-             (add-to-list 'ac-sources 'ac-source-yasnippet)
-             (yas-minor-mode)))
+;; (require 'yasnippet)
+;; (setq yas-snippet-dirs '("~/.emacs.d/yasnippets"))
+;; (yas-reload-all)
+;; (add-hook 'graphene-prog-mode-hook
+;;           '(lambda()
+;;              (add-to-list 'ac-sources 'ac-source-yasnippet)
+;;              (yas-minor-mode)))
 
 ;; Flycheck
 (require 'flycheck)
@@ -143,6 +143,8 @@
 
 ;; auto markdown-mode
 (push '("\\.md\\'" . markdown-mode) auto-mode-alist)
+(push '("\\.markdown\\'" . markdown-mode) auto-mode-alist)
+(add-hook 'markdown-mode-hook (lambda () (auto-fill-mode t)))
 
 ;; auto stylus-mode
 (push '("\\.styl\\'" . jade-mode) auto-mode-alist)
