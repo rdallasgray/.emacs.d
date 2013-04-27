@@ -1,4 +1,3 @@
-
 (add-to-list 'load-path "~/.emacs.d/")
 (add-to-list 'load-path "~/.emacs.d/graphene/lib")
 (add-to-list 'load-path "~/.emacs.d/pallet/lib")
@@ -99,7 +98,7 @@
   (multi-occur-in-matching-buffers ".*" regexp))
 (global-set-key (kbd "M-s O") 'multi-occur-in-open-buffers)
 
-;; yasnippet
+;; ;; yasnippet
 ;; (require 'yasnippet)
 ;; (setq yas-snippet-dirs '("~/.emacs.d/yasnippets"))
 ;; (yas-reload-all)
