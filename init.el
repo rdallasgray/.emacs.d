@@ -157,6 +157,9 @@
 ;; Non-blinking cursor
 (blink-cursor-mode -1)
 
+;; Remove trailing whitespace
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
 ;; Don't use tabs for indent; replace tabs with two spaces.
 (setq-default tab-width 2)
 (setq-default indent-tabs-mode nil)
