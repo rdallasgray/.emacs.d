@@ -8,9 +8,18 @@
 
 (setq warning-minimum-level :error)
 
+(setq dropbox-directory "~/Dropbox")
+
+;; org
+(setq org-directory (format "%s/org" user-emacs-directory))
+(setq org-mobile-inbox-for-pull (format "%s/inbox.org" org-directory))
+(setq org-mobile-directory (format "%s/Apps/MobileOrg" dropbox-directory))
+(add-hook 'after-init-hook 'org-mobile-pull)
+(add-hook 'kill-emacs-hook 'org-mobile-push)
+
 ;; Shell completion if not on Windows
 (if (eq system-type 'windows-nt)
-    (progn 
+    (progn
       (require 'smart-tab)
       (add-hook 'shell-mode-hook (lambda () (smart-tab-mode t))))
   ;; AC for shell-mode
