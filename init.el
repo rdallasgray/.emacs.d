@@ -94,6 +94,9 @@
   (multi-occur-in-matching-buffers ".*" regexp))
 (global-set-key (kbd "M-s O") 'multi-occur-in-open-buffers)
 
+;; multiple-cursors
+(global-set-key (kbd "C-c m") 'mc/mark-all-like-this-dwim)
+
 ;; ;; yasnippet
 ;; (require 'yasnippet)
 ;; (setq yas-snippet-dirs '("~/.emacs.d/yasnippets"))
