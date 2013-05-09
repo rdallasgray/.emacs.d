@@ -4,7 +4,6 @@
 (add-to-list 'load-path "~/.emacs.d/readline-complete/")
 
 (require 'pallet)
-(require 'pos-tip)
 (require 'graphene)
 
 (setq warning-minimum-level :error)
