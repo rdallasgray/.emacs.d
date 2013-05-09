@@ -22,3 +22,5 @@ elpa
 /flycheck-*
 persp-confs/
 /eshell
+/org/*
+!/org/.gitkeep
