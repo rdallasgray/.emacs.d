@@ -15,6 +15,7 @@
 (setq org-directory (expand-file-name "org" user-emacs-directory))
 (setq org-mobile-inbox-for-pull (expand-file-name "inbox.org" org-directory))
 (setq org-mobile-directory (expand-file-name "Apps/MobileOrg" dropbox-directory))
+(setq org-default-notes-file "notes.org")
 (setq org-mobile-files '("notes.org"))
 (add-hook 'after-init-hook 'org-mobile-pull)
 (add-hook 'kill-emacs-hook 'org-mobile-push)
@@ -149,6 +150,9 @@
 ;; auto stylus-mode
 (push '("\\.styl\\'" . jade-mode) auto-mode-alist)
 
+;; auto json-mode
+(push '("\\.json\\'" . json-mode) auto-mode-alist)
+
 ;; don't compile sass/scss on saving
 (setq scss-compile-at-save nil)
 
@@ -164,6 +168,9 @@
 ;; Don't use tabs for indent; replace tabs with two spaces.
 (setq-default tab-width 2)
 (setq-default indent-tabs-mode nil)
+
+;; Leave my minibuffer alone
+(setq resize-mini-windows nil)
 
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
