@@ -16,7 +16,7 @@
 (setq org-mobile-inbox-for-pull (expand-file-name "inbox.org" org-directory))
 (setq org-mobile-directory (expand-file-name "Apps/MobileOrg" dropbox-directory))
 (setq org-default-notes-file (expand-file-name org-directory "notes.org"))
-(setq org-mobile-files '("notes.org"))
+(setq org-mobile-filxes '("notes.org"))
 (add-hook 'after-init-hook 'org-mobile-pull)
 (add-hook 'kill-emacs-hook 'org-mobile-push)
 
