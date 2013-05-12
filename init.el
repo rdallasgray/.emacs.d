@@ -11,16 +11,54 @@
 (setq dropbox-directory "~/Dropbox")
 
 ;; org
-(require 'org-mobile)
 (setq org-directory (expand-file-name "org" user-emacs-directory))
-(setq org-mobile-inbox-for-pull (expand-file-name "inbox.org" org-directory))
-(setq org-mobile-directory (expand-file-name "Apps/MobileOrg" dropbox-directory))
+(setq org-completion-use-ido t)
 (setq org-default-notes-file (expand-file-name "notes.org" org-directory))
 (global-set-key (kbd "C-c c") 'org-capture)
-(setq org-capture-templates nil)
-(push '("n" "Note" entry (file org-default-notes-file) "* %U %?")
-      org-capture-templates)
-(setq org-mobile-files '("notes.org"))
+(setq org-agenda-files
+      (mapcar (lambda (el) (expand-file-name el org-directory))
+              '("notes.org" "personal.org" "projects.org" "blog.org" "ideas.org")))
+
+;; org capture/refile
+(defun capture-find-or-create-headline (headline)
+  "Find or create HEADLINE in the current buffer"
+  (goto-char (point-min))
+  (if (re-search-forward
+       (format org-complex-heading-regexp-format headline) nil t)
+      (progn (end-of-line) (newline))
+    (goto-char (point-max))
+    (or (bolp) (newline))
+    (insert "* " headline)
+    (end-of-line) (newline)))
+
+(defun capture-headline-current-project-name ()
+  (capture-find-or-create-headline project-persist-current-project-name))
+
+(setq org-capture-templates
+      '(("n" "Note" entry
+         (file org-default-notes-file)
+         "** %U %?")
+        ("p" "Project Note" entry
+         (file+function (expand-file-name "projects.org" org-directory) capture-headline-current-project-name)
+         "* %U %f: %?")
+        ("d" "Personal Note" entry
+         (file (expand-file-name "personal.org" org-directory))
+         "* %U %?")
+        ("b" "Blog Note" entry
+         (file (expand-file-name "blog.org" org-directory))
+         "* %U %?")
+        ("i" "Idea" entry
+         (file (expand-file-name "ideas.org" org-directory))
+         "* %U %?")))
+
+(setq org-refile-use-outline-path 'file)
+(setq org-outline-path-complete-in-steps t)
+(setq org-refile-targets '((nil :maxlevel . 5) (org-agenda-files :maxlevel . 5)))
+
+;; org-mobile
+(require 'org-mobile)
+(setq org-mobile-inbox-for-pull (expand-file-name "inbox.org" org-directory))
+(setq org-mobile-directory (expand-file-name "Apps/MobileOrg" dropbox-directory))
 (add-hook 'after-init-hook 'org-mobile-pull)
 (add-hook 'kill-emacs-hook 'org-mobile-push)
 
