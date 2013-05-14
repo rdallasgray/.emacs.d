@@ -35,6 +35,7 @@
 (depends-on "smex")
 (depends-on "sr-speedbar")
 (depends-on "sws-mode")
+(depends-on "undo-tree")
 (depends-on "visible-mark")
 (depends-on "visual-regexp")
 (depends-on "wgrep")
