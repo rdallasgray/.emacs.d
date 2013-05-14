@@ -26,16 +26,18 @@
   (when (not (re-search-forward
        (format org-complex-heading-regexp-format headline) nil t))
       (insert "* " headline))
-  (insert "\n"))
-
+  (newline))
 
 (defun capture-headline-current-project-name ()
   (capture-find-or-create-headline project-persist-current-project-name))
 
 (setq org-capture-templates
-      `(("n" "Note" entry
+      '(("n" "Note" entry
          (file org-default-notes-file)
          "* %U %?")
+        ("p" "Project Note" plain
+         (file+function (expand-file-name "projects.org" org-directory) capture-headline-current-project-name)
+         "** %U %f: %?")
         ("d" "Personal Note" entry
          (file (expand-file-name "personal.org" org-directory))
          "* %U %?")
@@ -46,8 +48,8 @@
          (file (expand-file-name "ideas.org" org-directory))
          "* %U %?")))
 
-(setq org-capture-templates-contexts
-      '(("p" (in-mode . "project-persist-mode"))))
+;; (setq org-capture-templates-contexts
+;;       '(("p" ((in-mode . "project-persist-mode")))))
 
 (setq org-refile-allow-creating-parent-nodes t)
 (setq org-refile-use-outline-path 'file)
