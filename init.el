@@ -80,6 +80,15 @@
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
 
+;; Popwin
+(popwin-mode t)
+(setq popwin:popup-window-height 8)
+(setq popwin:special-display-config
+      (append popwin:special-display-config
+              '(("*Flycheck errors*" :noselect t)
+              (magit-mode :height 20))
+              popwin:special-display-config))
+
 ;; Add de facto prog-mode hooks
 (push 'sws-mode-hook graphene-prog-mode-hooks)
 
