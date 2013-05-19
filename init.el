@@ -81,12 +81,22 @@
 (setq uniquify-buffer-name-style 'forward)
 
 ;; Popwin
+(require 'popwin)
+
+;; Ignore the Speedbar window if it exists
+(defadvice popwin:window-config-tree (after popwin-ignore-speedbar activate)
+  (destructuring-bind (root mini) ad-return-value
+    (ignore-errors
+      (let ((first-window (cadr (nth 2 root))))
+        (when (string= (buffer-name (window-buffer first-window)) "*SPEEDBAR*")
+          (setq root (nth 3 root))
+          (setq ad-return-value `(,root ,mini)))))))
+
 (popwin-mode t)
-(setq popwin:popup-window-height 8)
 (setq popwin:special-display-config
       (append popwin:special-display-config
-              '(("*Flycheck errors*" :noselect t)
-              (magit-mode :height 20))
+              '(("*Flycheck errors*" :noselect t :height 8)
+               (magit-mode :height 20))
               popwin:special-display-config))
 
 ;; Add de facto prog-mode hooks
