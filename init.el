@@ -175,7 +175,6 @@
 (require 'flycheck)
 (add-hook 'graphene-prog-mode-hook 'flycheck-mode)
 (setq flycheck-highlighting-mode nil)
-(require 'flymake-cursor)
 
 ;; Mark word, sexp, line, ...
 (require 'expand-region)
