@@ -95,8 +95,8 @@
 (popwin-mode t)
 (setq popwin:special-display-config
       (append popwin:special-display-config
-              '(("*Flycheck errors*" :noselect t :height 8)
-               (magit-mode :height 20))
+              '(("Flycheck" :regexp t :noselect t :height 8)
+               ("magit" :regexp t :height 20))
               popwin:special-display-config))
 
 ;; Add de facto prog-mode hooks
@@ -132,19 +132,19 @@
 
 ;; Add eco/jeco to mweb-filename-extensions
 (setq mweb-filename-extensions
-      (append '("eco" "jeco")
+      (append '("eco" "jeco" "ejs")
               mweb-filename-extensions))
 
 ; AC everywhere
 (setq ac-disable-faces nil)
 
 ;; RSense
-;; (setq rsense-home "/usr/local/Cellar/rsense/0.3/libexec")
-;; (add-to-list 'load-path (concat rsense-home "/etc"))
-;; (require 'rsense)
+(setq rsense-home "/usr/local/Cellar/rsense/0.3/libexec")
+(add-to-list 'load-path (concat rsense-home "/etc"))
+(require 'rsense)
 
-;; (add-hook 'ruby-mode-hook
-;;           (lambda () (add-to-list 'ac-sources 'ac-source-rsense)))
+(add-hook 'ruby-mode-hook
+          (lambda () (add-to-list 'ac-sources 'ac-source-rsense)))
 
 ;; imenu
 (require 'idomenu)
@@ -202,6 +202,10 @@
 (global-set-key (kbd "M-<down>") 'forward-sexp)
 (global-set-key (kbd "M-p") 'backward-sexp)
 (global-set-key (kbd "M-<up>") 'backward-sexp)
+
+;; Ruby special files
+(dolist (regex '("\\.rake$" "\\.gemspec$" "\\.ru$" "Rakefile$" "Gemfile$" "Capfile$" "Guardfile$"))
+  (add-to-list 'auto-mode-alist `(,regex . ruby-mode)))
 
 ;; auto markdown-mode
 (push '("\\.md\\'" . markdown-mode) auto-mode-alist)
