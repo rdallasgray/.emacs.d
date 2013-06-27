@@ -80,24 +80,8 @@
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
 
-;; Popwin
-(require 'popwin)
-
-;; Ignore the Speedbar window if it exists
-(defadvice popwin:window-config-tree (after popwin-ignore-speedbar activate)
-  (destructuring-bind (root mini) ad-return-value
-    (ignore-errors
-      (let ((first-window (cadr (nth 2 root))))
-        (when (string= (buffer-name (window-buffer first-window)) "*SPEEDBAR*")
-          (setq root (nth 3 root))
-          (setq ad-return-value `(,root ,mini)))))))
-
-(popwin-mode t)
-(setq popwin:special-display-config
-      (append popwin:special-display-config
-              '(("Flycheck" :regexp t :noselect t :height 8)
-               ("magit" :regexp t :height 20))
-              popwin:special-display-config))
+;; Sane magit window creation
+(setq magit-status-buffer-switch-function 'switch-to-buffer)
 
 ;; Add de facto prog-mode hooks
 (push 'sws-mode-hook graphene-prog-mode-hooks)
@@ -140,7 +124,8 @@
 (setq ac-disable-faces nil)
 
 ;; RSense
-(setq rsense-home "/usr/local/Cellar/rsense/0.3/libexec")
+;; (setq rsense-home "/usr/local/Cellar/rsense/0.3/libexec")
+(setq rsense-home "/usr/lib/rsense-0.3")
 (add-to-list 'load-path (concat rsense-home "/etc"))
 (require 'rsense)
 
