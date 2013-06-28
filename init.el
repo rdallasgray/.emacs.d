@@ -109,7 +109,7 @@
             (exec-path-from-shell-copy-env "COFFEELINT_CONFIG")))
 
 ;; Get rid of CoffeeREPL garbage
-(if (not (eq system-type 'windows-nt))
+(when (not (eq system-type 'windows-nt))
     (add-to-list
      'comint-preoutput-filter-functions
      (lambda (output)
@@ -124,13 +124,16 @@
 (setq ac-disable-faces nil)
 
 ;; RSense
-;; (setq rsense-home "/usr/local/Cellar/rsense/0.3/libexec")
-(setq rsense-home "/usr/lib/rsense-0.3")
-(add-to-list 'load-path (concat rsense-home "/etc"))
-(require 'rsense)
+(let ((rsense-home-val
+       (cond ((eq system-type 'gnu/linux) "usr/lib/rsense-0.3")
+             ((eq system-type 'darwin) "/usr/local/Cellar/rsense/0.3/libexec"))))
+  (setq rsense-home rsense-home-val)
+  (add-to-list 'load-path (concat rsense-home "/etc")))
 
-(add-hook 'ruby-mode-hook
-          (lambda () (add-to-list 'ac-sources 'ac-source-rsense)))
+(when (not (null rsense-home))
+  (require 'rsense)
+  (add-hook 'ruby-mode-hook
+          (lambda () (add-to-list 'ac-sources 'ac-source-rsense))))
 
 ;; imenu
 (require 'idomenu)
@@ -143,19 +146,11 @@
   "Occur in all open buffers."
   (interactive (occur-read-primary-args))
   (multi-occur-in-matching-buffers ".*" regexp))
+
 (global-set-key (kbd "M-s O") 'multi-occur-in-open-buffers)
 
 ;; multiple-cursors
 (global-set-key (kbd "C-c m") 'mc/mark-all-like-this-dwim)
-
-;; ;; yasnippet
-;; (require 'yasnippet)
-;; (setq yas-snippet-dirs '("~/.emacs.d/yasnippets"))
-;; (yas-reload-all)
-;; (add-hook 'graphene-prog-mode-hook
-;;           '(lambda()
-;;              (add-to-list 'ac-sources 'ac-source-yasnippet)
-;;              (yas-minor-mode)))
 
 ;; Flycheck
 (require 'flycheck)
