@@ -90,6 +90,10 @@
 (fset 'insert-pound "#")
 (define-key global-map "\M-3" 'insert-pound)
 (setq ns-right-alternate-modifier nil)
+;; Mac-port specific key settings
+(setq mac-option-modifier 'meta)
+(setq mac-command-modifier 'hyper)
+
 
 ;; Sensible window movement
 (global-set-key (kbd "C-x <up>") 'windmove-up)
@@ -124,7 +128,7 @@
 (setq ac-disable-faces nil)
 
 ;; RSense
-;; (setq rsense-home "/usr/local/Cellar/rsense/0.3/libexec")
+(setq rsense-home "/usr/local/Cellar/rsense/0.3/libexec")
 (setq rsense-home "/usr/lib/rsense-0.3")
 (add-to-list 'load-path (concat rsense-home "/etc"))
 (require 'rsense)
