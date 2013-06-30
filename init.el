@@ -158,7 +158,13 @@
 ;; Flycheck
 (require 'flycheck)
 (add-hook 'graphene-prog-mode-hook 'flycheck-mode)
-(setq flycheck-highlighting-mode nil)
+(setq flycheck-highlighting-mode nil
+      flycheck-display-errors-function 'rdg/flycheck-display-errors-function)
+
+(defun rdg/flycheck-display-errors-function (errors)
+  (mapc (lambda (err)
+          (message "FlyC: %s" (flycheck-error-message err)) (sit-for 1))
+        errors))
 
 ;; Mark word, sexp, line, ...
 (require 'expand-region)
