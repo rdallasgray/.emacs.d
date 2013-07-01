@@ -33,6 +33,7 @@
 (depends-on "restclient")
 (depends-on "robe")
 (depends-on "rsense")
+(depends-on "rubocop")
 (depends-on "s")
 (depends-on "scss-mode")
 (depends-on "smart-forward")
