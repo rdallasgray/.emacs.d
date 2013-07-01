@@ -90,6 +90,9 @@
 (fset 'insert-pound "#")
 (define-key global-map "\M-3" 'insert-pound)
 (setq ns-right-alternate-modifier nil)
+;; Mac-port specific key settings
+(setq mac-option-modifier 'meta)
+(setq mac-command-modifier 'hyper)
 
 ;; Sensible window movement
 (global-set-key (kbd "C-x <up>") 'windmove-up)
@@ -130,7 +133,7 @@
   (setq rsense-home rsense-home-val)
   (add-to-list 'load-path (concat rsense-home "/etc")))
 
-(when (not (null rsense-home))
+(when rsense-home
   (require 'rsense)
   (add-hook 'ruby-mode-hook
           (lambda () (add-to-list 'ac-sources 'ac-source-rsense))))
@@ -155,7 +158,13 @@
 ;; Flycheck
 (require 'flycheck)
 (add-hook 'graphene-prog-mode-hook 'flycheck-mode)
-(setq flycheck-highlighting-mode nil)
+(setq flycheck-highlighting-mode nil
+      flycheck-display-errors-function 'rdg/flycheck-display-errors-function)
+
+(defun rdg/flycheck-display-errors-function (errors)
+  (mapc (lambda (err)
+          (message "FlyC: %s" (flycheck-error-message err)) (sit-for 1))
+        errors))
 
 ;; Mark word, sexp, line, ...
 (require 'expand-region)
