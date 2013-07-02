@@ -196,9 +196,9 @@
   (add-to-list 'auto-mode-alist `(,regex . ruby-mode)))
 
 ;; auto markdown-mode
-(push '("\\.md\\'" . markdown-mode) auto-mode-alist)
-(push '("\\.markdown\\'" . markdown-mode) auto-mode-alist)
-(add-hook 'markdown-mode-hook (lambda () (auto-fill-mode t)))
+(push '("\\.md\\'" . gfm-mode) auto-mode-alist)
+(push '("\\.markdown\\'" . gfm-mode) auto-mode-alist)
+(add-hook 'gfm-mode-hook (lambda () (auto-fill-mode t)))
 
 ;; auto stylus-mode
 (push '("\\.styl\\'" . jade-mode) auto-mode-alist)
