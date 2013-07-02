@@ -76,6 +76,23 @@
   (add-to-list 'ac-modes 'shell-mode)
   (add-hook 'shell-mode-hook 'ac-rlc-setup-sources))
 
+;; Easily open/switch to a shell
+(defvar shell-window nil)
+
+(defun create-or-visit-shell ()
+  "Create a new shell, remember its window, and switch
+to that window if a shell already exists"
+  (interactive)
+  (unless (and shell-window (window-live-p shell-window))
+    (let ((new-shell-window (split-window-below -20)))
+      (select-window new-shell-window)
+      (shell)
+      (setq shell-window new-shell-window)))
+    (select-window shell-window)
+    (switch-to-buffer "*shell*"))
+
+(global-set-key (kbd "C-c `") 'create-or-visit-shell)
+
 ;; Uniquify buffers
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
