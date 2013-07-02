@@ -93,6 +93,10 @@ to that window if a shell already exists"
 
 (global-set-key (kbd "C-c `") 'create-or-visit-shell)
 
+;; No pop-ups
+(setq pop-up-frames nil
+      pop-up-windows nil)
+
 ;; Uniquify buffers
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
