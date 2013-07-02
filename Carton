@@ -25,7 +25,6 @@
 (depends-on "multi-web-mode")
 (depends-on "nginx-mode")
 (depends-on "pallet")
-(depends-on "paredit")
 (depends-on "popup")
 (depends-on "popwin")
 (depends-on "project-persist")
