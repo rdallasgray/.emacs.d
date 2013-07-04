@@ -149,7 +149,7 @@ to that window if a shell already exists"
 
 ;; RSense
 (let ((rsense-home-val
-       (cond ((eq system-type 'gnu/linux) "usr/lib/rsense-0.3")
+       (cond ((eq system-type 'gnu/linux) "/usr/lib/rsense-0.3")
              ((eq system-type 'darwin) "/usr/local/Cellar/rsense/0.3/libexec"))))
   (setq rsense-home rsense-home-val)
   (add-to-list 'load-path (concat rsense-home "/etc")))
