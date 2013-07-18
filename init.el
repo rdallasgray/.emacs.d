@@ -104,13 +104,6 @@
 (global-set-key (kbd "C-S-v") 'scroll-up-line)
 (global-set-key (kbd "M-V") 'scroll-down-line)
 
-;; CoffeeScript 4-space tabs (for Huzu)
-(setq coffee-tab-width 4)
-(add-hook 'coffee-mode-hook
-          (lambda ()
-            (setq default-tab-width 4)
-            (exec-path-from-shell-copy-env "COFFEELINT_CONFIG")))
-
 ;; Get rid of CoffeeREPL garbage
 (when (not (eq system-type 'windows-nt))
     (add-to-list
