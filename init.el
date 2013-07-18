@@ -76,6 +76,27 @@
   (add-to-list 'ac-modes 'shell-mode)
   (add-hook 'shell-mode-hook 'ac-rlc-setup-sources))
 
+;; Easily open/switch to a shell
+(defvar shell-window nil)
+
+(defun create-or-visit-shell ()
+  "Create a new shell, remember its window, and switch
+to that window if a shell already exists"
+  (interactive)
+  (unless (and shell-window (window-live-p shell-window))
+    (let ((new-shell-window (split-window-below -20)))
+      (select-window new-shell-window)
+      (shell)
+      (setq shell-window new-shell-window)))
+    (select-window shell-window)
+    (switch-to-buffer "*shell*"))
+
+(global-set-key (kbd "C-c `") 'create-or-visit-shell)
+
+;; No pop-ups
+(setq pop-up-frames nil
+      pop-up-windows nil)
+
 ;; Uniquify buffers
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
@@ -121,7 +142,7 @@
 
 ;; RSense
 (let ((rsense-home-val
-       (cond ((eq system-type 'gnu/linux) "usr/lib/rsense-0.3")
+       (cond ((eq system-type 'gnu/linux) "/usr/lib/rsense-0.3")
              ((eq system-type 'darwin) "/usr/local/Cellar/rsense/0.3/libexec"))))
   (setq rsense-home rsense-home-val)
   (add-to-list 'load-path (concat rsense-home "/etc")))
@@ -189,9 +210,9 @@
   (add-to-list 'auto-mode-alist `(,regex . ruby-mode)))
 
 ;; auto markdown-mode
-(push '("\\.md\\'" . markdown-mode) auto-mode-alist)
-(push '("\\.markdown\\'" . markdown-mode) auto-mode-alist)
-(add-hook 'markdown-mode-hook (lambda () (auto-fill-mode t)))
+(push '("\\.md\\'" . gfm-mode) auto-mode-alist)
+(push '("\\.markdown\\'" . gfm-mode) auto-mode-alist)
+(add-hook 'gfm-mode-hook (lambda () (auto-fill-mode t)))
 
 ;; auto stylus-mode
 (push '("\\.styl\\'" . jade-mode) auto-mode-alist)
