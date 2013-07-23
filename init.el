@@ -10,6 +10,15 @@
 
 (setq dropbox-directory "~/Dropbox")
 
+;; Windows
+(when (eq system-type 'windows-nt)
+  (setq magit-git-executable "C:\\Program Files (x86)\\Git\\bin\\git.exe"
+        explicit-shell-file-name "C:\\Program Files (x86)\\Git\\bin\\sh.exe"
+        shell-file-name explicit-shell-file-name)
+  (add-to-list 'exec-path "C:\\Program Files (x86)\\Git\\bin")
+  (setenv "SHELL" shell-file-name)
+  (add-hook 'comint-output-filter-functions 'comint-strip-ctrl-m))
+
 ;; org -- ignore if org dir doesn't exist
 (let ((maybe-org-directory (expand-file-name "org" user-emacs-directory)))
   (when (file-exists-p maybe-org-directory)
@@ -63,18 +72,12 @@
       (add-hook 'after-init-hook 'org-mobile-pull)
       (add-hook 'kill-emacs-hook 'org-mobile-push))))
 
-;; Shell completion if not on Windows
-(if (eq system-type 'windows-nt)
-    (progn
-      (require 'smart-tab)
-      (add-hook 'shell-mode-hook (lambda () (smart-tab-mode t))))
-  ;; AC for shell-mode
-  (setq explicit-shell-file-name "bash")
-  (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
-  (setq comint-process-echoes t)
-  (require 'readline-complete)
-  (add-to-list 'ac-modes 'shell-mode)
-  (add-hook 'shell-mode-hook 'ac-rlc-setup-sources))
+;; AC for shell-mode
+(setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
+      comint-process-echoes t)
+(require 'readline-complete)
+(add-to-list 'ac-modes 'shell-mode)
+(add-hook 'shell-mode-hook 'ac-rlc-setup-sources)
 
 ;; Easily open/switch to a shell
 (defvar shell-window nil)
@@ -125,12 +128,18 @@ to that window if a shell already exists"
 (global-set-key (kbd "C-S-v") 'scroll-up-line)
 (global-set-key (kbd "M-V") 'scroll-down-line)
 
+;; 4-space tabs for CoffeeScript
+(setq coffee-tab-width 4)
+(add-hook 'coffee-mode-hook
+          (lambda ()
+            (setq default-tab-width 4)
+            (exec-path-from-shell-copy-env "COFFEELINT_CONFIG")))
+
 ;; Get rid of CoffeeREPL garbage
-(when (not (eq system-type 'windows-nt))
-    (add-to-list
-     'comint-preoutput-filter-functions
-     (lambda (output)
-       (replace-regexp-in-string "\\[[0-9]+[GKJ]" "" output))))
+(add-to-list
+ 'comint-preoutput-filter-functions
+ (lambda (output)
+   (replace-regexp-in-string "\\[[0-9]+[GKJ]" "" output)))
 
 ;; Add eco/jeco to mweb-filename-extensions
 (setq mweb-filename-extensions
