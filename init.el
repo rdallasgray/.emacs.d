@@ -10,14 +10,45 @@
 
 (setq dropbox-directory "~/Dropbox")
 
-;; Windows
-(when (eq system-type 'windows-nt)
-  (setq magit-git-executable "C:\\Program Files (x86)\\Git\\bin\\git.exe"
-        explicit-shell-file-name "C:\\Program Files (x86)\\Git\\bin\\sh.exe"
-        shell-file-name explicit-shell-file-name)
-  (add-to-list 'exec-path "C:\\Program Files (x86)\\Git\\bin")
-  (setenv "SHELL" shell-file-name)
-  (add-hook 'comint-output-filter-functions 'comint-strip-ctrl-m))
+;; Shell
+(if (eq system-type 'windows-nt)
+    (progn
+      (setq magit-git-executable "C:\\Program Files (x86)\\Git\\bin\\git.exe"
+            explicit-shell-file-name "C:\\Program Files (x86)\\Git\\bin\\sh.exe"
+            rdg/shell-args-name "explicit-sh.exe-args")
+      (add-to-list 'exec-path "C:\\Program Files (x86)\\Git\\bin")
+      (add-hook 'comint-output-filter-functions 'comint-strip-ctrl-m))
+  (setq explicit-shell-file-name "bash"
+        rdg/shell-args-name "explicit-bash-args"))
+
+(defvar rdg/shell-args (intern rdg/shell-args-name))
+
+(setq shell-file-name explicit-shell-file-name)
+(setenv "SHELL" shell-file-name)
+
+;; AC for shell-mode
+(set rdg/shell-args '("-c" "export EMACS=; stty echo; bash"))
+(setq comint-process-echoes t)
+(require 'readline-complete)
+(add-to-list 'ac-modes 'shell-mode)
+(add-hook 'shell-mode-hook 'ac-rlc-setup-sources)
+
+;; Easily open/switch to a shell
+(defvar shell-window nil)
+
+(defun create-or-visit-shell ()
+  "Create a new shell, remember its window, and switch
+to that window if a shell already exists"
+  (interactive)
+  (unless (and shell-window (window-live-p shell-window))
+    (let ((new-shell-window (split-window-below -20)))
+      (select-window new-shell-window)
+      (shell)
+      (setq shell-window new-shell-window)))
+    (select-window shell-window)
+    (switch-to-buffer "*shell*"))
+
+(global-set-key (kbd "C-c `") 'create-or-visit-shell)
 
 ;; org -- ignore if org dir doesn't exist
 (let ((maybe-org-directory (expand-file-name "org" user-emacs-directory)))
@@ -72,29 +103,6 @@
       (add-hook 'after-init-hook 'org-mobile-pull)
       (add-hook 'kill-emacs-hook 'org-mobile-push))))
 
-;; AC for shell-mode
-(setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
-      comint-process-echoes t)
-(require 'readline-complete)
-(add-to-list 'ac-modes 'shell-mode)
-(add-hook 'shell-mode-hook 'ac-rlc-setup-sources)
-
-;; Easily open/switch to a shell
-(defvar shell-window nil)
-
-(defun create-or-visit-shell ()
-  "Create a new shell, remember its window, and switch
-to that window if a shell already exists"
-  (interactive)
-  (unless (and shell-window (window-live-p shell-window))
-    (let ((new-shell-window (split-window-below -20)))
-      (select-window new-shell-window)
-      (shell)
-      (setq shell-window new-shell-window)))
-    (select-window shell-window)
-    (switch-to-buffer "*shell*"))
-
-(global-set-key (kbd "C-c `") 'create-or-visit-shell)
 
 ;; No pop-ups
 (setq pop-up-frames nil
