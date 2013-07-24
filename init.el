@@ -13,25 +13,25 @@
 ;; Shell
 (if (eq system-type 'windows-nt)
     (progn
-      (setq magit-git-executable "C:\\Program Files (x86)\\Git\\bin\\git.exe"
-            explicit-shell-file-name "C:\\Program Files (x86)\\Git\\bin\\sh.exe"
-            rdg/shell-args-name "explicit-sh.exe-args")
-      (add-to-list 'exec-path "C:\\Program Files (x86)\\Git\\bin")
-      (add-hook 'comint-output-filter-functions 'comint-strip-ctrl-m))
-  (setq explicit-shell-file-name "bash"
-        rdg/shell-args-name "explicit-bash-args"))
+      ;; (add-to-list 'exec-path "C:\\Program Files (x86)\\Git\\bin")
+      (add-to-list 'exec-path "C:\\MinGW\\msys\\1.0\\bin")
+      (add-hook 'comint-output-filter-functions 'comint-strip-ctrl-m)
+      (setq magit-git-executable "C:\\Program Files (x86)\\Git\\bin\\git.exe")))
 
-(defvar rdg/shell-args (intern rdg/shell-args-name))
-
+(setq explicit-shell-file-name "bash")
 (setq shell-file-name explicit-shell-file-name)
 (setenv "SHELL" shell-file-name)
 
 ;; AC for shell-mode
-(set rdg/shell-args '("-c" "export EMACS=; stty echo; bash"))
-(setq comint-process-echoes t)
-(require 'readline-complete)
-(add-to-list 'ac-modes 'shell-mode)
-(add-hook 'shell-mode-hook 'ac-rlc-setup-sources)
+(if (eq system-type 'windows-nt)
+    (progn
+      (require 'smart-tab)
+      (add-hook 'shell-mode-hook (lambda () (smart-tab-mode t))))
+  (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
+  (setq comint-process-echoes t)
+  (require 'readline-complete)
+  (add-to-list 'ac-modes 'shell-mode)
+  (add-hook 'shell-mode-hook 'ac-rlc-setup-sources))
 
 ;; Easily open/switch to a shell
 (defvar shell-window nil)
