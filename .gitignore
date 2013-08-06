@@ -25,3 +25,4 @@ persp-confs/
 /org/*
 !/org/.gitkeep
 bookmarks
+.cask

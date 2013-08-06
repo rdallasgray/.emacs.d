@@ -3,6 +3,9 @@
 (add-to-list 'load-path "~/.emacs.d/pallet/lib")
 (add-to-list 'load-path "~/.emacs.d/readline-complete/")
 
+(require 'cask "~/.cask/cask.el")
+(cask-initialize)
+
 (require 'pallet)
 (require 'graphene)
 
@@ -13,7 +16,6 @@
 ;; Shell
 (if (eq system-type 'windows-nt)
     (progn
-      ;; (add-to-list 'exec-path "C:\\Program Files (x86)\\Git\\bin")
       (add-to-list 'exec-path "C:\\MinGW\\msys\\1.0\\bin")
       (add-hook 'comint-output-filter-functions 'comint-strip-ctrl-m)
       (setq magit-git-executable "C:\\Program Files (x86)\\Git\\bin\\git.exe")))
