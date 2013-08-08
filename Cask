@@ -4,6 +4,7 @@
 
 (depends-on "ack-and-a-half")
 (depends-on "auto-complete")
+(depends-on "cask")
 (depends-on "coffee-mode")
 (depends-on "color-theme")
 (depends-on "color-theme-solarized")
