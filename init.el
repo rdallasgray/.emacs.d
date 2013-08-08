@@ -13,23 +13,12 @@
 
 (setq dropbox-directory "~/Dropbox")
 
-;; Shell
-(if (eq system-type 'windows-nt)
-    (progn
-      (add-to-list 'exec-path "C:\\MinGW\\msys\\1.0\\bin")
-      (add-hook 'comint-output-filter-functions 'comint-strip-ctrl-m)
-      (setq magit-git-executable "C:\\Program Files (x86)\\Git\\bin\\git.exe")))
-
-(setq explicit-shell-file-name "bash")
-(setq shell-file-name explicit-shell-file-name)
-(setenv "SHELL" shell-file-name)
-
 ;; AC for shell-mode
 (if (eq system-type 'windows-nt)
-    (progn
-      (require 'smart-tab)
-      (add-hook 'shell-mode-hook (lambda () (smart-tab-mode t)))
-      (add-to-list 'ac-modes 'eshell-mode))
+    (add-to-list 'ac-modes 'eshell-mode)
+  (setq explicit-shell-file-name "bash")
+  (setq shell-file-name explicit-shell-file-name)
+  (setenv "SHELL" shell-file-name)
   (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
   (setq comint-process-echoes t)
   (require 'readline-complete)
