@@ -28,7 +28,8 @@
 (if (eq system-type 'windows-nt)
     (progn
       (require 'smart-tab)
-      (add-hook 'shell-mode-hook (lambda () (smart-tab-mode t))))
+      (add-hook 'shell-mode-hook (lambda () (smart-tab-mode t)))
+      (add-to-list 'ac-modes 'eshell-mode))
   (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
   (setq comint-process-echoes t)
   (require 'readline-complete)
