@@ -13,19 +13,17 @@
 
 (setq dropbox-directory "~/Dropbox")
 
-;; AC for shell-mode
-(if (eq system-type 'windows-nt)
-    (add-to-list 'ac-modes 'eshell-mode)
-  (setq explicit-shell-file-name "bash")
-  (setq shell-file-name explicit-shell-file-name)
-  (setenv "SHELL" shell-file-name)
+;; (e)shell-mode
+(add-to-list 'ac-modes 'eshell-mode)
+(add-to-list 'ac-modes 'shell-mode)
+(setq explicit-shell-file-name "bash")
+(setq shell-file-name explicit-shell-file-name)
+(setenv "SHELL" shell-file-name)
+(unless (eq system-type 'windows-nt)
   (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
   (setq comint-process-echoes t)
   (require 'readline-complete)
   (add-hook 'shell-mode-hook 'ac-rlc-setup-sources))
-
-(add-to-list 'ac-modes 'shell-mode)
-(add-to-list 'ac-modes 'eshell-mode)
 
 ;; Easily open/switch to a shell
 (defvar shell-window nil)
