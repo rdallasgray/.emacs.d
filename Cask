@@ -11,6 +11,7 @@
 (depends-on "dash")
 (depends-on "exec-path-from-shell")
 (depends-on "expand-region")
+(depends-on "feature-mode")
 (depends-on "flycheck")
 (depends-on "fringe-helper")
 (depends-on "git-gutter+")

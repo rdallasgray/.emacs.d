@@ -239,6 +239,9 @@ to that window if a shell already exists"
 ;; auto json-mode
 (push '("\\.json\\'" . json-mode) auto-mode-alist)
 
+;; auto feature-mode
+(push '("\\.feature\\'" . feature-mode) auto-mode-alist)
+
 ;; don't compile sass/scss on saving
 (setq scss-compile-at-save nil)
 
