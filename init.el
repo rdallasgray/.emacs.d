@@ -13,7 +13,6 @@
 
 (setq dropbox-directory "~/Dropbox")
 
-<<<<<<< HEAD
 ;; AC for shell-mode
 (if (eq system-type 'windows-nt)
     (add-to-list 'ac-modes 'eshell-mode)
