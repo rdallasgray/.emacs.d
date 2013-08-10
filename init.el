@@ -19,6 +19,8 @@
 (setq explicit-shell-file-name "bash")
 (setq shell-file-name explicit-shell-file-name)
 (setenv "SHELL" shell-file-name)
+
+;; Set up readline-complete if not on Windows
 (unless (eq system-type 'windows-nt)
   (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
   (setq comint-process-echoes t)
