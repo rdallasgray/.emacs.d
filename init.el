@@ -13,27 +13,17 @@
 
 (setq dropbox-directory "~/Dropbox")
 
-;; Shell
-(if (eq system-type 'windows-nt)
-    (progn
-      (add-to-list 'exec-path "C:\\MinGW\\msys\\1.0\\bin")
-      (add-hook 'comint-output-filter-functions 'comint-strip-ctrl-m)))
-
 ;; AC for shell-mode
-(if (eq system-type 'windows-nt)
-    (progn
-      (require 'smart-tab)
-      (add-hook 'shell-mode-hook (lambda () (smart-tab-mode t))))
-  (setq explicit-shell-file-name "bash")
-  (setq shell-file-name explicit-shell-file-name)
-  (setenv "SHELL" shell-file-name)
+(add-to-list 'ac-modes 'shell-mode)
+(add-to-list 'ac-modes 'eshell-mode)
+(setq explicit-shell-file-name "bash")
+(setq shell-file-name explicit-shell-file-name)
+(setenv "SHELL" shell-file-name)
+(unless (eq system-type 'windows-nt)
   (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
   (setq comint-process-echoes t)
   (require 'readline-complete)
-  (add-to-list 'ac-modes 'shell-mode)
   (add-hook 'shell-mode-hook 'ac-rlc-setup-sources))
-
-(add-to-list 'ac-modes 'eshell-mode)
 
 ;; Easily open/switch to a shell
 (defvar shell-window nil)
