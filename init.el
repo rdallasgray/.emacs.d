@@ -2,12 +2,14 @@
 (add-to-list 'load-path "~/.emacs.d/graphene/lib")
 (add-to-list 'load-path "~/.emacs.d/pallet/lib")
 (add-to-list 'load-path "~/.emacs.d/readline-complete/")
+(add-to-list 'load-path "~/.emacs.d/emacs-pry/")
 
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
 
 (require 'pallet)
 (require 'graphene)
+(require 'pry)
 
 (setq warning-minimum-level :error)
 
@@ -151,11 +153,11 @@ to that window if a shell already exists"
                 (with-current-buffer buffer
                   (let ((buffer-file-name "tmp.js")) (set-auto-mode)))))))
 
-;; Get rid of CoffeeREPL garbage
-(add-to-list
- 'comint-preoutput-filter-functions
- (lambda (output)
-   (replace-regexp-in-string "\\[[0-9]+[GKJ]" "" output)))
+;; ;; Get rid of CoffeeREPL garbage
+;; (add-to-list
+;;  'comint-preoutput-filter-functions
+;;  (lambda (output)
+;;    (replace-regexp-in-string "\\[[0-9]+[GKJ]" "" output)))
 
 ;; Add eco/jeco to mweb-filename-extensions
 (setq mweb-filename-extensions
@@ -165,12 +167,21 @@ to that window if a shell already exists"
 ; AC everywhere
 (setq ac-disable-faces nil)
 
+;; Ruby
+(add-hook 'ruby-mode-hook
+          (lambda ()
+            (robe-mode)
+            (robe-start)
+            (ruby-tools-mode)))
+(add-hook 'robe-mode-hook (lambda () (add-to-list 'ac-sources 'ac-source-robe)))
+
 ;; RSense
 (let ((rsense-home-val
        (cond ((eq system-type 'gnu/linux) "/usr/lib/rsense-0.3")
              ((eq system-type 'darwin) "/usr/local/Cellar/rsense/0.3/libexec"))))
-  (setq rsense-home rsense-home-val)
-  (add-to-list 'load-path (concat rsense-home "/etc")))
+  (when (file-exists-p rsense-home-val)
+    (setq rsense-home rsense-home-val)
+    (add-to-list 'load-path (concat rsense-home "/etc"))))
 
 (when rsense-home
   (require 'rsense)
@@ -178,10 +189,9 @@ to that window if a shell already exists"
           (lambda () (add-to-list 'ac-sources 'ac-source-rsense))))
 
 ;; imenu
-(require 'idomenu)
 (require 'imenu-anywhere)
-(global-set-key (kbd "C-c t") 'idomenu)
-(global-set-key (kbd "C-c T") 'imenu-anywhere)
+(setq imenu-auto-rescan t)
+(global-set-key (kbd "C-c .") 'imenu-anywhere)
 
 ;; multi-occur
 (defun multi-occur-in-open-buffers (regexp &optional allbufs)
@@ -231,7 +241,8 @@ to that window if a shell already exists"
       visible-mark-inhibit-trailing-overlay nil)
 
 ;; Ruby special files
-(dolist (regex '("\\.rake$" "\\.gemspec$" "\\.ru$" "Rakefile$" "Gemfile$" "Capfile$" "Guardfile$"))
+(dolist (regex
+         '("\\.rake$" "\\.gemspec$" "\\.ru$" "Rakefile$" "Gemfile$" "Capfile$" "Guardfile$"))
   (add-to-list 'auto-mode-alist `(,regex . ruby-mode)))
 
 ;; auto markdown-mode
@@ -254,6 +265,10 @@ to that window if a shell already exists"
 ;; 2-space indent for CSS
 (setq css-indent-offset 2)
 
+;; 4-space indent for html
+(add-hook 'html-mode-hook
+          (lambda () (set (make-local-variable 'sgml-basic-offset) 4)))
+
 ;; Non-blinking cursor
 (blink-cursor-mode -1)
 
@@ -264,11 +279,9 @@ to that window if a shell already exists"
 (setq-default tab-width 2)
 (setq-default indent-tabs-mode nil)
 
-;; Leave my minibuffer alone
-(setq resize-mini-windows nil)
-
 (setq custom-file "~/.emacs.d/custom.el")
-(load custom-file)
+(when (file-exists-p custom-file)
+  (load custom-file))
 
 (if window-system
     (load-theme 'solarized-light))
