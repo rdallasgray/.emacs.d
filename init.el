@@ -231,9 +231,9 @@ to that window if a shell already exists"
 ;; easier sexp navigation
 (defun beginning-of-next-defun ()
   (interactive)
-  (end-of-sexp)
-  (end-of-sexp)
-  (beginning-of-sexp))
+  (end-of-defun)
+  (end-of-defun)
+  (beginning-of-defun))
 (global-set-key (kbd "M-<down>") 'beginning-of-next-defun)
 (global-set-key (kbd "M-<up>") 'beginning-of-defun)
 
