@@ -1,3 +1,5 @@
+(server-start)
+
 (add-to-list 'load-path "~/.emacs.d/")
 (add-to-list 'load-path "~/.emacs.d/graphene/lib")
 (add-to-list 'load-path "~/.emacs.d/pallet/lib")
@@ -10,6 +12,9 @@
 (require 'pallet)
 (require 'graphene)
 (require 'pry)
+
+(require 'tramp)
+(setq tramp-verbose 10)
 
 (setq warning-minimum-level :error)
 
@@ -171,7 +176,7 @@ to that window if a shell already exists"
 (add-hook 'ruby-mode-hook
           (lambda ()
             (robe-mode)
-            (robe-start)
+;;            (robe-start)
             (ruby-tools-mode)))
 (add-hook 'robe-mode-hook (lambda () (add-to-list 'ac-sources 'ac-source-robe)))
 
@@ -223,8 +228,13 @@ to that window if a shell already exists"
                 'er/contract-region)
 
 ;; easier sexp navigation
-(global-set-key (kbd "M-<down>") 'forward-sexp)
-(global-set-key (kbd "M-<up>") 'backward-sexp)
+(defun beginning-of-next-defun ()
+  (interactive)
+  (end-of-sexp)
+  (end-of-sexp)
+  (beginning-of-sexp))
+(global-set-key (kbd "M-<down>") 'beginning-of-next-defun)
+(global-set-key (kbd "M-<up>") 'beginning-of-defun)
 
 ;; No visible region on C-x C-x
 (defun exchange-point-and-mark-no-region ()
