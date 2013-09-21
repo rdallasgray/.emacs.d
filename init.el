@@ -142,21 +142,7 @@ to that window if a shell already exists"
 (add-hook 'coffee-mode-hook
           (lambda ()
             (setq default-tab-width 4)
-            (exec-path-from-shell-copy-env "COFFEELINT_CONFIG")
-            (defun coffee-compile-region (start end)
-              (interactive "r")
-              (let ((buffer (get-buffer coffee-compiled-buffer-name)))
-                (when buffer
-                  (with-current-buffer buffer
-                    (erase-buffer))))
-              (let ((command (format "%s %s -s -p" coffee-command
-                                     (mapconcat 'identity coffee-args-compile " "))))
-                (shell-command-on-region start end command
-                                         (get-buffer-create coffee-compiled-buffer-name)))
-              (let ((buffer (get-buffer coffee-compiled-buffer-name)))
-                (display-buffer buffer)
-                (with-current-buffer buffer
-                  (let ((buffer-file-name "tmp.js")) (set-auto-mode)))))))
+            (exec-path-from-shell-copy-env "COFFEELINT_CONFIG")))
 
 ;; ;; Get rid of CoffeeREPL garbage
 ;; (add-to-list
@@ -245,11 +231,6 @@ to that window if a shell already exists"
   (deactivate-mark nil))
 
 (define-key global-map [remap exchange-point-and-mark] 'exchange-point-and-mark-no-region)
-
-;; visible-mark-mode
-(require 'visible-mark)
-(setq visible-mark-max 16
-      visible-mark-inhibit-trailing-overlay nil)
 
 ;; Ruby special files
 (dolist (regex
