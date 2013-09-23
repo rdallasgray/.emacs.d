@@ -35,21 +35,7 @@
   (add-hook 'shell-mode-hook 'ac-rlc-setup-sources))
 
 ;; Easily open/switch to a shell
-(defvar shell-window nil)
-
-(defun create-or-visit-shell ()
-  "Create a new shell, remember its window, and switch
-to that window if a shell already exists"
-  (interactive)
-  (unless (and shell-window (window-live-p shell-window))
-    (let ((new-shell-window (split-window-below -20)))
-      (select-window new-shell-window)
-      (shell)
-      (setq shell-window new-shell-window)))
-    (select-window shell-window)
-    (switch-to-buffer "*shell*"))
-
-(global-set-key (kbd "C-c `") 'create-or-visit-shell)
+(global-set-key (kbd "C-c `") 'shell-pop)
 
 ;; org -- ignore if org dir doesn't exist
 (let ((maybe-org-directory (expand-file-name "org" user-emacs-directory)))
@@ -136,19 +122,6 @@ to that window if a shell already exists"
 ;; Scroll up and down a line at a time
 (global-set-key (kbd "C-S-v") 'scroll-up-line)
 (global-set-key (kbd "M-V") 'scroll-down-line)
-
-;; 4-space tabs for CoffeeScript
-(setq coffee-tab-width 4)
-(add-hook 'coffee-mode-hook
-          (lambda ()
-            (setq default-tab-width 4)
-            (exec-path-from-shell-copy-env "COFFEELINT_CONFIG")))
-
-;; ;; Get rid of CoffeeREPL garbage
-;; (add-to-list
-;;  'comint-preoutput-filter-functions
-;;  (lambda (output)
-;;    (replace-regexp-in-string "\\[[0-9]+[GKJ]" "" output)))
 
 ;; Add eco/jeco to mweb-filename-extensions
 (setq mweb-filename-extensions
