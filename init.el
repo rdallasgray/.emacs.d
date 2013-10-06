@@ -133,6 +133,7 @@
 (setq ac-disable-faces nil)
 
 ;; Ruby
+(exec-path-from-shell-copy-env "GEM_HOME")
 (add-hook 'ruby-mode-hook
           (lambda ()
             (robe-mode)
