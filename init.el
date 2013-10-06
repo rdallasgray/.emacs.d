@@ -1,4 +1,5 @@
-(server-start)
+(require 'server)
+(unless (server-running-p) (server-start))
 
 (add-to-list 'load-path "~/.emacs.d/")
 (add-to-list 'load-path "~/.emacs.d/graphene/lib")
