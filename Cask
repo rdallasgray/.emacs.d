@@ -27,6 +27,7 @@
 (depends-on "markdown-mode")
 (depends-on "multi-web-mode")
 (depends-on "nginx-mode")
+(depends-on "octomacs")
 (depends-on "php-mode")
 (depends-on "popup")
 (depends-on "popup-kill-ring")
