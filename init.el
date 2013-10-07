@@ -87,13 +87,14 @@
     (setq org-outline-path-complete-in-steps t)
     (setq org-refile-targets '((nil :maxlevel . 5) (org-agenda-files :maxlevel . 5)))
 
-    ;; org-mobile -- ignore if no dropbox directory
-    (when (file-exists-p dropbox-directory)
-      (require 'org-mobile)
-      (setq org-mobile-inbox-for-pull (expand-file-name "inbox.org" org-directory))
-      (setq org-mobile-directory (expand-file-name "Apps/MobileOrg" dropbox-directory))
-      (add-hook 'after-init-hook 'org-mobile-pull)
-      (add-hook 'kill-emacs-hook 'org-mobile-push))))
+    ;; org-mobile -- ignore if no dropbox/org-mobile directory
+    (let ((maybe-org-mobile-directory (expand-file-name "Apps/MobileOrg" dropbox-directory)))
+      (when (file-exists-p maybe-org-mobile-directory)
+        (require 'org-mobile)
+        (setq org-mobile-inbox-for-pull (expand-file-name "inbox.org" org-directory))
+        (setq org-mobile-directory (expand-file-name "Apps/MobileOrg" dropbox-directory))
+        (add-hook 'after-init-hook 'org-mobile-pull)
+        (add-hook 'kill-emacs-hook 'org-mobile-push)))))
 
 
 ;; No pop-ups
