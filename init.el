@@ -43,58 +43,60 @@
 (global-set-key (kbd "C-c `") 'shell-pop)
 
 ;; org -- ignore if org dir doesn't exist
-(let ((maybe-org-directory (expand-file-name "org" user-emacs-directory)))
-  (when (file-exists-p maybe-org-directory)
-    (setq org-directory maybe-org-directory)
-    (setq org-completion-use-ido t)
-    (setq org-default-notes-file (expand-file-name "notes.org" org-directory))
-    (global-set-key (kbd "C-c c") 'org-capture)
-    (setq org-agenda-files
-          (mapcar (lambda (el) (expand-file-name el org-directory))
-                  '("notes.org" "personal.org" "projects.org" "blog.org" "ideas.org")))
+(eval-after-load 'org-mode
+  (lambda ()
+    (let ((maybe-org-directory (expand-file-name "org" user-emacs-directory)))
+      (when (file-exists-p maybe-org-directory)
+        (setq org-directory maybe-org-directory)
+        (setq org-completion-use-ido t)
+        (setq org-default-notes-file (expand-file-name "notes.org" org-directory))
+        (global-set-key (kbd "C-c c") 'org-capture)
+        (setq org-agenda-files
+              (mapcar (lambda (el) (expand-file-name el org-directory))
+                      '("notes.org" "personal.org" "projects.org" "blog.org" "ideas.org")))
 
-    ;; org capture/refile
-    (defun capture-find-or-create-headline (headline)
-      "Find or create HEADLINE in the current buffer"
-      (goto-char (point-min))
-      (when (not (re-search-forward
-                  (format org-complex-heading-regexp-format headline) nil t))
-        (insert "* " headline))
-      (newline))
+        ;; org capture/refile
+        (defun capture-find-or-create-headline (headline)
+          "Find or create HEADLINE in the current buffer"
+          (goto-char (point-min))
+          (when (not (re-search-forward
+                      (format org-complex-heading-regexp-format headline) nil t))
+            (insert "* " headline))
+          (newline))
 
-    (defun capture-headline-current-project-name ()
-      (capture-find-or-create-headline project-persist-current-project-name))
+        (defun capture-headline-current-project-name ()
+          (capture-find-or-create-headline project-persist-current-project-name))
 
-    (setq org-capture-templates
-          '(("n" "Note" entry
-             (file org-default-notes-file)
-             "* %U %?")
-            ("p" "Project Note" plain
-             (file+function (expand-file-name "projects.org" org-directory) capture-headline-current-project-name)
-             "** %U %f: %?")
-            ("d" "Personal Note" entry
-             (file (expand-file-name "personal.org" org-directory))
-             "* %U %?")
-            ("b" "Blog Note" entry
-             (file (expand-file-name "blog.org" org-directory))
-             "* %U %?")
-            ("i" "Idea" entry
-             (file (expand-file-name "ideas.org" org-directory))
-             "* %U %?")))
+        (setq org-capture-templates
+              '(("n" "Note" entry
+                 (file org-default-notes-file)
+                 "* %U %?")
+                ("p" "Project Note" plain
+                 (file+function (expand-file-name "projects.org" org-directory) capture-headline-current-project-name)
+                 "** %U %f: %?")
+                ("d" "Personal Note" entry
+                 (file (expand-file-name "personal.org" org-directory))
+                 "* %U %?")
+                ("b" "Blog Note" entry
+                 (file (expand-file-name "blog.org" org-directory))
+                 "* %U %?")
+                ("i" "Idea" entry
+                 (file (expand-file-name "ideas.org" org-directory))
+                 "* %U %?")))
 
-    (setq org-refile-allow-creating-parent-nodes t)
-    (setq org-refile-use-outline-path 'file)
-    (setq org-outline-path-complete-in-steps t)
-    (setq org-refile-targets '((nil :maxlevel . 5) (org-agenda-files :maxlevel . 5)))
+        (setq org-refile-allow-creating-parent-nodes t)
+        (setq org-refile-use-outline-path 'file)
+        (setq org-outline-path-complete-in-steps t)
+        (setq org-refile-targets '((nil :maxlevel . 5) (org-agenda-files :maxlevel . 5)))
 
-    ;; org-mobile -- ignore if no dropbox/org-mobile directory
-    (let ((maybe-org-mobile-directory (expand-file-name "Apps/MobileOrg" dropbox-directory)))
-      (when (file-exists-p maybe-org-mobile-directory)
-        (require 'org-mobile)
-        (setq org-mobile-inbox-for-pull (expand-file-name "inbox.org" org-directory))
-        (setq org-mobile-directory (expand-file-name "Apps/MobileOrg" dropbox-directory))
-        (add-hook 'after-init-hook 'org-mobile-pull)
-        (add-hook 'kill-emacs-hook 'org-mobile-push)))))
+        ;; org-mobile -- ignore if no dropbox/org-mobile directory
+        (let ((maybe-org-mobile-directory (expand-file-name "Apps/MobileOrg" dropbox-directory)))
+          (when (file-exists-p maybe-org-mobile-directory)
+            (require 'org-mobile)
+            (setq org-mobile-inbox-for-pull (expand-file-name "inbox.org" org-directory))
+            (setq org-mobile-directory (expand-file-name "Apps/MobileOrg" dropbox-directory))
+            (org-mobile-pull)
+            (add-hook 'kill-emacs-hook 'org-mobile-push)))))))
 
 
 ;; No pop-ups
@@ -138,27 +140,33 @@
 (setq ac-disable-faces nil)
 
 ;; Ruby
-(exec-path-from-shell-copy-env "GEM_HOME")
-(setq ruby-deep-indent-paren nil)
-(add-hook 'ruby-mode-hook
-          (lambda ()
-            (robe-mode)
-            (ruby-tools-mode)))
-(add-hook 'robe-mode-hook (lambda () (add-to-list 'ac-sources 'ac-source-robe)))
+(dolist (regex
+         '("\\.rake$" "\\.gemspec$" "\\.ru$" "Rakefile$" "Gemfile$" "Capfile$" "Guardfile$"))
+  (add-to-list 'auto-mode-alist `(,regex . ruby-mode)))
 
-;; RSense
-(setq rsense-home nil)
-(let ((rsense-home-val
-       (cond ((eq system-type 'gnu/linux) "/usr/lib/rsense-0.3")
-             ((eq system-type 'darwin) "/usr/local/Cellar/rsense/0.3/libexec"))))
-  (when (and rsense-home-val (file-exists-p rsense-home-val))
-    (setq rsense-home rsense-home-val)
-    (add-to-list 'load-path (concat rsense-home "/etc"))))
+(eval-after-load 'ruby-mode
+  (lambda ()
+    (exec-path-from-shell-copy-env "GEM_HOME")
+    (setq ruby-deep-indent-paren nil)
+    (add-hook 'ruby-mode-hook
+              (lambda ()
+                (robe-mode)
+                (ruby-tools-mode)))
+    (add-hook 'robe-mode-hook (lambda () (add-to-list 'ac-sources 'ac-source-robe)))
 
-(when rsense-home
-  (require 'rsense)
-  (add-hook 'ruby-mode-hook
-          (lambda () (add-to-list 'ac-sources 'ac-source-rsense))))
+    ;; RSense
+    (setq rsense-home nil)
+    (let ((rsense-home-val
+           (cond ((eq system-type 'gnu/linux) "/usr/lib/rsense-0.3")
+                 ((eq system-type 'darwin) "/usr/local/Cellar/rsense/0.3/libexec"))))
+      (when (and rsense-home-val (file-exists-p rsense-home-val))
+        (setq rsense-home rsense-home-val)
+        (add-to-list 'load-path (concat rsense-home "/etc"))))
+
+    (when rsense-home
+      (require 'rsense)
+      (add-hook 'ruby-mode-hook
+                (lambda () (add-to-list 'ac-sources 'ac-source-rsense))))))
 
 ;; imenu
 (require 'imenu-anywhere)
@@ -211,11 +219,6 @@
   (deactivate-mark nil))
 
 (define-key global-map [remap exchange-point-and-mark] 'exchange-point-and-mark-no-region)
-
-;; Ruby special files
-(dolist (regex
-         '("\\.rake$" "\\.gemspec$" "\\.ru$" "Rakefile$" "Gemfile$" "Capfile$" "Guardfile$"))
-  (add-to-list 'auto-mode-alist `(,regex . ruby-mode)))
 
 ;; auto markdown-mode
 (push '("\\.md\\'" . gfm-mode) auto-mode-alist)
