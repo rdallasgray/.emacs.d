@@ -1,5 +1,9 @@
 (require 'server)
-(unless (server-running-p) (server-start))
+(if (server-running-p)
+    (message "Server is running")
+  (progn
+    (message "Starting server")
+    (server-start)))
 
 (add-to-list 'load-path "~/.emacs.d/")
 (add-to-list 'load-path "~/.emacs.d/graphene/lib")
@@ -134,10 +138,10 @@
 
 ;; Ruby
 (exec-path-from-shell-copy-env "GEM_HOME")
+(setq ruby-deep-indent-paren nil)
 (add-hook 'ruby-mode-hook
           (lambda ()
             (robe-mode)
-;;            (robe-start)
             (ruby-tools-mode)))
 (add-hook 'robe-mode-hook (lambda () (add-to-list 'ac-sources 'ac-source-robe)))
 
