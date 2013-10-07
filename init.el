@@ -1,4 +1,5 @@
-(server-start)
+(require 'server)
+(unless (server-running-p) (server-start))
 
 (add-to-list 'load-path "~/.emacs.d/")
 (add-to-list 'load-path "~/.emacs.d/graphene/lib")
@@ -133,6 +134,7 @@
 (setq ac-disable-faces nil)
 
 ;; Ruby
+(exec-path-from-shell-copy-env "GEM_HOME")
 (add-hook 'ruby-mode-hook
           (lambda ()
             (robe-mode)
