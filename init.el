@@ -44,7 +44,7 @@
 
 ;; org -- ignore if org dir doesn't exist
 (eval-after-load 'org-mode
-  (lambda ()
+  '(lambda ()
     (let ((maybe-org-directory (expand-file-name "org" user-emacs-directory)))
       (when (file-exists-p maybe-org-directory)
         (setq org-directory maybe-org-directory)
@@ -131,21 +131,16 @@
 (global-set-key (kbd "C-S-v") 'scroll-up-line)
 (global-set-key (kbd "M-V") 'scroll-down-line)
 
-;; Add eco/jeco to mweb-filename-extensions
-(setq mweb-filename-extensions
-      (append '("eco" "jeco" "ejs")
-              mweb-filename-extensions))
-
 ; AC everywhere
 (setq ac-disable-faces nil)
 
 ;; Ruby
-(dolist (regex
+(dolist (regexp
          '("\\.rake$" "\\.gemspec$" "\\.ru$" "Rakefile$" "Gemfile$" "Capfile$" "Guardfile$"))
-  (add-to-list 'auto-mode-alist `(,regex . ruby-mode)))
+  (add-to-list 'auto-mode-alist `(,regexp . ruby-mode)))
 
 (eval-after-load 'ruby-mode
-  (lambda ()
+  '(lambda ()
     (exec-path-from-shell-copy-env "GEM_HOME")
     (setq ruby-deep-indent-paren nil)
     (add-hook 'ruby-mode-hook
@@ -239,10 +234,6 @@
 
 ;; 2-space indent for CSS
 (setq css-indent-offset 2)
-
-;; 4-space indent for html
-(add-hook 'html-mode-hook
-          (lambda () (set (make-local-variable 'sgml-basic-offset) 4)))
 
 ;; Non-blinking cursor
 (blink-cursor-mode -1)
