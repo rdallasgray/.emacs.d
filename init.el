@@ -22,8 +22,6 @@
 (setq dropbox-directory "~/Dropbox")
 
 ;;(e)shell-mode
-(add-to-list 'ac-modes 'eshell-mode)
-(add-to-list 'ac-modes 'shell-mode)
 (setq explicit-shell-file-name "bash")
 (setq shell-file-name explicit-shell-file-name)
 (setenv "SHELL" shell-file-name)
