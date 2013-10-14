@@ -141,7 +141,7 @@
 
 ;; Ruby
 (dolist (regex
-         '("\\.rake$" "\\.gemspec$" "\\.ru$" "Rakefile$" "Gemfile$" "Capfile$" "Guardfile$"))
+         '("\\.watchr$" "\\.arb$" "\\.rake$" "\\.gemspec$" "\\.ru$" "Rakefile$" "Gemfile$" "Capfile$" "Guardfile$"))
   (add-to-list 'auto-mode-alist `(,regex . ruby-mode)))
 
 (eval-after-load 'ruby-mode
