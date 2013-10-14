@@ -16,18 +16,12 @@
 
 (require 'pallet)
 (require 'graphene)
-(require 'pry)
-
-(require 'tramp)
-(setq tramp-verbose 10)
 
 (setq warning-minimum-level :error)
 
 (setq dropbox-directory "~/Dropbox")
 
 ;;(e)shell-mode
-(add-to-list 'ac-modes 'eshell-mode)
-(add-to-list 'ac-modes 'shell-mode)
 (setq explicit-shell-file-name "bash")
 (setq shell-file-name explicit-shell-file-name)
 (setenv "SHELL" shell-file-name)
@@ -44,7 +38,7 @@
 
 ;; org -- ignore if org dir doesn't exist
 (eval-after-load 'org-mode
-  (lambda ()
+  '(progn
     (let ((maybe-org-directory (expand-file-name "org" user-emacs-directory)))
       (when (file-exists-p maybe-org-directory)
         (setq org-directory maybe-org-directory)
@@ -131,11 +125,6 @@
 (global-set-key (kbd "C-S-v") 'scroll-up-line)
 (global-set-key (kbd "M-V") 'scroll-down-line)
 
-;; Add eco/jeco to mweb-filename-extensions
-(setq mweb-filename-extensions
-      (append '("eco" "jeco" "ejs")
-              mweb-filename-extensions))
-
 ; AC everywhere
 (setq ac-disable-faces nil)
 
@@ -145,13 +134,14 @@
   (add-to-list 'auto-mode-alist `(,regex . ruby-mode)))
 
 (eval-after-load 'ruby-mode
-  (lambda ()
+  '(progn
     (exec-path-from-shell-copy-env "GEM_HOME")
     (setq ruby-deep-indent-paren nil)
     (add-hook 'ruby-mode-hook
               (lambda ()
                 (robe-mode)
-                (ruby-tools-mode)))
+                (ruby-tools-mode)
+                (require 'pry)))
     (add-hook 'robe-mode-hook (lambda () (add-to-list 'ac-sources 'ac-source-robe)))
 
     ;; RSense
@@ -169,9 +159,14 @@
                 (lambda () (add-to-list 'ac-sources 'ac-source-rsense))))))
 
 ;; imenu
-(require 'imenu-anywhere)
-(setq imenu-auto-rescan t)
-(global-set-key (kbd "C-c .") 'imenu-anywhere)
+(add-hook 'graphene-prog-mode-hook
+          (lambda ()
+            (require 'imenu-anywhere)))
+
+(eval-after-load 'imenu-anywhere
+  '(progn
+     (setq imenu-auto-rescan t)
+     (global-set-key (kbd "C-c .") 'imenu-anywhere)))
 
 ;; multi-occur
 (defun multi-occur-in-open-buffers (regexp &optional allbufs)
@@ -185,15 +180,20 @@
 (global-set-key (kbd "C-c m") 'mc/mark-all-like-this-dwim)
 
 ;; Flycheck
-(require 'flycheck)
-(add-hook 'graphene-prog-mode-hook 'flycheck-mode)
-(setq flycheck-highlighting-mode nil
-      flycheck-display-errors-function 'rdg/flycheck-display-errors-function)
+(add-hook 'graphene-prog-mode-hook
+          (lambda()
+            (require 'flycheck)
+            (flycheck-mode)))
 
-(defun rdg/flycheck-display-errors-function (errors)
-  (mapc (lambda (err)
-          (message "FlyC: %s" (flycheck-error-message err)) (sit-for 1))
-        errors))
+(eval-after-load 'flycheck
+  '(progn
+     (defun rdg/flycheck-display-errors-function (errors)
+       (mapc (lambda (err)
+               (message "FlyC: %s" (flycheck-error-message err)) (sit-for 1))
+             errors))
+     (setq flycheck-highlighting-mode nil
+           flycheck-display-errors-function 'rdg/flycheck-display-errors-function)))
+
 
 ;; Mark word, sexp, line, ...
 (require 'expand-region)
@@ -239,10 +239,6 @@
 
 ;; 2-space indent for CSS
 (setq css-indent-offset 2)
-
-;; 4-space indent for html
-(add-hook 'html-mode-hook
-          (lambda () (set (make-local-variable 'sgml-basic-offset) 4)))
 
 ;; Non-blinking cursor
 (blink-cursor-mode -1)
