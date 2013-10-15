@@ -31,7 +31,10 @@
   (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
   (setq comint-process-echoes t)
   (require 'readline-complete)
-  (add-hook 'shell-mode-hook 'ac-rlc-setup-sources))
+  (add-hook 'shell-mode-hook
+            (lambda ()
+              (ac-rlc-setup-sources)
+              (auto-complete-mode))))
 
 ;; Easily open/switch to a shell
 (global-set-key (kbd "C-c `") 'shell-pop)
@@ -127,6 +130,11 @@
 
 ; AC everywhere
 (setq ac-disable-faces nil)
+
+;; JS
+(eval-after-load 'javascript-mode
+  '(progn
+     (setq js-indent-level 2)))
 
 ;; Ruby
 (dolist (regex
