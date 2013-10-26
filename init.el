@@ -59,6 +59,7 @@
      ;; 1) expression inside single pair
      ;; 2) expression inside nested pair
      ;; 3) nested string in sexp
+     ;; NB Possible SP bug with (sp-get-paired-expression)
      (defun pair-at-point (&optional back)
        (let ((corr (cond (back -1) (t 1))))
          (goto-char (+ (point) corr)))
@@ -74,7 +75,7 @@
          (sp-go-pairwise dir inner)))
 
      (defun forward-inside-pair (&optional dir)
-       (forward-enclosing-pair dir t)))
+       (forward-enclosing-pair dir t))
 
      (require 'thingatpt)
      (require 'easy-kill)
