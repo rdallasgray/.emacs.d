@@ -41,45 +41,53 @@
 (global-set-key (kbd "C-c `") 'shell-pop)
 
 ;; easy-kill
-(defun sp-go-pairwise (dir &optional inner)
-  (let ((pair (cond (inner (sp-get-enclosing-sexp))
-                    (t (pair-at-point (point) (< dir 0))))))
-    (if pair
-      (let* ((del (cond ((> dir 0) '(:end . :cl))
-                        (t '(:beg . :op))))
-             (target (plist-get pair (car del)))
-             (dec (* dir
-                     (cond (inner (length (plist-get pair (cdr del))))
-                           (t 0)))))
-        (message "pair: %s dir: %d dec: %d" pair dir dec)
-        (goto-char (- target dec)))
-      (message "no pair"))))
+(eval-after-load 'smartparens
+  '(progn
+     (defun sp-go-pairwise (dir &optional inner)
+       (let ((pair (cond (inner (sp-get-enclosing-sexp))
+                         (t (pair-at-point (< dir 0))))))
+         (if pair
+             (let* ((del (cond ((> dir 0) '(:end . :cl))
+                               (t '(:beg . :op))))
+                    (target (plist-get pair (car del)))
+                    (dec (* dir
+                            (cond (inner (length (plist-get pair (cdr del))))
+                                  (t 0)))))
+               (goto-char (- target dec))))))
 
-(defun pair-at-point (pt &optional back)
-  (let ((paired-expression (sp-get-paired-expression back))
-        (del (cond (back :end) (t :beg))))
-    (if (and paired-expression
-             (eq pt (plist-get paired-expression del)))
-        paired-expression
-      (sp-get-enclosing-sexp))))
+     ;; Need test cases
+     ;; 1) expression inside single pair
+     ;; 2) expression inside nested pair
+     ;; 3) nested string in sexp
+     (defun pair-at-point (&optional back)
+       (let ((corr (cond (back -1) (t 1))))
+         (goto-char (+ (point) corr)))
+       (let ((paired-expression (sp-get-paired-expression back))
+             (del (cond (back :end) (t :beg))))
+         (if (and paired-expression
+                  (eq (point) (plist-get paired-expression del)))
+             paired-expression
+           (sp-get-enclosing-sexp))))
 
-(defun forward-enclosing-pair (&optional dir inner)
-  (let ((dir (or dir 1)))
-    (sp-go-pairwise dir inner)))
+     (defun forward-enclosing-pair (&optional dir inner)
+       (let ((dir (or dir 1)))
+         (sp-go-pairwise dir inner)))
 
-(defun forward-inside-pair (&optional dir)
-  (forward-enclosing-pair dir t))
+     (defun forward-inside-pair (&optional dir)
+       (forward-enclosing-pair dir t)))
 
-(require 'thingatpt)
+     (require 'thingatpt)
+     (require 'easy-kill)
 
-(put 'enclosing-pair 'forward-op 'forward-enclosing-pair)
-(put 'inside-pair 'forward-op 'forward-inside-pair)
+     (put 'enclosing-pair 'forward-op 'forward-enclosing-pair)
+     (put 'inside-pair 'forward-op 'forward-inside-pair)
 
-(append easy-kill-alist '((?p . enclosing-pair)
-                          (?i . inside-pair)))
+     (setq easy-kill-alist
+           (append easy-kill-alist '((?p . enclosing-pair)
+                                     (?i . inside-pair))))
 
-(setq easy-kill-try-things '(word sexp line))
-(global-set-key [remap mark-sexp] 'easy-mark-sexp)
+     (setq easy-kill-try-things '(word sexp line))
+     (global-set-key [remap mark-sexp] 'easy-mark-sexp)))
 
 ;; org
 (defun load-org-and-capture ()
@@ -231,21 +239,6 @@
   (multi-occur-in-matching-buffers ".*" regexp))
 
 (global-set-key (kbd "M-s O") 'multi-occur-in-open-buffers)
-
-;; Flycheck
-(add-hook 'graphene-prog-mode-hook
-          (lambda()
-            (require 'flycheck)
-            (flycheck-mode)))
-
-(eval-after-load 'flycheck
-  '(progn
-     (defun rdg/flycheck-display-errors-function (errors)
-       (mapc (lambda (err)
-               (message "FlyC: %s" (flycheck-error-message err)) (sit-for 1))
-             errors))
-     (setq flycheck-highlighting-mode nil
-           flycheck-display-errors-function 'rdg/flycheck-display-errors-function)))
 
 ;; easier defun navigation
 (defun beginning-of-next-defun ()
