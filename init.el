@@ -21,15 +21,16 @@
 
 (setq dropbox-directory "~/Dropbox")
 
-;;(e)shell-mode
-(setq explicit-shell-file-name "bash")
-(setq shell-file-name explicit-shell-file-name)
-(setenv "SHELL" shell-file-name)
+;; (e)shell-mode
+(let ((shell-name "bash"))
+  (setq explicit-shell-file-name shell-name
+        shell-file-name shell-name)
+  (setenv "SHELL" shell-name))
 
 ;; Set up readline-complete if not on Windows
 (unless (eq system-type 'windows-nt)
-  (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
-  (setq comint-process-echoes t)
+  (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
+        comint-process-echoes t)
   (require 'readline-complete)
   (add-hook 'shell-mode-hook
             (lambda ()
@@ -39,15 +40,62 @@
 ;; Easily open/switch to a shell
 (global-set-key (kbd "C-c `") 'shell-pop)
 
-;; org -- ignore if org dir doesn't exist
-(eval-after-load 'org-mode
+;; easy-kill
+(defun sp-go-pairwise (dir &optional inner)
+  (let ((pair (cond (inner (sp-get-enclosing-sexp))
+                    (t (pair-at-point (point) (< dir 0))))))
+    (if pair
+      (let* ((del (cond ((> dir 0) '(:end . :cl))
+                        (t '(:beg . :op))))
+             (target (plist-get pair (car del)))
+             (dec (* dir
+                     (cond (inner (length (plist-get pair (cdr del))))
+                           (t 0)))))
+        (message "pair: %s dir: %d dec: %d" pair dir dec)
+        (goto-char (- target dec)))
+      (message "no pair"))))
+
+(defun pair-at-point (pt &optional back)
+  (let ((paired-expression (sp-get-paired-expression back))
+        (del (cond (back :end) (t :beg))))
+    (if (and paired-expression
+             (eq pt (plist-get paired-expression del)))
+        paired-expression
+      (sp-get-enclosing-sexp))))
+
+(defun forward-enclosing-pair (&optional dir inner)
+  (let ((dir (or dir 1)))
+    (sp-go-pairwise dir inner)))
+
+(defun forward-inside-pair (&optional dir)
+  (forward-enclosing-pair dir t))
+
+(require 'thingatpt)
+
+(put 'enclosing-pair 'forward-op 'forward-enclosing-pair)
+(put 'inside-pair 'forward-op 'forward-inside-pair)
+
+(append easy-kill-alist '((?p . enclosing-pair)
+                          (?i . inside-pair)))
+
+(setq easy-kill-try-things '(word sexp line))
+(global-set-key [remap mark-sexp] 'easy-mark-sexp)
+
+;; org
+(defun load-org-and-capture ()
+  (interactive)
+  (require 'org)
+  (org-capture))
+
+(global-set-key (kbd "C-c c") 'load-org-and-capture)
+
+(eval-after-load 'org
   '(progn
     (let ((maybe-org-directory (expand-file-name "org" user-emacs-directory)))
       (when (file-exists-p maybe-org-directory)
         (setq org-directory maybe-org-directory)
         (setq org-completion-use-ido t)
         (setq org-default-notes-file (expand-file-name "notes.org" org-directory))
-        (global-set-key (kbd "C-c c") 'org-capture)
         (setq org-agenda-files
               (mapcar (lambda (el) (expand-file-name el org-directory))
                       '("notes.org" "personal.org" "projects.org" "blog.org" "ideas.org")))
@@ -119,10 +167,10 @@
 (setq mac-command-modifier 'hyper)
 
 ;; Sensible window movement
-(global-set-key (kbd "C-x <up>") 'windmove-up)
-(global-set-key (kbd "C-x <down>") 'windmove-down)
-(global-set-key (kbd "C-x <right>") 'windmove-right)
-(global-set-key (kbd "C-x <left>") 'windmove-left)
+(global-set-key (kbd "C-c <up>") 'windmove-up)
+(global-set-key (kbd "C-c <down>") 'windmove-down)
+(global-set-key (kbd "C-c <right>") 'windmove-right)
+(global-set-key (kbd "C-c <left>") 'windmove-left)
 
 ;; Scroll up and down a line at a time
 (global-set-key (kbd "C-S-v") 'scroll-up-line)
@@ -184,9 +232,6 @@
 
 (global-set-key (kbd "M-s O") 'multi-occur-in-open-buffers)
 
-;; multiple-cursors
-(global-set-key (kbd "C-c m") 'mc/mark-all-like-this-dwim)
-
 ;; Flycheck
 (add-hook 'graphene-prog-mode-hook
           (lambda()
@@ -202,15 +247,7 @@
      (setq flycheck-highlighting-mode nil
            flycheck-display-errors-function 'rdg/flycheck-display-errors-function)))
 
-
-;; Mark word, sexp, line, ...
-(require 'expand-region)
-(global-set-key (kbd "C-=")
-                'er/expand-region)
-(global-set-key (kbd "C--")
-                'er/contract-region)
-
-;; easier sexp navigation
+;; easier defun navigation
 (defun beginning-of-next-defun ()
   (interactive)
   (end-of-defun)
