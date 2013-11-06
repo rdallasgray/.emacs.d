@@ -6,8 +6,8 @@
     (server-start)))
 
 (add-to-list 'load-path "~/.emacs.d/")
-(add-to-list 'load-path "~/.emacs.d/graphene/lib")
-(add-to-list 'load-path "~/.emacs.d/pallet/lib")
+(add-to-list 'load-path "~/.emacs.d/graphene/")
+(add-to-list 'load-path "~/.emacs.d/pallet/")
 (add-to-list 'load-path "~/.emacs.d/readline-complete/")
 (add-to-list 'load-path "~/.emacs.d/emacs-pry/")
 
@@ -89,6 +89,8 @@
 
      (setq easy-kill-try-things '(word sexp line))
      (global-set-key [remap mark-sexp] 'easy-mark-sexp)))
+
+(smartparens-global-strict-mode)
 
 ;; org
 (defun load-org-and-capture ()
