@@ -18,6 +18,7 @@
 (depends-on "expand-region")
 (depends-on "f")
 (depends-on "feature-mode")
+(depends-on "fiplr")
 (depends-on "flycheck")
 (depends-on "fringe-helper")
 (depends-on "git")
