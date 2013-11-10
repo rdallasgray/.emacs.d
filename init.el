@@ -40,6 +40,9 @@
 ;; Easily open/switch to a shell
 (global-set-key (kbd "C-c `") 'shell-pop)
 
+;; fiplr
+(global-set-key (kbd "C-c f") 'fiplr-find-file)
+
 ;; easy-kill
 (eval-after-load 'smartparens
   '(progn
@@ -89,8 +92,6 @@
 
      (setq easy-kill-try-things '(word sexp line))
      (global-set-key [remap mark-sexp] 'easy-mark-sexp)))
-
-(smartparens-global-strict-mode)
 
 ;; org
 (defun load-org-and-capture ()
