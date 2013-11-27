@@ -82,7 +82,6 @@
 
      (require 'thingatpt)
      (require 'easy-kill)
-
      (put 'enclosing-pair 'forward-op 'forward-enclosing-pair)
      (put 'inside-pair 'forward-op 'forward-inside-pair)
 
@@ -160,15 +159,8 @@
 (setq pop-up-frames nil
       pop-up-windows nil)
 
-;; Uniquify buffers
-(require 'uniquify)
-(setq uniquify-buffer-name-style 'forward)
-
 ;; Sane magit window creation
 (setq magit-status-buffer-switch-function 'switch-to-buffer)
-
-;; Add de facto prog-mode hooks
-(push 'sws-mode-hook graphene-prog-mode-hooks)
 
 ;; Use Alt-3 1o insert a #, unbind right alt
 (fset 'insert-pound "#")
@@ -188,18 +180,10 @@
 (global-set-key (kbd "C-S-v") 'scroll-up-line)
 (global-set-key (kbd "M-V") 'scroll-down-line)
 
-; AC everywhere
-(setq ac-disable-faces nil)
-
 ;; JS
 (eval-after-load 'javascript-mode
   '(progn
      (setq js-indent-level 2)))
-
-;; Ruby
-(dolist (regex
-         '("\\.watchr$" "\\.arb$" "\\.rake$" "\\.gemspec$" "\\.ru$" "Rakefile$" "Gemfile$" "Capfile$" "Guardfile$"))
-  (add-to-list 'auto-mode-alist `(,regex . ruby-mode)))
 
 (eval-after-load 'ruby-mode
   '(progn
@@ -263,35 +247,8 @@
 
 (define-key global-map [remap exchange-point-and-mark] 'exchange-point-and-mark-no-region)
 
-;; auto markdown-mode
-(push '("\\.md\\'" . gfm-mode) auto-mode-alist)
-(push '("\\.markdown\\'" . gfm-mode) auto-mode-alist)
-(add-hook 'gfm-mode-hook (lambda () (auto-fill-mode t)))
-
-;; auto stylus-mode
-(push '("\\.styl\\'" . jade-mode) auto-mode-alist)
-
-;; auto json-mode
-(push '("\\.json\\'" . json-mode) auto-mode-alist)
-
-;; auto feature-mode
-(push '("\\.feature\\'" . feature-mode) auto-mode-alist)
-
-;; don't compile sass/scss on saving
-(setq scss-compile-at-save nil)
-
-;; 2-space indent for CSS
-(setq css-indent-offset 2)
-
-;; Non-blinking cursor
-(blink-cursor-mode -1)
-
 ;; Remove trailing whitespace
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
-
-;; Don't use tabs for indent; replace tabs with two spaces.
-(setq-default tab-width 2)
-(setq-default indent-tabs-mode nil)
 
 (setq custom-file "~/.emacs.d/custom.el")
 (when (file-exists-p custom-file)
