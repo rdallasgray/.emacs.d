@@ -187,14 +187,50 @@
 
 (eval-after-load 'ruby-mode
   '(progn
-    (exec-path-from-shell-copy-env "GEM_HOME")
-    (setq ruby-deep-indent-paren nil)
-    (add-hook 'ruby-mode-hook
-              (lambda ()
-                (robe-mode)
-                (ruby-tools-mode)
-                (require 'pry)))
-    (add-hook 'robe-mode-hook (lambda () (add-to-list 'ac-sources 'ac-source-robe)))
+     (exec-path-from-shell-copy-env "GEM_HOME")
+     (setq ruby-deep-indent-paren nil)
+     (add-hook 'ruby-mode-hook
+               (lambda ()
+                 (robe-mode)
+                 (ruby-tools-mode)
+                 (require 'pry)
+                 ;; https://github.com/lewang/le_emacs_libs/blob/master/ruby-mode-indent-fix.el
+                 (defvar ruby--paren-closings-regex "[])}\"']")
+                 (defun ruby--indent-before-all-sexps ()
+                   (if (re-search-backward ruby--paren-closings-regex (point-at-bol) t)
+                       (let ((ppss (syntax-ppss))
+                             beg)
+                         (goto-char (match-beginning 0))
+                         (cond ((setq beg (nth 1 ppss))  ; brace
+                                (goto-char beg))
+                               ((nth 3 ppss)             ; string
+                                (goto-char (nth 8 ppss))))
+                         (ruby--indent-before-all-sexps))))
+                 (defadvice ruby-indent-line (around line-up-args activate)
+                   (let (indent ppss)
+                     (save-excursion
+                       (back-to-indentation)
+                       (skip-chars-backward " \t\n")
+                       (setq ppss (syntax-ppss))
+                       ;; check for inside comment, string, or inside braces
+                       (when (and (eq ?, (char-before))
+                                  (not (memq (syntax-ppss-context ppss) '(comment string)))
+                                  (zerop (car ppss)))
+                         (ruby--indent-before-all-sexps)
+                         (back-to-indentation)
+                         (if (save-excursion
+                               (skip-chars-backward " \t\n")
+                               (eq (char-before) ?,))
+                             (setq indent (current-column))
+                           (skip-syntax-forward "w_.")
+                           (skip-chars-forward " ")
+                           ;; if the first symbol on the line is followed, by a comma, then this
+                           ;; line must be a continuation
+                           (setq indent (current-column)))))
+                     (if indent
+                         (indent-line-to indent)
+                       ad-do-it)))))))
+(add-hook 'robe-mode-hook (lambda () (add-to-list 'ac-sources 'ac-source-robe)))
 
     ;; RSense
     ;; (setq rsense-home nil)
