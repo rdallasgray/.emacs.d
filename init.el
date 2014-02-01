@@ -43,54 +43,8 @@
 ;; fiplr
 (global-set-key (kbd "C-c f") 'fiplr-find-file)
 
-;; easy-kill
-(eval-after-load 'smartparens
-  '(progn
-     (defun sp-go-pairwise (dir &optional inner)
-       (let ((pair (cond (inner (sp-get-enclosing-sexp))
-                         (t (pair-at-point (< dir 0))))))
-         (if pair
-             (let* ((del (cond ((> dir 0) '(:end . :cl))
-                               (t '(:beg . :op))))
-                    (target (plist-get pair (car del)))
-                    (dec (* dir
-                            (cond (inner (length (plist-get pair (cdr del))))
-                                  (t 0)))))
-               (goto-char (- target dec))))))
-
-     ;; Need test cases
-     ;; 1) expression inside single pair
-     ;; 2) expression inside nested pair
-     ;; 3) nested string in sexp
-     ;; NB Possible SP bug with (sp-get-paired-expression)
-     (defun pair-at-point (&optional back)
-       (let ((corr (cond (back -1) (t 1))))
-         (goto-char (+ (point) corr)))
-       (let ((paired-expression (sp-get-paired-expression back))
-             (del (cond (back :end) (t :beg))))
-         (if (and paired-expression
-                  (eq (point) (plist-get paired-expression del)))
-             paired-expression
-           (sp-get-enclosing-sexp))))
-
-     (defun forward-enclosing-pair (&optional dir inner)
-       (let ((dir (or dir 1)))
-         (sp-go-pairwise dir inner)))
-
-     (defun forward-inside-pair (&optional dir)
-       (forward-enclosing-pair dir t))
-
-     (require 'thingatpt)
-     (require 'easy-kill)
-     (put 'enclosing-pair 'forward-op 'forward-enclosing-pair)
-     (put 'inside-pair 'forward-op 'forward-inside-pair)
-
-     (setq easy-kill-alist
-           (append easy-kill-alist '((?p . enclosing-pair)
-                                     (?i . inside-pair))))
-
-     (setq easy-kill-try-things '(word sexp line))
-     (global-set-key [remap mark-sexp] 'easy-mark-sexp)))
+;; er
+(global-set-key (kbd "C-M-SPC") 'er/expand-region)
 
 ;; org
 (defun load-org-and-capture ()
@@ -231,21 +185,6 @@
                          (indent-line-to indent)
                        ad-do-it)))))))
 (add-hook 'robe-mode-hook (lambda () (add-to-list 'ac-sources 'ac-source-robe)))
-
-    ;; RSense
-    ;; (setq rsense-home nil)
-    ;; (let ((rsense-home-val
-    ;;        (cond ((eq system-type 'gnu/linux) "/usr/lib/rsense-0.3")
-    ;;              ((eq system-type 'darwin) "/usr/local/Cellar/rsense/0.3/libexec"))))
-    ;;   (when (and rsense-home-val (file-exists-p rsense-home-val))
-    ;;     (setq rsense-home rsense-home-val)
-    ;;     (add-to-list 'load-path (concat rsense-home "/etc"))))
-
-    ;; (when rsense-home
-    ;;   (require 'rsense)
-    ;;   (add-hook 'ruby-mode-hook
-    ;;             (lambda () (add-to-list 'ac-sources 'ac-source-rsense))))
-    ))
 
 ;; imenu
 (add-hook 'graphene-prog-mode-hook
