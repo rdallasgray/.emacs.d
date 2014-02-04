@@ -1,6 +1,6 @@
-(source "gnu" "http://elpa.gnu.org/packages/")
-(source "melpa" "http://melpa.milkbox.net/packages/")
-(source "marmalade" "http://marmalade-repo.org/packages/")
+(source gnu)
+(source melpa)
+(source marmalade)
 
 (depends-on "ack-and-a-half")
 (depends-on "auto-complete")
@@ -56,6 +56,7 @@
 (depends-on "smex")
 (depends-on "sr-speedbar")
 (depends-on "sws-mode")
+(depends-on "tidy")
 (depends-on "vagrant")
 (depends-on "visible-mark")
 (depends-on "visual-regexp")
@@ -63,3 +64,4 @@
 (depends-on "wgrep")
 (depends-on "wgrep-ack")
 (depends-on "yaml-mode")
+(depends-on "yard-mode")
