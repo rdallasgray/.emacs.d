@@ -229,8 +229,8 @@
                            (setq indent (current-column)))))
                      (if indent
                          (indent-line-to indent)
-                       ad-do-it)))))))
-(add-hook 'robe-mode-hook (lambda () (add-to-list 'ac-sources 'ac-source-robe)))
+                       ad-do-it)))))
+     (add-hook 'robe-mode-hook (lambda () (add-to-list 'ac-sources 'ac-source-robe)))))
 
     ;; RSense
     ;; (setq rsense-home nil)
@@ -245,7 +245,7 @@
     ;;   (require 'rsense)
     ;;   (add-hook 'ruby-mode-hook
     ;;             (lambda () (add-to-list 'ac-sources 'ac-source-rsense))))
-    ))
+    ;; ))
 
 ;; imenu
 (add-hook 'graphene-prog-mode-hook
