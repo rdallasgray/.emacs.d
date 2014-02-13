@@ -59,6 +59,7 @@
 (depends-on "smex")
 (depends-on "sr-speedbar")
 (depends-on "sws-mode")
+(depends-on "tidy")
 (depends-on "vagrant")
 (depends-on "visible-mark")
 (depends-on "visual-regexp")
@@ -66,3 +67,4 @@
 (depends-on "wgrep")
 (depends-on "wgrep-ack")
 (depends-on "yaml-mode")
+(depends-on "yard-mode")

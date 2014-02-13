@@ -183,8 +183,23 @@
                            (setq indent (current-column)))))
                      (if indent
                          (indent-line-to indent)
-                       ad-do-it)))))))
-(add-hook 'robe-mode-hook (lambda () (add-to-list 'ac-sources 'ac-source-robe)))
+                       ad-do-it)))))
+     (add-hook 'robe-mode-hook (lambda () (add-to-list 'ac-sources 'ac-source-robe)))))
+
+    ;; RSense
+    ;; (setq rsense-home nil)
+    ;; (let ((rsense-home-val
+    ;;        (cond ((eq system-type 'gnu/linux) "/usr/lib/rsense-0.3")
+    ;;              ((eq system-type 'darwin) "/usr/local/Cellar/rsense/0.3/libexec"))))
+    ;;   (when (and rsense-home-val (file-exists-p rsense-home-val))
+    ;;     (setq rsense-home rsense-home-val)
+    ;;     (add-to-list 'load-path (concat rsense-home "/etc"))))
+
+    ;; (when rsense-home
+    ;;   (require 'rsense)
+    ;;   (add-hook 'ruby-mode-hook
+    ;;             (lambda () (add-to-list 'ac-sources 'ac-source-rsense))))
+    ;; ))
 
 ;; imenu
 (add-hook 'graphene-prog-mode-hook
