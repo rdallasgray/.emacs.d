@@ -66,5 +66,5 @@
 (depends-on "web-mode")
 (depends-on "wgrep")
 (depends-on "wgrep-ack")
-(depends-on "yaml-mode")
 (depends-on "yard-mode")
+(depends-on "yaml-mode")
