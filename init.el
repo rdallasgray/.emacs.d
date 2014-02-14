@@ -34,7 +34,7 @@
   (require 'readline-complete)
   (add-hook 'shell-mode-hook
             (lambda ()
-              (ac-rlc-setup-sources)
+              (add-to-list 'ac-sources 'ac-source-shell)
               (auto-complete-mode))))
 
 ;; Easily open/switch to a shell
