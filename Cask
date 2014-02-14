@@ -43,6 +43,7 @@
 (depends-on "pos-tip")
 (depends-on "project-persist")
 (depends-on "quickrun")
+(depends-on "rainbow-mode")
 (depends-on "restclient")
 (depends-on "robe")
 (depends-on "rsense")
