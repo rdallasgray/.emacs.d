@@ -5,14 +5,15 @@
     (message "Starting server")
     (server-start)))
 
-(add-to-list 'load-path "~/.emacs.d/")
 (add-to-list 'load-path "~/.emacs.d/graphene/")
 (add-to-list 'load-path "~/.emacs.d/pallet/")
 (add-to-list 'load-path "~/.emacs.d/readline-complete/")
 (add-to-list 'load-path "~/.emacs.d/emacs-pry/")
 
+(require 'package)
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
+(add-to-list 'auto-mode-alist '("\\Cask\\'" . emacs-lisp-mode))
 
 (require 'pallet)
 (require 'graphene)
@@ -32,10 +33,9 @@
   (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
         comint-process-echoes t)
   (require 'readline-complete)
-  (add-hook 'shell-mode-hook
-            (lambda ()
-              (add-to-list 'ac-sources 'ac-source-shell)
-              (auto-complete-mode))))
+  (push 'company-readline company-backends)
+  (add-hook 'rlc-no-readline-hook (lambda () (company-mode -1)))
+  (add-hook 'shell-mode-hook 'company-mode))
 
 ;; Easily open/switch to a shell
 (global-set-key (kbd "C-c `") 'shell-pop)
