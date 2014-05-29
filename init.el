@@ -34,8 +34,8 @@
         comint-process-echoes t)
   (require 'readline-complete)
   (push '(company-readline company-files company-dabbrev) company-backends)
-  (add-hook 'rlc-no-readline-hook (lambda () (company-mode -1)))
-  (add-hook 'shell-mode-hook 'company-mode))
+  (add-hook 'shell-mode-hook 'company-mode)
+  (setq rlc-attempts 5))
 
 ;; Easily open/switch to a shell
 (global-set-key (kbd "C-c `") 'shell-pop)
@@ -183,8 +183,7 @@
                            (setq indent (current-column)))))
                      (if indent
                          (indent-line-to indent)
-                       ad-do-it)))))
-     (add-hook 'robe-mode-hook (lambda () (add-to-list 'ac-sources 'ac-source-robe)))))
+                       ad-do-it)))))))
 
     ;; RSense
     ;; (setq rsense-home nil)
