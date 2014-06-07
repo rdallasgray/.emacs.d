@@ -33,7 +33,7 @@
   (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
         comint-process-echoes t)
   (require 'readline-complete)
-  (push '(company-readline company-files company-dabbrev) company-backends)
+  (push '(company-readline company-files) company-backends)
   (add-hook 'shell-mode-hook 'company-mode)
   (setq rlc-attempts 5))
 
