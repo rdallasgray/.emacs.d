@@ -6,7 +6,7 @@
 	url = git@github.com:rdallasgray/pallet.git
 [submodule "readline-complete"]
 	path = readline-complete
-	url = https://github.com/monsanto/readline-complete.el.git
+	url = git@github.com:rdallasgray/readline-complete.el.git
 [submodule "emacs-pry"]
 	path = emacs-pry
 	url = https://github.com/jacott/emacs-pry.git
