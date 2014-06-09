@@ -8,6 +8,7 @@
 (depends-on "cask")
 (depends-on "coffee-mode")
 (depends-on "color-theme")
+(depends-on "color-theme-solarized")
 (depends-on "commander")
 (depends-on "company")
 (depends-on "company")
