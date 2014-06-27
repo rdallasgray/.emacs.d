@@ -33,7 +33,7 @@
   (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
         comint-process-echoes t)
   (require 'readline-complete)
-  (push '(company-readline company-files) company-backends)
+  (push 'company-readline company-backends)
   (add-hook 'shell-mode-hook 'company-mode)
   (setq rlc-attempts 5))
 
@@ -135,9 +135,8 @@
 (global-set-key (kbd "M-V") 'scroll-down-line)
 
 ;; JS
-(eval-after-load 'javascript-mode
-  '(progn
-     (setq js-indent-level 2)))
+(add-hook 'js-mode-hook
+          (lambda () (setq js-indent-level 2)))
 
 (eval-after-load 'ruby-mode
   '(progn
