@@ -18,6 +18,10 @@
 (require 'pallet)
 (require 'graphene)
 
+(require 'midnight)
+(setq clean-buffer-list-delay-general 7)
+(midnight-delay-set 'midnight-delay "12:00am")
+
 (setq warning-minimum-level :error)
 
 (setq dropbox-directory "~/Dropbox")
@@ -45,6 +49,12 @@
 
 ;; er
 (global-set-key (kbd "C-M-SPC") 'er/expand-region)
+
+;; sp
+(global-set-key (kbd "C-M-<left>") 'sp-backward-sexp)
+(global-set-key (kbd "C-M-<right>") 'sp-forward-sexp)
+(global-set-key (kbd "C-M-<up>") 'sp-backward-up-sexp)
+(global-set-key (kbd "C-M-<down>") 'sp-down-sexp)
 
 ;; org
 (defun load-org-and-capture ()
