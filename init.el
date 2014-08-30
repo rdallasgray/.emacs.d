@@ -11,7 +11,7 @@
 (add-to-list 'load-path "~/.emacs.d/emacs-pry/")
 
 (require 'package)
-(require 'cask "~/.cask/cask.el")
+(require 'cask "/usr/local/Cellar/cask/0.7.1/cask.el")
 (cask-initialize)
 (add-to-list 'auto-mode-alist '("\\Cask\\'" . emacs-lisp-mode))
 
@@ -192,6 +192,9 @@
   (beginning-of-defun))
 (global-set-key (kbd "M-<down>") 'beginning-of-next-defun)
 (global-set-key (kbd "M-<up>") 'beginning-of-defun)
+
+;; goto-chg
+(global-set-key (kbd "C-c /") 'goto-last-change)
 
 ;; No visible region on C-x C-x
 (defun exchange-point-and-mark-no-region ()
