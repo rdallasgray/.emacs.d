@@ -24,6 +24,7 @@
 (depends-on "git-commit-mode")
 (depends-on "git-rebase-mode")
 (depends-on "gitignore-mode")
+(depends-on "goto-chg")
 (depends-on "grizzl")
 (depends-on "helm")
 (depends-on "hl-sexp")
