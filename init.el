@@ -55,6 +55,7 @@
 (global-set-key (kbd "C-M-<right>") 'sp-forward-sexp)
 (global-set-key (kbd "C-M-<up>") 'sp-backward-up-sexp)
 (global-set-key (kbd "C-M-<down>") 'sp-down-sexp)
+(global-set-key (kbd "C-M-<backspace>") 'sp-unwrap-sexp)
 
 ;; org
 (defun load-org-and-capture ()
