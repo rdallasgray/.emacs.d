@@ -30,7 +30,8 @@
 (let ((shell-name "bash"))
   (setq explicit-shell-file-name shell-name
         shell-file-name shell-name)
-  (setenv "SHELL" shell-name))
+  (setenv "SHELL" shell-name)
+  (setenv "PAGER" "/bin/cat"))
 
 ;; Set up readline-complete if not on Windows
 (unless (eq system-type 'windows-nt)
@@ -39,7 +40,7 @@
   (require 'readline-complete)
   (push 'company-readline company-backends)
   (add-hook 'shell-mode-hook 'company-mode)
-  (setq rlc-attempts 5))
+  (setq rlc-attempts 1))
 
 ;; Easily open/switch to a shell
 (global-set-key (kbd "C-c `") 'shell-pop)
@@ -131,9 +132,6 @@
 (fset 'insert-pound "#")
 (define-key global-map "\M-3" 'insert-pound)
 (setq ns-right-alternate-modifier nil)
-;; Mac-port specific key settings
-(setq mac-option-modifier 'meta)
-(setq mac-command-modifier 'hyper)
 
 ;; Sensible window movement
 (global-set-key (kbd "C-c <up>") 'windmove-up)
@@ -152,7 +150,7 @@
 (eval-after-load 'ruby-mode
   '(progn
      (exec-path-from-shell-copy-env "GEM_HOME")))
-;; RSense
+;; RSense - TODO create company backend
 ;; (setq rsense-home nil)
 ;; (let ((rsense-home-val
 ;;        (cond ((eq system-type 'gnu/linux) "/usr/lib/rsense-0.3")
@@ -175,7 +173,8 @@
 (eval-after-load 'imenu-anywhere
   '(progn
      (setq imenu-auto-rescan t)
-     (global-set-key (kbd "C-c .") 'imenu-anywhere)))
+     (global-set-key (kbd "C-c .") 'idomenu)
+     (global-set-key (kbd "C-c C-.") 'imenu-anywhere)))
 
 ;; multi-occur
 (defun multi-occur-in-open-buffers (regexp &optional allbufs)
