@@ -11,11 +11,12 @@
 (add-to-list 'load-path "~/.emacs.d/emacs-pry/")
 
 (require 'package)
-(require 'cask "/usr/local/Cellar/cask/0.7.1/cask.el")
+(require 'cask "/usr/local/Cellar/cask/0.7.2/cask.el")
 (cask-initialize)
 (add-to-list 'auto-mode-alist '("\\Cask\\'" . emacs-lisp-mode))
 
 (require 'pallet)
+(pallet-mode t)
 (require 'graphene)
 
 (require 'midnight)
