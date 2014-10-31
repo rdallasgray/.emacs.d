@@ -40,7 +40,7 @@
   (require 'readline-complete)
   (push 'company-readline company-backends)
   (add-hook 'shell-mode-hook 'company-mode)
-  (setq rlc-attempts 1))
+  (setq rlc-attempts 10))
 
 ;; Easily open/switch to a shell
 (global-set-key (kbd "C-c `") 'shell-pop)
@@ -142,6 +142,10 @@
 ;; Scroll up and down a line at a time
 (global-set-key (kbd "C-S-v") 'scroll-up-line)
 (global-set-key (kbd "M-V") 'scroll-down-line)
+
+;; SCSS
+(eval-after-load 'scss-mode
+  '(setq scss-compile-at-save nil))
 
 ;; JS
 (add-hook 'js-mode-hook
