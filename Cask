@@ -23,6 +23,7 @@
 (depends-on "git")
 (depends-on "git-commit-mode")
 (depends-on "git-rebase-mode")
+(depends-on "git-timemachine")
 (depends-on "gitignore-mode")
 (depends-on "goto-chg")
 (depends-on "grizzl")

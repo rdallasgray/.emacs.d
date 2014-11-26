@@ -144,6 +144,10 @@
 (global-set-key (kbd "C-S-v") 'scroll-up-line)
 (global-set-key (kbd "M-V") 'scroll-down-line)
 
+;; SCSS
+(eval-after-load 'scss-mode
+  '(setq scss-compile-at-save nil))
+
 ;; JS
 (add-hook 'js-mode-hook
           (lambda () (setq js-indent-level 2)))
