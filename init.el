@@ -41,7 +41,7 @@
   (require 'readline-complete)
   (push 'company-readline company-backends)
   (add-hook 'shell-mode-hook 'company-mode)
-  (setq rlc-attempts 1))
+  (setq rlc-attempts 10))
 
 ;; Easily open/switch to a shell
 (global-set-key (kbd "C-c `") 'shell-pop)
@@ -212,6 +212,11 @@
 (setq custom-file "~/.emacs.d/custom.el")
 (when (file-exists-p custom-file)
   (load custom-file))
+
+(setq graphene-default-font "Fira Mono OT-12"
+      graphene-fixed-pitch-font "Fira Mono OT-12"
+      graphene-variable-pitch-font "Fira Sans OT-12"
+      graphene-line-spacing 1)
 
 (if window-system
     (load-theme 'solarized-light))
