@@ -26,3 +26,4 @@ persp-confs/
 !/org/.gitkeep
 bookmarks
 .cask
+/project-explorer-cache
