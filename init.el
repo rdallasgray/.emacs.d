@@ -34,6 +34,12 @@
   (setenv "SHELL" shell-name)
   (setenv "PAGER" "/bin/cat"))
 
+(defun rdg/remove-rogue-control-chars (op)
+  (replace-regexp-in-string "\\(\\[0G\\)\\|\\(\\]2;\\)\\|\\(\\)" "" op))
+
+(add-to-list 'comint-preoutput-filter-functions
+             'rdg/remove-rogue-control-chars)
+
 ;; Set up readline-complete if not on Windows
 (unless (eq system-type 'windows-nt)
   (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
@@ -223,4 +229,4 @@
 ;;       graphene-line-spacing 1)
 
 (when window-system
-    (load-theme 'solarized-light))
+    (load-theme 'solarized-light t))
