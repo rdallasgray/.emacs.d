@@ -37,8 +37,9 @@
 (defun rdg/remove-rogue-control-chars (op)
   (replace-regexp-in-string "\\(\\[0G\\)\\|\\(\\]2;\\)\\|\\(\\)" "" op))
 
-(add-to-list 'comint-preoutput-filter-functions
-             'rdg/remove-rogue-control-chars)
+(eval-after-load 'shell
+  '(add-to-list 'comint-preoutput-filter-functions
+                'rdg/remove-rogue-control-chars))
 
 ;; Set up readline-complete if not on Windows
 (unless (eq system-type 'windows-nt)
