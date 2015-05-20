@@ -10,3 +10,12 @@
 [submodule "emacs-pry"]
 	path = emacs-pry
 	url = https://github.com/jacott/emacs-pry.git
+[submodule "project-persist-drawer"]
+	path = project-persist-drawer
+	url = git@github.com:rdallasgray/project-persist-drawer.git
+[submodule "project-persist-git"]
+	path = project-persist-git
+	url = git@github.com:rdallasgray/project-persist.git
+[submodule "ppd-sr-speedbar"]
+	path = ppd-sr-speedbar
+	url = git@github.com:rdallasgray/ppd-sr-speedbar.git
