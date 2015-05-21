@@ -7,6 +7,9 @@
 
 (add-to-list 'load-path "~/.emacs.d/graphene/")
 (add-to-list 'load-path "~/.emacs.d/pallet/")
+(add-to-list 'load-path "~/.emacs.d/project-persist-git/")
+(add-to-list 'load-path "~/.emacs.d/project-persist-drawer/")
+(add-to-list 'load-path "~/.emacs.d/ppd-sr-speedbar/")
 (add-to-list 'load-path "~/.emacs.d/readline-complete/")
 (add-to-list 'load-path "~/.emacs.d/emacs-pry/")
 
@@ -21,6 +24,13 @@
 
 (eval-after-load 'tramp
   '(vagrant-tramp-enable))
+
+(eval-after-load 'persp-mode
+  '(progn
+     (defadvice persp-switch (before undedicate-speedbar activate)
+       (when (boundp 'sr-speedbar-window)
+         (ignore-errors
+           (set-window-dedicated-p sr-speedbar-window nil))))))
 
 (require 'midnight)
 (setq clean-buffer-list-delay-general 7)
@@ -235,4 +245,4 @@
 ;;       graphene-line-spacing 1)
 
 (when window-system
-    (load-theme 'solarized-light t))
+    (load-theme 'solarized t))
