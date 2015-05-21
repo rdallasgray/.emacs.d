@@ -193,9 +193,9 @@
 ;; ))
 
 ;; imenu
-(add-hook 'graphene-prog-mode-hook
-          (lambda ()
-            (require 'imenu-anywhere)))
+;; (add-hook 'graphene-prog-mode-hook
+;;           (lambda ()
+;;             (require 'imenu-anywhere)))
 
 (eval-after-load 'imenu-anywhere
   '(progn
