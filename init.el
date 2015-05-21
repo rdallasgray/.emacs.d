@@ -19,6 +19,9 @@
 (pallet-mode t)
 (require 'graphene)
 
+(eval-after-load 'tramp
+  '(vagrant-tramp-enable))
+
 (require 'midnight)
 (setq clean-buffer-list-delay-general 7)
 (midnight-delay-set 'midnight-delay "12:00am")
@@ -40,6 +43,8 @@
 (eval-after-load 'shell
   '(add-to-list 'comint-preoutput-filter-functions
                 'rdg/remove-rogue-control-chars))
+
+(add-hook 'coffee-mode-hook 'subword-mode)
 
 ;; Set up readline-complete if not on Windows
 (unless (eq system-type 'windows-nt)
