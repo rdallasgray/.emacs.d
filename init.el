@@ -22,15 +22,8 @@
 (pallet-mode t)
 (require 'graphene)
 
-(eval-after-load 'tramp
-  '(vagrant-tramp-enable))
-
-(eval-after-load 'persp-mode
-  '(progn
-     (defadvice persp-switch (before undedicate-speedbar activate)
-       (when (boundp 'sr-speedbar-window)
-         (ignore-errors
-           (set-window-dedicated-p sr-speedbar-window nil))))))
+(eval-after-load 'flycheck
+  '(setq flycheck-coffee-executable "cjsx"))
 
 (require 'midnight)
 (setq clean-buffer-list-delay-general 7)
@@ -55,6 +48,7 @@
                 'rdg/remove-rogue-control-chars))
 
 (add-hook 'coffee-mode-hook 'subword-mode)
+(add-hook 'ruby-mode-hook 'subword-mode)
 
 ;; Set up readline-complete if not on Windows
 (unless (eq system-type 'windows-nt)
@@ -63,13 +57,10 @@
   (require 'readline-complete)
   (push 'company-readline company-backends)
   (add-hook 'shell-mode-hook 'company-mode)
-  (setq rlc-attempts 10))
+  (setq rlc-attempts 5))
 
 ;; Easily open/switch to a shell
 (global-set-key (kbd "C-c `") 'shell-pop)
-
-;; fiplr
-(global-set-key (kbd "C-c f") 'fiplr-find-file)
 
 ;; er
 (global-set-key (kbd "C-M-SPC") 'er/expand-region)
@@ -197,11 +188,12 @@
 ;;           (lambda ()
 ;;             (require 'imenu-anywhere)))
 
-(eval-after-load 'imenu-anywhere
+(eval-after-load 'idomenu
   '(progn
      (setq imenu-auto-rescan t)
      (global-set-key (kbd "C-c .") 'idomenu)
-     (global-set-key (kbd "C-c C-.") 'imenu-anywhere)))
+     ;; (global-set-key (kbd "C-c C-.") 'imenu-anywhere)
+     ))
 
 ;; multi-occur
 (defun multi-occur-in-open-buffers (regexp &optional allbufs)
@@ -238,11 +230,6 @@
 (setq custom-file "~/.emacs.d/custom.el")
 (when (file-exists-p custom-file)
   (load custom-file))
-
-;; (setq graphene-default-font "Fira Mono OT-12"
-;;       graphene-fixed-pitch-font "Fira Mono OT-12"
-;;       graphene-variable-pitch-font "Fira Sans OT-12"
-;;       graphene-line-spacing 1)
 
 (when window-system
     (load-theme 'solarized t))
