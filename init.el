@@ -22,6 +22,25 @@
 (pallet-mode t)
 (require 'graphene)
 
+(require 'ido-ubiquitous)
+(ido-ubiquitous-mode t)
+
+(require 'mmm-auto)
+(setq mmm-global-mode 'maybe)
+(mmm-add-classes
+ '((cjsx
+    :submode web
+    :face mmm-declaration-submode-face
+    :front "<[:alnum:]+"
+    :back "[:blank:]*/>"
+    :include-front t
+    :include-back t)))
+(mmm-add-mode-ext-class 'coffee-mode "\\.coffee\\'" 'cjsx)
+
+(require 'swiper)
+;; (global-set-key "\C-s" 'swiper)
+;; (global-set-key "\C-r" 'swiper)
+
 (eval-after-load 'flycheck
   '(setq flycheck-coffee-executable "cjsx"))
 
@@ -164,7 +183,12 @@
 ;; JS
 (add-hook 'js-mode-hook
           (lambda () (setq js-indent-level 2)))
+(push 'company-tern company-backends)
 
+;; Web
+(push 'company-web company-backends)
+
+;; Ruby
 (eval-after-load 'ruby-mode
   '(progn
      (exec-path-from-shell-copy-env "GEM_HOME")))
