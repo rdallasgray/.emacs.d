@@ -22,27 +22,12 @@
 (pallet-mode t)
 (require 'graphene)
 
-(require 'ido-ubiquitous)
-(ido-ubiquitous-mode t)
-
-(require 'mmm-auto)
-(setq mmm-global-mode 'maybe)
-(mmm-add-classes
- '((cjsx
-    :submode web
-    :face mmm-declaration-submode-face
-    :front "<[:alnum:]+"
-    :back "[:blank:]*/>"
-    :include-front t
-    :include-back t)))
-(mmm-add-mode-ext-class 'coffee-mode "\\.coffee\\'" 'cjsx)
-
 (require 'swiper)
-;; (global-set-key "\C-s" 'swiper)
-;; (global-set-key "\C-r" 'swiper)
+(global-set-key "\C-s" 'swiper)
+(global-set-key "\C-r" 'swiper)
 
-(eval-after-load 'flycheck
-  '(setq flycheck-coffee-executable "cjsx"))
+(with-eval-after-load 'flycheck
+  (setq flycheck-coffee-executable "cjsx"))
 
 (require 'midnight)
 (setq clean-buffer-list-delay-general 7)
@@ -62,9 +47,9 @@
 (defun rdg/remove-rogue-control-chars (op)
   (replace-regexp-in-string "\\(\\[0G\\)\\|\\(\\]2;\\)\\|\\(\\)" "" op))
 
-(eval-after-load 'shell
-  '(add-to-list 'comint-preoutput-filter-functions
-                'rdg/remove-rogue-control-chars))
+(with-eval-after-load 'shell
+  (add-to-list 'comint-preoutput-filter-functions
+               'rdg/remove-rogue-control-chars))
 
 (add-hook 'coffee-mode-hook 'subword-mode)
 (add-hook 'ruby-mode-hook 'subword-mode)
@@ -99,59 +84,58 @@
 
 (global-set-key (kbd "C-c c") 'load-org-and-capture)
 
-(eval-after-load 'org
-  '(progn
-    (let ((maybe-org-directory (expand-file-name "org" user-emacs-directory)))
-      (when (file-exists-p maybe-org-directory)
-        (setq org-directory maybe-org-directory)
-        (setq org-completion-use-ido t)
-        (setq org-default-notes-file (expand-file-name "notes.org" org-directory))
-        (setq org-agenda-files
-              (mapcar (lambda (el) (expand-file-name el org-directory))
-                      '("notes.org" "personal.org" "projects.org" "blog.org" "ideas.org")))
+(with-eval-after-load 'org
+  (let ((maybe-org-directory (expand-file-name "org" user-emacs-directory)))
+    (when (file-exists-p maybe-org-directory)
+      (setq org-directory maybe-org-directory)
+      (setq org-completion-use-ido t)
+      (setq org-default-notes-file (expand-file-name "notes.org" org-directory))
+      (setq org-agenda-files
+            (mapcar (lambda (el) (expand-file-name el org-directory))
+                    '("notes.org" "personal.org" "projects.org" "blog.org" "ideas.org")))
 
-        ;; org capture/refile
-        (defun capture-find-or-create-headline (headline)
-          "Find or create HEADLINE in the current buffer"
-          (goto-char (point-min))
-          (when (not (re-search-forward
-                      (format org-complex-heading-regexp-format headline) nil t))
-            (insert "* " headline))
-          (newline))
+      ;; org capture/refile
+      (defun capture-find-or-create-headline (headline)
+        "Find or create HEADLINE in the current buffer"
+        (goto-char (point-min))
+        (when (not (re-search-forward
+                    (format org-complex-heading-regexp-format headline) nil t))
+          (insert "* " headline))
+        (newline))
 
-        (defun capture-headline-current-project-name ()
-          (capture-find-or-create-headline project-persist-current-project-name))
+      (defun capture-headline-current-project-name ()
+        (capture-find-or-create-headline project-persist-current-project-name))
 
-        (setq org-capture-templates
-              '(("n" "Note" entry
-                 (file org-default-notes-file)
-                 "* %U %?")
-                ("p" "Project Note" plain
-                 (file+function (expand-file-name "projects.org" org-directory) capture-headline-current-project-name)
-                 "** %U %f: %?")
-                ("d" "Personal Note" entry
-                 (file (expand-file-name "personal.org" org-directory))
-                 "* %U %?")
-                ("b" "Blog Note" entry
-                 (file (expand-file-name "blog.org" org-directory))
-                 "* %U %?")
-                ("i" "Idea" entry
-                 (file (expand-file-name "ideas.org" org-directory))
-                 "* %U %?")))
+      (setq org-capture-templates
+            '(("n" "Note" entry
+               (file org-default-notes-file)
+               "* %U %?")
+              ("p" "Project Note" plain
+               (file+function (expand-file-name "projects.org" org-directory) capture-headline-current-project-name)
+               "** %U %f: %?")
+              ("d" "Personal Note" entry
+               (file (expand-file-name "personal.org" org-directory))
+               "* %U %?")
+              ("b" "Blog Note" entry
+               (file (expand-file-name "blog.org" org-directory))
+               "* %U %?")
+              ("i" "Idea" entry
+               (file (expand-file-name "ideas.org" org-directory))
+               "* %U %?")))
 
-        (setq org-refile-allow-creating-parent-nodes t)
-        (setq org-refile-use-outline-path 'file)
-        (setq org-outline-path-complete-in-steps t)
-        (setq org-refile-targets '((nil :maxlevel . 5) (org-agenda-files :maxlevel . 5)))
+      (setq org-refile-allow-creating-parent-nodes t)
+      (setq org-refile-use-outline-path 'file)
+      (setq org-outline-path-complete-in-steps t)
+      (setq org-refile-targets '((nil :maxlevel . 5) (org-agenda-files :maxlevel . 5)))
 
-        ;; org-mobile -- ignore if no dropbox/org-mobile directory
-        (let ((maybe-org-mobile-directory (expand-file-name "Apps/MobileOrg" dropbox-directory)))
-          (when (file-exists-p maybe-org-mobile-directory)
-            (require 'org-mobile)
-            (setq org-mobile-inbox-for-pull (expand-file-name "inbox.org" org-directory))
-            (setq org-mobile-directory (expand-file-name "Apps/MobileOrg" dropbox-directory))
-            (org-mobile-pull)
-            (add-hook 'kill-emacs-hook 'org-mobile-push)))))))
+      ;; org-mobile -- ignore if no dropbox/org-mobile directory
+      (let ((maybe-org-mobile-directory (expand-file-name "Apps/MobileOrg" dropbox-directory)))
+        (when (file-exists-p maybe-org-mobile-directory)
+          (require 'org-mobile)
+          (setq org-mobile-inbox-for-pull (expand-file-name "inbox.org" org-directory))
+          (setq org-mobile-directory (expand-file-name "Apps/MobileOrg" dropbox-directory))
+          (org-mobile-pull)
+          (add-hook 'kill-emacs-hook 'org-mobile-push))))))
 
 
 ;; No pop-ups
@@ -177,21 +161,17 @@
 (global-set-key (kbd "M-V") 'scroll-down-line)
 
 ;; SCSS
-(eval-after-load 'scss-mode
-  '(setq scss-compile-at-save nil))
+(with-eval-after-load 'scss-mode
+  (setq scss-compile-at-save nil))
 
 ;; JS
 (add-hook 'js-mode-hook
           (lambda () (setq js-indent-level 2)))
 (push 'company-tern company-backends)
 
-;; Web
-(push 'company-web company-backends)
-
 ;; Ruby
-(eval-after-load 'ruby-mode
-  '(progn
-     (exec-path-from-shell-copy-env "GEM_HOME")))
+(with-eval-after-load 'ruby-mode
+  (exec-path-from-shell-copy-env "GEM_HOME"))
 ;; RSense - TODO create company backend
 ;; (setq rsense-home nil)
 ;; (let ((rsense-home-val
@@ -212,12 +192,11 @@
 ;;           (lambda ()
 ;;             (require 'imenu-anywhere)))
 
-(eval-after-load 'idomenu
-  '(progn
-     (setq imenu-auto-rescan t)
-     (global-set-key (kbd "C-c .") 'idomenu)
-     ;; (global-set-key (kbd "C-c C-.") 'imenu-anywhere)
-     ))
+(with-eval-after-load 'idomenu
+  (setq imenu-auto-rescan t)
+  (global-set-key (kbd "C-c .") 'idomenu)
+  ;; (global-set-key (kbd "C-c C-.") 'imenu-anywhere)
+  )
 
 ;; multi-occur
 (defun multi-occur-in-open-buffers (regexp &optional allbufs)
