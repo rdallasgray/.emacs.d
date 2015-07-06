@@ -236,3 +236,36 @@
 
 (when window-system
     (load-theme 'solarized t))
+
+(require 'windmove)
+
+(defun buf-stack (direction)
+  (let* ((other-win (windmove-find-other-window direction))
+         (buf-this-buf (window-buffer (selected-window))))
+    (if (null other-win)
+        (error "No window in that direction")
+      (set-window-buffer other-win buf-this-buf)
+      (set-window-buffer (selected-window)
+                         (car (nth 1 (window-prev-buffers
+                                      (selected-window))))))))
+
+(defun buf-stack-left ()
+    (interactive)
+  (buf-stack 'left))
+
+(defun buf-stack-right ()
+    (interactive)
+  (buf-stack 'right))
+
+(defun buf-stack-up ()
+    (interactive)
+  (buf-stack 'up))
+
+(defun buf-stack-down ()
+    (interactive)
+  (buf-stack 'down))
+
+(global-set-key (kbd "C-c C-<left>") 'buf-stack-left)
+(global-set-key (kbd "C-c C-<right>") 'buf-stack-right)
+(global-set-key (kbd "C-c C-<up>") 'buf-stack-up)
+(global-set-key (kbd "C-c C-<down>") 'buf-stack-down)
