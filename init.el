@@ -257,7 +257,7 @@
     (interactive)
   (buf-stack 'down))
 
-(global-set-key (kbd "C-c C-<left>") 'buf-stack-left)
-(global-set-key (kbd "C-c C-<right>") 'buf-stack-right)
-(global-set-key (kbd "C-c C-<up>") 'buf-stack-up)
-(global-set-key (kbd "C-c C-<down>") 'buf-stack-down)
+(global-set-key (kbd "C-c S-<left>") 'buf-stack-left)
+(global-set-key (kbd "C-c S-<right>") 'buf-stack-right)
+(global-set-key (kbd "C-c S-<up>") 'buf-stack-up)
+(global-set-key (kbd "C-c S-<down>") 'buf-stack-down)
