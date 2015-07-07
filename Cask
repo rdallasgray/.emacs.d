@@ -42,6 +42,7 @@
 (depends-on "json-reformat")
 (depends-on "json-snatcher")
 (depends-on "let-alist")
+(depends-on "magit")
 (depends-on "markdown-mode")
 (depends-on "mmm-mode")
 (depends-on "names")
