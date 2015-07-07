@@ -36,6 +36,7 @@
 (depends-on "ido-vertical-mode")
 (depends-on "ido-yes-or-no")
 (depends-on "idomenu")
+(depends-on "imenu-anywhere")
 (depends-on "inf-ruby")
 (depends-on "json-mode")
 (depends-on "json-reformat")

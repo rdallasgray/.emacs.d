@@ -1,3 +1,7 @@
+(setq custom-file "~/.emacs.d/custom.el")
+(when (file-exists-p custom-file)
+  (load custom-file))
+
 (require 'server)
 (if (server-running-p)
     (message "Server is running")
@@ -18,6 +22,9 @@
 (cask-initialize)
 (add-to-list 'auto-mode-alist '("\\Cask\\'" . emacs-lisp-mode))
 
+(when window-system
+    (load-theme 'solarized t))
+
 (require 'pallet)
 (pallet-mode t)
 (require 'graphene)
@@ -25,9 +32,6 @@
 (require 'swiper)
 (global-set-key "\C-s" 'swiper)
 (global-set-key "\C-r" 'swiper)
-
-(with-eval-after-load 'flycheck
-  (setq flycheck-coffee-executable "cjsx"))
 
 (require 'midnight)
 (setq clean-buffer-list-delay-general 7)
@@ -192,11 +196,11 @@
 ;;           (lambda ()
 ;;             (require 'imenu-anywhere)))
 
-(with-eval-after-load 'idomenu
-  (setq imenu-auto-rescan t)
-  (global-set-key (kbd "C-c .") 'idomenu)
-  ;; (global-set-key (kbd "C-c C-.") 'imenu-anywhere)
-  )
+(require 'idomenu)
+(require 'imenu-anywhere)
+(setq imenu-auto-rescan t)
+(global-set-key (kbd "C-c .") 'idomenu)
+(global-set-key (kbd "C-c C-.") 'imenu-anywhere)
 
 ;; multi-occur
 (defun multi-occur-in-open-buffers (regexp &optional allbufs)
@@ -215,9 +219,6 @@
 (global-set-key (kbd "M-<down>") 'beginning-of-next-defun)
 (global-set-key (kbd "M-<up>") 'beginning-of-defun)
 
-;; goto-chg
-(global-set-key (kbd "C-c /") 'goto-last-change)
-
 ;; No visible region on C-x C-x
 (defun exchange-point-and-mark-no-region ()
   "Suppress region visibility when exchanging point and mark."
@@ -229,13 +230,6 @@
 
 ;; Remove trailing whitespace
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
-
-(setq custom-file "~/.emacs.d/custom.el")
-(when (file-exists-p custom-file)
-  (load custom-file))
-
-(when window-system
-    (load-theme 'solarized t))
 
 (require 'windmove)
 
