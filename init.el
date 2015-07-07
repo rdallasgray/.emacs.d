@@ -245,9 +245,7 @@
     (if (null other-win)
         (error "No window in that direction")
       (set-window-buffer other-win buf-this-buf)
-      (set-window-buffer (selected-window)
-                         (car (nth 1 (window-prev-buffers
-                                      (selected-window))))))))
+      (switch-to-prev-buffer (selected-window) t))))
 
 (defun buf-stack-left ()
     (interactive)
