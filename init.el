@@ -168,10 +168,12 @@
 (with-eval-after-load 'scss-mode
   (setq scss-compile-at-save nil))
 
-;; JS
+;; JS/Coffee
 (add-hook 'js-mode-hook
           (lambda () (setq js-indent-level 2)))
 (push 'company-tern company-backends)
+(with-eval-after-load 'flycheck
+  (setq flycheck-coffee-executable "cjsx"))
 
 ;; Ruby
 (with-eval-after-load 'ruby-mode
