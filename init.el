@@ -10,7 +10,12 @@
     (server-start)))
 
 ;; git-wip
-(add-to-list 'exec-path "/Users/robertdallasgray/Documents/Code/git-wip")
+(let ((git-wip-path "/Users/robertdallasgray/Documents/Code/git-wip"))
+  (add-to-list 'exec-path git-wip-path)
+  (add-to-list 'load-path (format "%s/emacs/" git-wip-path)))
+
+(require 'git-wip-mode)
+(git-wip-mode t)
 
 (add-to-list 'load-path "~/.emacs.d/graphene/")
 (add-to-list 'load-path "~/.emacs.d/pallet/")
@@ -39,6 +44,19 @@
 (require 'midnight)
 (setq clean-buffer-list-delay-general 7)
 (midnight-delay-set 'midnight-delay "12:00am")
+
+(defhydra hydra-mark (global-map "C-c SPC")
+  "mark"
+  ("w" er/mark-word)
+  ("s" er/mark-sexp)
+  ("d" er/mark-defun)
+  ("i" er/mark-inside-pairs)
+  ("o" er/mark-outside-pairs)
+  ("+" er/expand-region)
+  ("-" er/contract-region)
+  (">" mc/mark-next-like-this)
+  ("<" mc/mark-previous-like-this)
+  ("m" mc/mark-more-like-this-extended))
 
 (setq warning-minimum-level :error)
 

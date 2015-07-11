@@ -46,6 +46,7 @@
 (depends-on "magit")
 (depends-on "markdown-mode")
 (depends-on "mmm-mode")
+(depends-on "multiple-cursors")
 (depends-on "names")
 (depends-on "nginx-mode")
 (depends-on "noflet")
