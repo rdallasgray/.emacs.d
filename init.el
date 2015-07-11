@@ -9,6 +9,9 @@
     (message "Starting server")
     (server-start)))
 
+;; git-wip
+(add-to-list 'exec-path "/Users/robertdallasgray/Documents/Code/git-wip")
+
 (add-to-list 'load-path "~/.emacs.d/graphene/")
 (add-to-list 'load-path "~/.emacs.d/pallet/")
 (add-to-list 'load-path "~/.emacs.d/project-persist-git/")
