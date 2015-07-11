@@ -30,6 +30,7 @@
 (depends-on "fringe-helper")
 (depends-on "git")
 (depends-on "git-timemachine")
+(depends-on "git-wip-timemachine")
 (depends-on "gitignore-mode")
 (depends-on "hydra")
 (depends-on "ido-ubiquitous")
