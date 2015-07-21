@@ -45,6 +45,7 @@
 (setq clean-buffer-list-delay-general 7)
 (midnight-delay-set 'midnight-delay "12:00am")
 
+(require 'expand-region)
 (defhydra hydra-mark (global-map "C-c SPC")
   "mark"
   ("w" er/mark-word)
@@ -284,3 +285,13 @@
 (global-set-key (kbd "C-c S-<right>") 'buf-stack-right)
 (global-set-key (kbd "C-c S-<up>") 'buf-stack-up)
 (global-set-key (kbd "C-c S-<down>") 'buf-stack-down)
+
+(defun kill-zombie-buffers ()
+  "Kill buffers no longer associated with a file."
+  (interactive)
+  (let ((buffers (buffer-list)))
+    (mapc (lambda (buf)
+            (let ((filename (buffer-file-name buf)))
+              (when (and filename (not (file-exists-p filename)))
+                (kill-buffer buf))))
+          buffers)))
