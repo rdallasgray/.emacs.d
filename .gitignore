@@ -27,3 +27,5 @@ persp-confs/
 bookmarks
 .cask
 /project-explorer-cache
+ido.last
+smex-items
