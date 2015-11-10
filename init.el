@@ -26,7 +26,7 @@
 (add-to-list 'load-path "~/.emacs.d/emacs-pry/")
 
 (require 'package)
-(require 'cask "/usr/local/Cellar/cask/0.7.1/cask.el")
+(require 'cask "/usr/local/Cellar/cask/0.7.2_1/cask.el")
 (cask-initialize)
 (add-to-list 'auto-mode-alist '("\\Cask\\'" . emacs-lisp-mode))
 
@@ -36,10 +36,6 @@
 (require 'pallet)
 (pallet-mode t)
 (require 'graphene)
-
-(require 'swiper)
-(global-set-key "\C-s" 'swiper)
-(global-set-key "\C-r" 'swiper)
 
 (require 'midnight)
 (setq clean-buffer-list-delay-general 7)
@@ -71,7 +67,13 @@
   (setenv "PAGER" "/bin/cat"))
 
 (defun rdg/remove-rogue-control-chars (op)
-  (replace-regexp-in-string "\\(\\[0G\\)\\|\\(\\]2;\\)\\|\\(\\)" "" op))
+  (replace-regexp-in-string
+   "\\(\\[0G\\)\\|\\(\\]2;\\)\\|\\(\\)|\\(\\[?25h\\)|\\(\\[1A\\)"
+   ""
+   op))
+
+(add-hook 'comint-output-filter-functions
+          'comint-truncate-buffer)
 
 (with-eval-after-load 'shell
   (add-to-list 'comint-preoutput-filter-functions
@@ -285,6 +287,16 @@
 (global-set-key (kbd "C-c S-<right>") 'buf-stack-right)
 (global-set-key (kbd "C-c S-<up>") 'buf-stack-up)
 (global-set-key (kbd "C-c S-<down>") 'buf-stack-down)
+
+(defun rdg/unwrap-and-mark-sexp (&optional arg)
+  (interactive)
+  (let ((sexp-info (sp-unwrap-sexp arg)))
+    (message "%s" sexp-info)
+    (goto-char (plist-get sexp-info :beg))
+    (push-mark (- (plist-get sexp-info :end) 2) t t)
+    (setq deactivate-mark nil)))
+
+(global-set-key (kbd "C-M-<backspace>") 'rdg/unwrap-and-mark-sexp)
 
 (defun kill-zombie-buffers ()
   "Kill buffers no longer associated with a file."
