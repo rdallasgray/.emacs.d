@@ -18,6 +18,7 @@
 (git-wip-mode t)
 
 (add-to-list 'load-path "~/.emacs.d/graphene/")
+(add-to-list 'custom-theme-load-path "~/.emacs.d/graphene-meta-theme/")
 (add-to-list 'load-path "~/.emacs.d/pallet/")
 (add-to-list 'load-path "~/.emacs.d/project-persist-git/")
 (add-to-list 'load-path "~/.emacs.d/project-persist-drawer/")
