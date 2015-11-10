@@ -19,3 +19,6 @@
 [submodule "ppd-sr-speedbar"]
 	path = ppd-sr-speedbar
 	url = git@github.com:rdallasgray/ppd-sr-speedbar.git
+[submodule "graphene-meta-theme"]
+	path = graphene-meta-theme
+	url = git@github.com:rdallasgray/graphene-meta-theme.git
