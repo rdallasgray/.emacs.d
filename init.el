@@ -2,6 +2,8 @@
 (when (file-exists-p custom-file)
   (load custom-file))
 
+(setq require-final-newline t)
+
 (require 'server)
 (if (server-running-p)
     (message "Server is running")
@@ -18,6 +20,7 @@
 (git-wip-mode t)
 
 (add-to-list 'load-path "~/.emacs.d/graphene/")
+(add-to-list 'load-path "~/.emacs.d/graphene-meta-theme/")
 (add-to-list 'custom-theme-load-path "~/.emacs.d/graphene-meta-theme/")
 (add-to-list 'load-path "~/.emacs.d/pallet/")
 (add-to-list 'load-path "~/.emacs.d/project-persist-git/")
@@ -37,6 +40,9 @@
 (require 'pallet)
 (pallet-mode t)
 (require 'graphene)
+
+(setq graphene-default-font "Fira Code-12"
+      graphene-fixed-pitch-font "Fira Code-12")
 
 (require 'midnight)
 (setq clean-buffer-list-delay-general 7)
@@ -203,25 +209,6 @@
 ;; Ruby
 (with-eval-after-load 'ruby-mode
   (exec-path-from-shell-copy-env "GEM_HOME"))
-;; RSense - TODO create company backend
-;; (setq rsense-home nil)
-;; (let ((rsense-home-val
-;;        (cond ((eq system-type 'gnu/linux) "/usr/lib/rsense-0.3")
-;;              ((eq system-type 'darwin) "/usr/local/Cellar/rsense/0.3/libexec"))))
-;;   (when (and rsense-home-val (file-exists-p rsense-home-val))
-;;     (setq rsense-home rsense-home-val)
-;;     (add-to-list 'load-path (concat rsense-home "/etc"))))
-
-;; (when rsense-home
-;;   (require 'rsense)
-;;   (add-hook 'ruby-mode-hook
-;;             (lambda () (add-to-list 'ac-sources 'ac-source-rsense))))
-;; ))
-
-;; imenu
-;; (add-hook 'graphene-prog-mode-hook
-;;           (lambda ()
-;;             (require 'imenu-anywhere)))
 
 (require 'idomenu)
 (require 'imenu-anywhere)
