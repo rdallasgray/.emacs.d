@@ -30,7 +30,7 @@
 (add-to-list 'load-path "~/.emacs.d/emacs-pry/")
 
 (require 'package)
-(require 'cask "/usr/local/Cellar/cask/0.7.2_1/cask.el")
+(require 'cask "/usr/local/Cellar/cask/0.7.2/cask.el")
 (cask-initialize)
 (add-to-list 'auto-mode-alist '("\\Cask\\'" . emacs-lisp-mode))
 
@@ -40,9 +40,6 @@
 (require 'pallet)
 (pallet-mode t)
 (require 'graphene)
-
-(setq graphene-default-font "Fira Code-12"
-      graphene-fixed-pitch-font "Fira Code-12")
 
 (require 'midnight)
 (setq clean-buffer-list-delay-general 7)
@@ -79,10 +76,12 @@
    ""
    op))
 
-(add-hook 'comint-output-filter-functions
-          'comint-truncate-buffer)
 
 (with-eval-after-load 'shell
+  (add-hook 'comint-output-filter-functions
+            'comint-truncate-buffer)
+  (add-to-list 'comint-output-filter-functions
+               'ansi-color-process-output)
   (add-to-list 'comint-preoutput-filter-functions
                'rdg/remove-rogue-control-chars))
 
