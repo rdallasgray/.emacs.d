@@ -45,6 +45,28 @@
 (setq clean-buffer-list-delay-general 7)
 (midnight-delay-set 'midnight-delay "12:00am")
 
+;; anzu
+(require 'anzu)
+(global-anzu-mode +1)
+
+(set-face-attribute 'anzu-mode-line nil
+                    :foreground 'unspecified
+                    :inherit 'company-tooltip-search)
+
+(custom-set-variables
+ '(anzu-mode-lighter "")
+ '(anzu-deactivate-region t)
+ '(anzu-replace-to-string-separator " => "))
+
+(define-key (current-global-map) [remap query-replace]
+  #'anzu-query-replace)
+(define-key (current-global-map) [remap query-replace-regexp]
+  #'anzu-query-replace-regexg)
+(define-key isearch-mode-map [remap isearch-query-replace]
+  #'anzu-isearch-query-replace)
+(define-key isearch-mode-map [remap isearch-query-replace-regexp]
+  #'anzu-isearch-query-replace-regexp)
+
 (require 'expand-region)
 (defhydra hydra-mark (global-map "C-c SPC")
   "mark"
@@ -76,6 +98,9 @@
    ""
    op))
 
+(setq comint-buffer-maximum-size 10000)
+(add-hook 'comint-output-filter-functions
+          'comint-truncate-buffer)
 
 (with-eval-after-load 'shell
   (add-hook 'comint-output-filter-functions
@@ -170,7 +195,6 @@
           (setq org-mobile-directory (expand-file-name "Apps/MobileOrg" dropbox-directory))
           (org-mobile-pull)
           (add-hook 'kill-emacs-hook 'org-mobile-push))))))
-
 
 ;; No pop-ups
 (setq pop-up-frames nil

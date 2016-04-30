@@ -6,6 +6,7 @@
 (depends-on "ace-window")
 (depends-on "ag")
 (depends-on "aggressive-indent")
+(depends-on "anzu")
 (depends-on "async")
 (depends-on "avy")
 (depends-on "browse-kill-ring")
