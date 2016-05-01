@@ -135,7 +135,10 @@
   (setq rlc-attempts 5))
 
 ;; Easily open/switch to a shell
-(global-set-key (kbd "C-c `") 'shell-pop)
+(require 'shell-pop)
+(setq shell-pop-universal-key "C-c `"
+      shell-pop-full-span t
+      shell-pop-window-position "bottom")
 
 ;; sp
 (global-set-key (kbd "C-M-<left>") 'sp-backward-sexp)
