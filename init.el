@@ -149,7 +149,6 @@
 (defun rdg/unwrap-and-mark-sexp (&optional arg)
   (interactive)
   (let ((sexp-info (sp-unwrap-sexp arg)))
-    (message "%s" sexp-info)
     (goto-char (plist-get sexp-info :beg))
     (push-mark (- (plist-get sexp-info :end) 2) t t)
     (setq deactivate-mark nil)))
