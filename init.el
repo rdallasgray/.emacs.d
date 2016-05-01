@@ -1,3 +1,10 @@
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
+
 (setq custom-file "~/.emacs.d/custom.el")
 (when (file-exists-p custom-file)
   (load custom-file))
@@ -10,14 +17,6 @@
   (progn
     (message "Starting server")
     (server-start)))
-
-;; git-wip
-(let ((git-wip-path "/Users/robertdallasgray/Documents/Code/git-wip"))
-  (add-to-list 'exec-path git-wip-path)
-  (add-to-list 'load-path (format "%s/emacs/" git-wip-path)))
-
-(require 'git-wip-mode)
-(git-wip-mode t)
 
 (add-to-list 'load-path "~/.emacs.d/graphene/")
 (add-to-list 'load-path "~/.emacs.d/graphene-meta-theme/")
@@ -41,6 +40,15 @@
 (pallet-mode t)
 (require 'graphene)
 
+;; git-wip
+(let ((git-wip-path "/Users/robertdallasgray/Documents/Code/git-wip"))
+  (add-to-list 'exec-path git-wip-path)
+  (add-to-list 'load-path (format "%s/emacs/" git-wip-path)))
+
+(require 'git-wip-mode)
+(git-wip-mode t)
+
+;; midnight
 (require 'midnight)
 (setq clean-buffer-list-delay-general 7)
 (midnight-delay-set 'midnight-delay "12:00am")
@@ -67,7 +75,11 @@
 (define-key isearch-mode-map [remap isearch-query-replace-regexp]
   #'anzu-isearch-query-replace-regexp)
 
+
+;; er
 (require 'expand-region)
+(global-set-key (kbd "C-M-SPC") 'er/expand-region)
+
 (defhydra hydra-mark (global-map "C-c SPC")
   "mark"
   ("w" er/mark-word)
@@ -125,76 +137,21 @@
 ;; Easily open/switch to a shell
 (global-set-key (kbd "C-c `") 'shell-pop)
 
-;; er
-(global-set-key (kbd "C-M-SPC") 'er/expand-region)
-
 ;; sp
 (global-set-key (kbd "C-M-<left>") 'sp-backward-sexp)
 (global-set-key (kbd "C-M-<right>") 'sp-forward-sexp)
 (global-set-key (kbd "C-M-<up>") 'sp-backward-up-sexp)
 (global-set-key (kbd "C-M-<down>") 'sp-down-sexp)
-(global-set-key (kbd "C-M-<backspace>") 'sp-unwrap-sexp)
 
-;; org
-(defun load-org-and-capture ()
+(defun rdg/unwrap-and-mark-sexp (&optional arg)
   (interactive)
-  (require 'org)
-  (org-capture))
+  (let ((sexp-info (sp-unwrap-sexp arg)))
+    (message "%s" sexp-info)
+    (goto-char (plist-get sexp-info :beg))
+    (push-mark (- (plist-get sexp-info :end) 2) t t)
+    (setq deactivate-mark nil)))
 
-(global-set-key (kbd "C-c c") 'load-org-and-capture)
-
-(with-eval-after-load 'org
-  (let ((maybe-org-directory (expand-file-name "org" user-emacs-directory)))
-    (when (file-exists-p maybe-org-directory)
-      (setq org-directory maybe-org-directory)
-      (setq org-completion-use-ido t)
-      (setq org-default-notes-file (expand-file-name "notes.org" org-directory))
-      (setq org-agenda-files
-            (mapcar (lambda (el) (expand-file-name el org-directory))
-                    '("notes.org" "personal.org" "projects.org" "blog.org" "ideas.org")))
-
-      ;; org capture/refile
-      (defun capture-find-or-create-headline (headline)
-        "Find or create HEADLINE in the current buffer"
-        (goto-char (point-min))
-        (when (not (re-search-forward
-                    (format org-complex-heading-regexp-format headline) nil t))
-          (insert "* " headline))
-        (newline))
-
-      (defun capture-headline-current-project-name ()
-        (capture-find-or-create-headline project-persist-current-project-name))
-
-      (setq org-capture-templates
-            '(("n" "Note" entry
-               (file org-default-notes-file)
-               "* %U %?")
-              ("p" "Project Note" plain
-               (file+function (expand-file-name "projects.org" org-directory) capture-headline-current-project-name)
-               "** %U %f: %?")
-              ("d" "Personal Note" entry
-               (file (expand-file-name "personal.org" org-directory))
-               "* %U %?")
-              ("b" "Blog Note" entry
-               (file (expand-file-name "blog.org" org-directory))
-               "* %U %?")
-              ("i" "Idea" entry
-               (file (expand-file-name "ideas.org" org-directory))
-               "* %U %?")))
-
-      (setq org-refile-allow-creating-parent-nodes t)
-      (setq org-refile-use-outline-path 'file)
-      (setq org-outline-path-complete-in-steps t)
-      (setq org-refile-targets '((nil :maxlevel . 5) (org-agenda-files :maxlevel . 5)))
-
-      ;; org-mobile -- ignore if no dropbox/org-mobile directory
-      (let ((maybe-org-mobile-directory (expand-file-name "Apps/MobileOrg" dropbox-directory)))
-        (when (file-exists-p maybe-org-mobile-directory)
-          (require 'org-mobile)
-          (setq org-mobile-inbox-for-pull (expand-file-name "inbox.org" org-directory))
-          (setq org-mobile-directory (expand-file-name "Apps/MobileOrg" dropbox-directory))
-          (org-mobile-pull)
-          (add-hook 'kill-emacs-hook 'org-mobile-push))))))
+(global-set-key (kbd "C-M-<backspace>") 'rdg/unwrap-and-mark-sexp)
 
 ;; No pop-ups
 (setq pop-up-frames nil
@@ -233,6 +190,7 @@
 (with-eval-after-load 'ruby-mode
   (exec-path-from-shell-copy-env "GEM_HOME"))
 
+;; imenu
 (require 'idomenu)
 (require 'imenu-anywhere)
 (setq imenu-auto-rescan t)
@@ -298,16 +256,6 @@
 (global-set-key (kbd "C-c S-<right>") 'buf-stack-right)
 (global-set-key (kbd "C-c S-<up>") 'buf-stack-up)
 (global-set-key (kbd "C-c S-<down>") 'buf-stack-down)
-
-(defun rdg/unwrap-and-mark-sexp (&optional arg)
-  (interactive)
-  (let ((sexp-info (sp-unwrap-sexp arg)))
-    (message "%s" sexp-info)
-    (goto-char (plist-get sexp-info :beg))
-    (push-mark (- (plist-get sexp-info :end) 2) t t)
-    (setq deactivate-mark nil)))
-
-(global-set-key (kbd "C-M-<backspace>") 'rdg/unwrap-and-mark-sexp)
 
 (defun kill-zombie-buffers ()
   "Kill buffers no longer associated with a file."
