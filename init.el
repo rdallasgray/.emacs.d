@@ -40,6 +40,8 @@
 (pallet-mode t)
 (require 'graphene)
 
+(add-hook 'graphene-prog-mode-hook 'eldoc-mode)
+
 ;; git-wip
 (let ((git-wip-path "/Users/robertdallasgray/Documents/Code/git-wip"))
   (add-to-list 'exec-path git-wip-path)
@@ -54,7 +56,6 @@
 (midnight-delay-set 'midnight-delay "12:00am")
 
 ;; anzu
-(require 'anzu)
 (global-anzu-mode +1)
 
 (set-face-attribute 'anzu-mode-line nil
@@ -77,7 +78,6 @@
 
 
 ;; er
-(require 'expand-region)
 (global-set-key (kbd "C-M-SPC") 'er/expand-region)
 
 (defhydra hydra-mark (global-map "C-c SPC")
@@ -122,9 +122,6 @@
   (add-to-list 'comint-preoutput-filter-functions
                'rdg/remove-rogue-control-chars))
 
-(add-hook 'coffee-mode-hook 'subword-mode)
-(add-hook 'ruby-mode-hook 'subword-mode)
-
 ;; Set up readline-complete if not on Windows
 (unless (eq system-type 'windows-nt)
   (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
@@ -135,9 +132,11 @@
   (setq rlc-attempts 5))
 
 ;; Easily open/switch to a shell
+;; Please don't open my shells in new windows
+(add-to-list 'display-buffer-alist '("*shell*" display-buffer-same-window))
 (require 'shell-pop)
+(global-set-key (kbd "C-c `") 'shell-pop)
 (setq shell-pop-universal-key "C-c `"
-      shell-pop-full-span t
       shell-pop-window-position "bottom")
 
 ;; sp
@@ -154,6 +153,7 @@
     (setq deactivate-mark nil)))
 
 (global-set-key (kbd "C-M-<backspace>") 'rdg/unwrap-and-mark-sexp)
+(sp-pair "{ " " }")
 
 ;; No pop-ups
 (setq pop-up-frames nil
@@ -187,10 +187,14 @@
 (push 'company-tern company-backends)
 (with-eval-after-load 'flycheck
   (setq flycheck-coffee-executable "cjsx"))
+(add-hook 'coffee-mode-hook 'subword-mode)
 
 ;; Ruby
 (with-eval-after-load 'ruby-mode
   (exec-path-from-shell-copy-env "GEM_HOME"))
+(add-hook 'ruby-mode-hook 'subword-mode)
+(add-hook 'ruby-mode-hook 'yard-mode)
+(add-hook 'ruby-mode-hook 'ruby-tools-mode)
 
 ;; imenu
 (require 'idomenu)
@@ -227,6 +231,10 @@
 
 ;; Remove trailing whitespace
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+;; String inflection
+;; Could do this with Hydra
+(global-set-key (kbd "C-c i") 'string-inflection-all-cycle)
 
 (require 'windmove)
 
