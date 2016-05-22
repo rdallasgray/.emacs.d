@@ -9,7 +9,8 @@
 (when (file-exists-p custom-file)
   (load custom-file))
 
-(setq require-final-newline t)
+(setq require-final-newline t
+      warning-minimum-level :error)
 
 (require 'server)
 (if (server-running-p)
@@ -48,7 +49,7 @@
   (add-to-list 'load-path (format "%s/emacs/" git-wip-path)))
 
 (require 'git-wip-mode)
-(git-wip-mode t)
+(add-hook 'graphene-prog-mode-hook (lambda (git-wip-mode t)))
 
 ;; midnight
 (require 'midnight)
@@ -76,26 +77,26 @@
 (define-key isearch-mode-map [remap isearch-query-replace-regexp]
   #'anzu-isearch-query-replace-regexp)
 
+;; er/mc
+(defun hydra-mark-begin (&optional arg)
+  (interactive "p")
+  (er/expand-region arg)
+  (hydra-mark/body))
 
-;; er
-(global-set-key (kbd "C-M-SPC") 'er/expand-region)
+(defhydra hydra-mark (global-map "C-M-SPC")
+  "Mark"
+  ("w" er/mark-word "Word")
+  ("s" er/mark-sexp "Sexp")
+  ("d" er/mark-defun "Defun")
+  ("i" er/mark-inside-pairs "Inside pairs")
+  ("o" er/mark-outside-pairs "Outside pairs")
+  ("+" er/expand-region "Expand")
+  ("-" er/contract-region "Contract")
+  (">" mc/mark-next-like-this "Next")
+  ("<" mc/mark-previous-like-this "Previous")
+  ("m" mc/mark-more-like-this-extended "More"))
 
-(defhydra hydra-mark (global-map "C-c SPC")
-  "mark"
-  ("w" er/mark-word)
-  ("s" er/mark-sexp)
-  ("d" er/mark-defun)
-  ("i" er/mark-inside-pairs)
-  ("o" er/mark-outside-pairs)
-  ("+" er/expand-region)
-  ("-" er/contract-region)
-  (">" mc/mark-next-like-this)
-  ("<" mc/mark-previous-like-this)
-  ("m" mc/mark-more-like-this-extended))
-
-(setq warning-minimum-level :error)
-
-(setq dropbox-directory "~/Dropbox")
+(global-set-key (kbd "C-M-SPC") 'hydra-mark-begin)
 
 ;; (e)shell-mode
 (let ((shell-name "bash"))
@@ -140,7 +141,6 @@
       shell-pop-window-position "bottom")
 
 ;; google-this
-;; (setq google-this-keybind (kbd "C-c g"))
 (require 'google-this)
 (google-this-mode t)
 
@@ -158,6 +158,15 @@
 (global-set-key (kbd "C-{") 'sp-backward-barf-sexp)
 (global-set-key (kbd "M-F") 'sp-forward-symbol)
 (global-set-key (kbd "M-B") 'sp-backward-symbol)
+
+;; easier defun navigation
+(defun beginning-of-next-defun ()
+  (interactive)
+  (end-of-defun)
+  (end-of-defun)
+  (beginning-of-defun))
+(global-set-key (kbd "M-<down>") 'beginning-of-next-defun)
+(global-set-key (kbd "M-<up>") 'beginning-of-defun)
 
 (sp-pair "{ " " }")
 
@@ -191,12 +200,6 @@
 (define-key global-map "\M-3" 'insert-pound)
 (setq ns-right-alternate-modifier nil)
 
-;; Sensible window movement
-(global-set-key (kbd "C-c <up>") 'windmove-up)
-(global-set-key (kbd "C-c <down>") 'windmove-down)
-(global-set-key (kbd "C-c <right>") 'windmove-right)
-(global-set-key (kbd "C-c <left>") 'windmove-left)
-
 ;; Scroll up and down a line at a time
 (global-set-key (kbd "C-S-v") 'scroll-up-line)
 (global-set-key (kbd "M-V") 'scroll-down-line)
@@ -220,6 +223,12 @@
 (add-hook 'ruby-mode-hook 'yard-mode)
 (add-hook 'ruby-mode-hook 'ruby-tools-mode)
 
+(with-eval-after-load 'web-mode
+  (setq web-mode-engine-file-regexps
+        (append (delete '("erb" . "\\.\\(erb\\|rhtml\\|erb\\.html\\)\\'")
+                        web-mode-engine-file-regexps)
+                '(("erb" . "\\.html.erb\\'")))))
+
 ;; imenu
 (require 'idomenu)
 (require 'imenu-anywhere)
@@ -235,15 +244,6 @@
 
 (global-set-key (kbd "M-s O") 'multi-occur-in-open-buffers)
 
-;; easier defun navigation
-(defun beginning-of-next-defun ()
-  (interactive)
-  (end-of-defun)
-  (end-of-defun)
-  (beginning-of-defun))
-(global-set-key (kbd "M-<down>") 'beginning-of-next-defun)
-(global-set-key (kbd "M-<up>") 'beginning-of-defun)
-
 ;; No visible region on C-x C-x
 (defun exchange-point-and-mark-no-region ()
   "Suppress region visibility when exchanging point and mark."
@@ -257,10 +257,21 @@
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; String inflection
-;; Could do this with Hydra
-(global-set-key (kbd "C-c i") 'string-inflection-all-cycle)
+(global-set-key (kbd "C-c i") 'hydra-string-inflection/body)
+(defhydra hydra-string-inflection ()
+  "Inflect"
+  ("u" string-inflection-underscore "underscore")
+  ("U" string-inflection-upcase "UPPER_UNDERSCORE")
+  ("c" string-inflection-lower-camelcase "camelCase")
+  ("C" string-inflection-camelcase "UpperCamelCase")
+  ("-" string-inflection-lisp "hyphenate"))
 
+;; Sensible window movement
 (require 'windmove)
+(global-set-key (kbd "C-c <up>") 'windmove-up)
+(global-set-key (kbd "C-c <down>") 'windmove-down)
+(global-set-key (kbd "C-c <right>") 'windmove-right)
+(global-set-key (kbd "C-c <left>") 'windmove-left)
 
 (defun buf-stack (direction)
   (let* ((other-win (windmove-find-other-window direction))
