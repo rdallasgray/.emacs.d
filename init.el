@@ -49,7 +49,7 @@
   (add-to-list 'load-path (format "%s/emacs/" git-wip-path)))
 
 (require 'git-wip-mode)
-(add-hook 'graphene-prog-mode-hook (lambda (git-wip-mode t)))
+(add-hook 'graphene-prog-mode-hook (lambda () (git-wip-mode t)))
 
 ;; midnight
 (require 'midnight)
@@ -112,8 +112,6 @@
    op))
 
 (setq comint-buffer-maximum-size 10000)
-(add-hook 'comint-output-filter-functions
-          'comint-truncate-buffer)
 
 (with-eval-after-load 'shell
   (add-hook 'comint-output-filter-functions
@@ -122,6 +120,16 @@
                'ansi-color-process-output)
   (add-to-list 'comint-preoutput-filter-functions
                'rdg/remove-rogue-control-chars))
+
+;; dired
+(require 'dired+)
+(diredp-make-find-file-keys-reuse-dirs)
+(setq diredp-hide-details-initially-flag nil)
+
+;; company
+(require 'company-try-hard)
+(global-set-key (kbd "C-<tab>") #'company-try-hard)
+(define-key company-active-map (kbd "C-<tab>") #'company-try-hard)
 
 ;; Set up readline-complete if not on Windows
 (unless (eq system-type 'windows-nt)
