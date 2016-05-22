@@ -105,21 +105,22 @@
   (setenv "SHELL" shell-name)
   (setenv "PAGER" "/bin/cat"))
 
-(defun rdg/remove-rogue-control-chars (op)
-  (replace-regexp-in-string
-   "\\(\\[0G\\)\\|\\(\\]2;\\)\\|\\(\\)|\\(\\[?25h\\)|\\(\\[1A\\)"
-   ""
-   op))
+(defun rdg/remove-shell-control-chars (op)
+  (replace-regexp-in-string "\\[[0-9]+[JGK]" "" op))
 
 (setq comint-buffer-maximum-size 10000)
 
 (with-eval-after-load 'shell
-  (add-hook 'comint-output-filter-functions
-            'comint-truncate-buffer)
+  (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
   (add-to-list 'comint-output-filter-functions
                'ansi-color-process-output)
+  (add-hook 'comint-output-filter-functions
+            'comint-truncate-buffer)
+  ;; Nb this causes issues with inferior command interpreters
+  ;; (e.g. coffee, irb) because company-readline sends
+  ;; commands twice to the inferior process.
   (add-to-list 'comint-preoutput-filter-functions
-               'rdg/remove-rogue-control-chars))
+               'rdg/remove-shell-control-chars))
 
 ;; dired
 (require 'dired+)
@@ -137,7 +138,7 @@
         comint-process-echoes t)
   (require 'readline-complete)
   (push 'company-readline company-backends)
-  (add-hook 'shell-mode-hook 'company-mode)
+  ;; (add-hook 'shell-mode-hook 'company-mode)
   (setq rlc-attempts 5))
 
 ;; Easily open/switch to a shell
