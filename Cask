@@ -36,6 +36,7 @@
 (depends-on "git-timemachine")
 (depends-on "git-wip-timemachine")
 (depends-on "gitignore-mode")
+(depends-on "google-this")
 (depends-on "ido-completing-read+")
 (depends-on "ido-ubiquitous")
 (depends-on "ido-vertical-mode")
