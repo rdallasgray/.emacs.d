@@ -139,6 +139,11 @@
 (setq shell-pop-universal-key "C-c `"
       shell-pop-window-position "bottom")
 
+;; google-this
+;; (setq google-this-keybind (kbd "C-c g"))
+(require 'google-this)
+(google-this-mode t)
+
 ;; sp
 (global-set-key (kbd "C-M-<left>") 'sp-backward-sexp)
 (global-set-key (kbd "C-M-<right>") 'sp-forward-sexp)
