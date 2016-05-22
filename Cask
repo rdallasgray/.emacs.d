@@ -23,6 +23,7 @@
 (depends-on "dash")
 (depends-on "dash-functional")
 (depends-on "epl")
+(depends-on "eruby-mode")
 (depends-on "es-lib")
 (depends-on "es-windows")
 (depends-on "exec-path-from-shell")
