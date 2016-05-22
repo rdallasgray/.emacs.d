@@ -144,6 +144,17 @@
 (global-set-key (kbd "C-M-<right>") 'sp-forward-sexp)
 (global-set-key (kbd "C-M-<up>") 'sp-backward-up-sexp)
 (global-set-key (kbd "C-M-<down>") 'sp-down-sexp)
+(global-set-key (kbd "C-M-k") 'sp-kill-sexp)
+(global-set-key (kbd "C-M-w") 'sp-copy-sexp)
+(global-set-key (kbd "C-]") 'sp-select-next-thing)
+(global-set-key (kbd "C-)") 'sp-forward-slurp-sexp)
+(global-set-key (kbd "C-(") 'sp-backward-slurp-sexp)
+(global-set-key (kbd "C-}") 'sp-forward-barf-sexp)
+(global-set-key (kbd "C-{") 'sp-backward-barf-sexp)
+(global-set-key (kbd "M-F") 'sp-forward-symbol)
+(global-set-key (kbd "M-B") 'sp-backward-symbol)
+
+(sp-pair "{ " " }")
 
 (defun rdg/unwrap-and-mark-sexp (&optional arg)
   (interactive)
@@ -153,7 +164,15 @@
     (setq deactivate-mark nil)))
 
 (global-set-key (kbd "C-M-<backspace>") 'rdg/unwrap-and-mark-sexp)
-(sp-pair "{ " " }")
+
+(defun rdg/wrap-and-mark-region (orig &rest args)
+  (apply orig args)
+  (let ((sexp-info sp-last-wrapped-region))
+    (goto-char (plist-get sexp-info :beg))
+    (push-mark (plist-get sexp-info :end) t t)
+    (setq deactivate-mark nil)))
+
+(advice-add 'sp-wrap :around 'rdg/wrap-and-mark-region)
 
 ;; No pop-ups
 (setq pop-up-frames nil
