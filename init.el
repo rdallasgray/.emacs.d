@@ -30,7 +30,7 @@
 (add-to-list 'load-path "~/.emacs.d/emacs-pry/")
 
 (require 'package)
-(require 'cask "/usr/local/Cellar/cask/0.7.2/cask.el")
+(require 'cask "/usr/local/Cellar/cask/0.7.2_1/cask.el")
 (cask-initialize)
 (add-to-list 'auto-mode-alist '("\\Cask\\'" . emacs-lisp-mode))
 
@@ -138,7 +138,7 @@
         comint-process-echoes t)
   (require 'readline-complete)
   (push 'company-readline company-backends)
-  ;; (add-hook 'shell-mode-hook 'company-mode)
+  (add-hook 'shell-mode-hook 'company-mode)
   (setq rlc-attempts 5))
 
 ;; Easily open/switch to a shell
@@ -231,12 +231,6 @@
 (add-hook 'ruby-mode-hook 'subword-mode)
 (add-hook 'ruby-mode-hook 'yard-mode)
 (add-hook 'ruby-mode-hook 'ruby-tools-mode)
-
-(with-eval-after-load 'web-mode
-  (setq web-mode-engine-file-regexps
-        (append (delete '("erb" . "\\.\\(erb\\|rhtml\\|erb\\.html\\)\\'")
-                        web-mode-engine-file-regexps)
-                '(("erb" . "\\.html.erb\\'")))))
 
 ;; imenu
 (require 'idomenu)

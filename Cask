@@ -22,6 +22,7 @@
 (depends-on "company-web")
 (depends-on "dash")
 (depends-on "dash-functional")
+(depends-on "dired+")
 (depends-on "epl")
 (depends-on "eruby-mode")
 (depends-on "es-lib")
