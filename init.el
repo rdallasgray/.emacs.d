@@ -316,6 +316,6 @@
           buffers)))
 
 ;; Show all files in speedbar
-(let ((re "^..?$"))
+(let ((re "^..?\\(DS_Store\\)?$"))
   (setq speedbar-directory-unshown-regexp re
         speedbar-file-unshown-regexp re))
