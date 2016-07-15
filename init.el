@@ -314,3 +314,8 @@
               (when (and filename (not (file-exists-p filename)))
                 (kill-buffer buf))))
           buffers)))
+
+;; Show all files in speedbar
+(let ((re "^..?$"))
+  (setq speedbar-directory-unshown-regexp re
+        speedbar-file-unshown-regexp re))
