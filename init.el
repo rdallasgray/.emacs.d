@@ -56,6 +56,10 @@
 (setq clean-buffer-list-delay-general 7)
 (midnight-delay-set 'midnight-delay "12:00am")
 
+;; text scaling
+(global-set-key (kbd "C-M-=") 'default-text-scale-increase)
+(global-set-key (kbd "C-M--") 'default-text-scale-decrease)
+
 ;; anzu
 (global-anzu-mode +1)
 
@@ -238,6 +242,9 @@
 (setq imenu-auto-rescan t)
 (global-set-key (kbd "C-c .") 'idomenu)
 (global-set-key (kbd "C-c C-.") 'imenu-anywhere)
+
+;; bm
+(setq bm-highlight-style 'bm-highlight-only-fringe)
 
 ;; multi-occur
 (defun multi-occur-in-open-buffers (regexp &optional allbufs)
