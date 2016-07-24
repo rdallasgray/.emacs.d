@@ -244,7 +244,19 @@
 (global-set-key (kbd "C-c C-.") 'imenu-anywhere)
 
 ;; bm
-(setq bm-highlight-style 'bm-highlight-only-fringe)
+(setq bm-highlight-style 'bm-highlight-only-line)
+(global-set-key (kbd "C-c b") 'hydra-bm/body)
+(defhydra hydra-bm ()
+  "Bookmarks"
+  ("t" bm-toggle "toggle")
+  ("n" bm-next "next")
+  ("p" bm-previous "previous")
+  ("N" bm-lifo-next "next (lifo)")
+  ("P" bm-lifo-previous "previous (lifo)")
+  ("^" bm-first "first")
+  ("$" bm-last "last")
+  ("d" bm-remove-all-current-buffer "delete all (current buffer)")
+  ("D" bm-remove-all-all-buffers "delete all (all buffers)"))
 
 ;; multi-occur
 (defun multi-occur-in-open-buffers (regexp &optional allbufs)
