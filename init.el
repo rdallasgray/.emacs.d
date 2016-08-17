@@ -30,7 +30,7 @@
 (add-to-list 'load-path "~/.emacs.d/emacs-pry/")
 
 (require 'package)
-(require 'cask "/usr/local/Cellar/cask/0.7.2_1/cask.el")
+(require 'cask "/usr/local/Cellar/cask/0.7.2/cask.el")
 (cask-initialize)
 (add-to-list 'auto-mode-alist '("\\Cask\\'" . emacs-lisp-mode))
 
@@ -55,6 +55,10 @@
 (require 'midnight)
 (setq clean-buffer-list-delay-general 7)
 (midnight-delay-set 'midnight-delay "12:00am")
+
+;; text scaling
+(global-set-key (kbd "C-M-=") 'default-text-scale-increase)
+(global-set-key (kbd "C-M--") 'default-text-scale-decrease)
 
 ;; anzu
 (global-anzu-mode +1)
@@ -240,6 +244,21 @@
 (global-set-key (kbd "C-c .") 'idomenu)
 (global-set-key (kbd "C-c C-.") 'imenu-anywhere)
 
+;; bm
+(setq bm-highlight-style 'bm-highlight-only-line)
+(global-set-key (kbd "C-c b") 'hydra-bm/body)
+(defhydra hydra-bm ()
+  "Bookmarks"
+  ("t" bm-toggle "toggle")
+  ("n" bm-next "next")
+  ("p" bm-previous "previous")
+  ("N" bm-lifo-next "next (lifo)")
+  ("P" bm-lifo-previous "previous (lifo)")
+  ("^" bm-first "first")
+  ("$" bm-last "last")
+  ("d" bm-remove-all-current-buffer "delete all (current buffer)")
+  ("D" bm-remove-all-all-buffers "delete all (all buffers)"))
+
 ;; multi-occur
 (defun multi-occur-in-open-buffers (regexp &optional allbufs)
   "Occur in all open buffers."
@@ -320,3 +339,6 @@
 (let ((re "^\\.\\.?\\(\\(DS_Store\\)\\|\\(#.+\\)\\)?$"))
   (setq speedbar-directory-unshown-regexp re
         speedbar-file-unshown-regexp re))
+
+;; Don't create .# lockfiles
+(setq create-lockfiles nil)
