@@ -111,16 +111,17 @@
 (setq comint-buffer-maximum-size 10000)
 
 (with-eval-after-load 'shell
-  (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
-  (add-to-list 'comint-output-filter-functions
-               'ansi-color-process-output)
-  (add-hook 'comint-output-filter-functions
-            'comint-truncate-buffer)
+  ;; (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+  ;; (add-to-list 'comint-output-filter-functions
+  ;;              'ansi-color-process-output)
+  ;; (add-hook 'comint-output-filter-functions
+  ;;           'comint-truncate-buffer)
   ;; Nb this causes issues with inferior command interpreters
   ;; (e.g. coffee, irb) because company-readline sends
   ;; commands twice to the inferior process.
-  (add-to-list 'comint-preoutput-filter-functions
-               'rdg/remove-shell-control-chars))
+  ;; (add-to-list 'comint-preoutput-filter-functions
+  ;;              'rdg/remove-shell-control-chars)
+  )
 
 ;; dired
 (require 'dired+)
@@ -316,6 +317,6 @@
           buffers)))
 
 ;; Show all files in speedbar
-(let ((re "^\\.\\.?\\(\\(DS_Store\\)|\\(#\\)\\)?$"))
+(let ((re "^\\.\\.?\\(\\(DS_Store\\)\\|\\(#.+\\)\\)?$"))
   (setq speedbar-directory-unshown-regexp re
         speedbar-file-unshown-regexp re))
