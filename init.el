@@ -30,7 +30,7 @@
 (add-to-list 'load-path "~/.emacs.d/emacs-pry/")
 
 (require 'package)
-(require 'cask "/usr/local/Cellar/cask/0.7.2/cask.el")
+(require 'cask "/usr/local/Cellar/cask/0.7.2_1/cask.el")
 (cask-initialize)
 (add-to-list 'auto-mode-alist '("\\Cask\\'" . emacs-lisp-mode))
 
@@ -42,6 +42,10 @@
 (require 'graphene)
 
 (add-hook 'graphene-prog-mode-hook 'eldoc-mode)
+
+(autoload 'zap-up-to-char "misc"
+  "Kill up to, but not including ARGth occurrence of CHAR.")
+(global-set-key (kbd "M-Z") 'zap-up-to-char)
 
 ;; git-wip
 (let ((git-wip-path "/Users/robertdallasgray/Documents/Code/git-wip"))
@@ -144,7 +148,8 @@
   (require 'readline-complete)
   (push 'company-readline company-backends)
   (add-hook 'shell-mode-hook 'company-mode)
-  (setq rlc-attempts 5))
+  (setq rlc-attempts 10
+        rlc-timeout 0.05))
 
 ;; Easily open/switch to a shell
 ;; Please don't open my shells in new windows
@@ -228,6 +233,8 @@
 (push 'company-tern company-backends)
 (with-eval-after-load 'flycheck
   (setq flycheck-coffee-executable "cjsx"))
+(with-eval-after-load 'coffee-mode
+  (setq coffee-command "cjsx"))
 (add-hook 'coffee-mode-hook 'subword-mode)
 
 ;; Ruby
