@@ -137,9 +137,10 @@
 (setq diredp-hide-details-initially-flag nil)
 
 ;; company
-(require 'company-try-hard)
-(global-set-key (kbd "C-<tab>") #'company-try-hard)
-(define-key company-active-map (kbd "C-<tab>") #'company-try-hard)
+(with-eval-after-load 'company
+  (require 'company-try-hard)
+  (global-set-key (kbd "C-<tab>") #'company-try-hard)
+  (define-key company-active-map (kbd "C-<tab>") #'company-try-hard))
 
 ;; Set up readline-complete if not on Windows
 (unless (eq system-type 'windows-nt)
@@ -148,8 +149,8 @@
   (require 'readline-complete)
   (push 'company-readline company-backends)
   (add-hook 'shell-mode-hook 'company-mode)
-  (setq rlc-attempts 10
-        rlc-timeout 0.05))
+  (setq rlc-attempts 50
+        rlc-timeout 0.001))
 
 ;; Easily open/switch to a shell
 ;; Please don't open my shells in new windows
@@ -164,6 +165,7 @@
 (google-this-mode t)
 
 ;; sp
+(setq sp-escape-quotes-after-insert nil)
 (global-set-key (kbd "C-M-<left>") 'sp-backward-sexp)
 (global-set-key (kbd "C-M-<right>") 'sp-forward-sexp)
 (global-set-key (kbd "C-M-<up>") 'sp-backward-up-sexp)
@@ -284,7 +286,7 @@
 (define-key global-map [remap exchange-point-and-mark] 'exchange-point-and-mark-no-region)
 
 ;; Remove trailing whitespace
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
+;; (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; String inflection
 (global-set-key (kbd "C-c i") 'hydra-string-inflection/body)
