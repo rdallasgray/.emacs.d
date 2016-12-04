@@ -30,7 +30,7 @@
 (add-to-list 'load-path "~/.emacs.d/emacs-pry/")
 
 (require 'package)
-(require 'cask "/usr/local/Cellar/cask/0.7.2_1/cask.el")
+(require 'cask "/usr/local/Cellar/cask/0.8.1/cask.el")
 (cask-initialize)
 (add-to-list 'auto-mode-alist '("\\Cask\\'" . emacs-lisp-mode))
 
@@ -141,6 +141,21 @@
   (require 'company-try-hard)
   (global-set-key (kbd "C-<tab>") #'company-try-hard)
   (define-key company-active-map (kbd "C-<tab>") #'company-try-hard))
+
+;; swiper/ivy
+(ivy-mode 1)
+(setq ivy-use-virtual-buffers t)
+(global-set-key "\C-s" 'swiper)
+(global-set-key "\C-r" 'swiper)
+(global-set-key (kbd "C-c C-r") 'ivy-resume)
+(global-set-key (kbd "M-x") 'counsel-M-x)
+(global-set-key (kbd "C-x C-f") 'counsel-find-file)
+(global-set-key (kbd "C-h f") 'counsel-describe-function)
+(global-set-key (kbd "C-h v") 'counsel-describe-variable)
+(global-set-key (kbd "C-h i") 'counsel-info-lookup-symbol)
+(global-set-key (kbd "C-c u") 'counsel-unicode-char)
+(global-set-key (kbd "C-c g") 'counsel-git-grep)
+(define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
 
 ;; Set up readline-complete if not on Windows
 (unless (eq system-type 'windows-nt)
