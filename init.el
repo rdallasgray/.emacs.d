@@ -206,8 +206,6 @@
 (global-set-key (kbd "M-<down>") 'beginning-of-next-defun)
 (global-set-key (kbd "M-<up>") 'beginning-of-defun)
 
-(sp-pair "{ " " }")
-
 (defun rdg/unwrap-and-mark-sexp (&optional arg)
   (interactive)
   (let ((sexp-info (sp-unwrap-sexp arg)))
@@ -216,6 +214,8 @@
     (setq deactivate-mark nil)))
 
 (global-set-key (kbd "C-M-<backspace>") 'rdg/unwrap-and-mark-sexp)
+
+;; TODO: Add spaces as a wrapping pair
 
 (defun rdg/wrap-and-mark-region (orig &rest args)
   (apply orig args)
