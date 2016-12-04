@@ -215,7 +215,7 @@
 
 (global-set-key (kbd "C-M-<backspace>") 'rdg/unwrap-and-mark-sexp)
 
-;; TODO: Add spaces as a wrapping pair
+(sp-pair " " " " :actions '(wrap))
 
 (defun rdg/wrap-and-mark-region (orig &rest args)
   (apply orig args)
