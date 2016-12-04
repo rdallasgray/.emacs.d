@@ -155,6 +155,8 @@
 (global-set-key (kbd "C-h i") 'counsel-info-lookup-symbol)
 (global-set-key (kbd "C-c u") 'counsel-unicode-char)
 (global-set-key (kbd "C-c g") 'counsel-git-grep)
+(global-set-key (kbd "C-c .") 'counsel-imenu)
+(global-set-key (kbd "M-y") 'counsel-yank-pop)
 (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
 
 ;; Set up readline-complete if not on Windows
