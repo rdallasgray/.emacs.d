@@ -118,18 +118,18 @@
 
 (setq comint-buffer-maximum-size 10000)
 
+(defun rdg/setup-shell ()
+  (setq comint-prompt-read-only t)
+  (ansi-color-for-comint-mode-on)
+    (add-to-list 'comint-output-filter-functions
+                 'ansi-color-process-output)
+      (add-hook 'comint-output-filter-functions
+            'comint-truncate-buffer)
+  (add-to-list 'comint-preoutput-filter-functions
+               'rdg/remove-shell-control-chars))
+
 (with-eval-after-load 'shell
-  ;; (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
-  ;; (add-to-list 'comint-output-filter-functions
-  ;;              'ansi-color-process-output)
-  ;; (add-hook 'comint-output-filter-functions
-  ;;           'comint-truncate-buffer)
-  ;; Nb this causes issues with inferior command interpreters
-  ;; (e.g. coffee, irb) because company-readline sends
-  ;; commands twice to the inferior process.
-  ;; (add-to-list 'comint-preoutput-filter-functions
-  ;;              'rdg/remove-shell-control-chars)
-  )
+  (add-hook 'shell-mode-hook 'rdg/setup-shell))
 
 ;; dired
 (require 'dired+)
