@@ -93,6 +93,7 @@
 (depends-on "sws-mode")
 (depends-on "tern")
 (depends-on "tidy")
+(depends-on "undo-tree")
 (depends-on "uuidgen")
 (depends-on "vagrant")
 (depends-on "vagrant-tramp")

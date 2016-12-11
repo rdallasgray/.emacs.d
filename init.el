@@ -119,6 +119,7 @@
 (setq comint-buffer-maximum-size 10000)
 
 (defun rdg/setup-shell ()
+  (setq system-uses-terminfo nil)
   (setq comint-prompt-read-only t)
   (ansi-color-for-comint-mode-on)
     (add-to-list 'comint-output-filter-functions
@@ -369,3 +370,10 @@
 
 ;; Don't create .# lockfiles
 (setq create-lockfiles nil)
+
+(undo-tree-mode)
+(define-key undo-tree-map (kbd "C-/") 'undo-tree-undo)
+
+(setq-default bidi-display-reordering nil)
+
+(setq kill-do-not-save-duplicates t)
