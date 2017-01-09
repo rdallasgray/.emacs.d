@@ -119,15 +119,15 @@
 (setq comint-buffer-maximum-size 10000)
 
 (defun rdg/setup-shell ()
-  (setq system-uses-terminfo nil)
   (setq comint-prompt-read-only t)
   (ansi-color-for-comint-mode-on)
     (add-to-list 'comint-output-filter-functions
                  'ansi-color-process-output)
       (add-hook 'comint-output-filter-functions
             'comint-truncate-buffer)
-  (add-to-list 'comint-preoutput-filter-functions
-               'rdg/remove-shell-control-chars))
+  ;; (add-to-list 'comint-preoutput-filter-functions
+  ;;              'rdg/remove-shell-control-chars)
+  )
 
 (with-eval-after-load 'shell
   (add-hook 'shell-mode-hook 'rdg/setup-shell))
@@ -248,6 +248,7 @@
   (setq scss-compile-at-save nil))
 
 ;; JS/Coffee
+(add-to-list 'auto-mode-alist '("\\.cjsx\\'" . coffee-mode))
 (add-hook 'js-mode-hook
           (lambda () (setq js-indent-level 2)))
 (push 'company-tern company-backends)
