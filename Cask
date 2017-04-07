@@ -1,5 +1,4 @@
 (source gnu)
-(source marmalade)
 (source melpa)
 (source melpa-stable)
 
@@ -26,6 +25,7 @@
 (depends-on "dash-functional")
 (depends-on "default-text-scale")
 (depends-on "dired+")
+(depends-on "dockerfile-mode")
 (depends-on "epl")
 (depends-on "eruby-mode")
 (depends-on "es-lib")
@@ -74,6 +74,7 @@
 (depends-on "pos-tip")
 (depends-on "rainbow-mode")
 (depends-on "restclient")
+(depends-on "rjsx-mode")
 (depends-on "rsense")
 (depends-on "rspec-mode")
 (depends-on "rubocop")
@@ -108,3 +109,6 @@
 (depends-on "with-editor")
 (depends-on "yaml-mode")
 (depends-on "yard-mode")
+(depends-on "prettier-js"
+            :git "https://github.com/prettier/prettier.git"
+            :files ("editors/emacs/*.el"))

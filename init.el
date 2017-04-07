@@ -1,9 +1,11 @@
-
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
 (package-initialize)
+
+(setq max-lisp-eval-depth 5000
+      max-specpdl-size 5000)
 
 (setq custom-file "~/.emacs.d/custom.el")
 (when (file-exists-p custom-file)
@@ -43,6 +45,8 @@
 
 (add-hook 'graphene-prog-mode-hook 'eldoc-mode)
 
+(add-hook 'before-save-hook 'whitespace-cleanup)
+
 (autoload 'zap-up-to-char "misc"
   "Kill up to, but not including ARGth occurrence of CHAR.")
 (global-set-key (kbd "M-Z") 'zap-up-to-char)
@@ -66,6 +70,9 @@
 
 ;; anzu
 (global-anzu-mode +1)
+
+;; company
+(setq company-idle-delay 0.15)
 
 (set-face-attribute 'anzu-mode-line nil
                     :foreground 'unspecified
@@ -107,27 +114,44 @@
 (global-set-key (kbd "C-M-SPC") 'hydra-mark-begin)
 
 ;; (e)shell-mode
-(let ((shell-name "bash"))
-  (setq explicit-shell-file-name shell-name
-        shell-file-name shell-name)
-  (setenv "SHELL" shell-name)
-  (setenv "PAGER" "/bin/cat"))
+(unless (eq system-type 'windows-nt)
+  (let ((shell-name "bash"))
+    (setq explicit-shell-file-name shell-name
+          shell-file-name shell-name)
+    (setenv "SHELL" shell-name)
+    (setenv "PAGER" "/bin/cat"))
+  (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
+  (require 'readline-complete)
+  (push 'company-readline company-backends)
+  (add-hook 'shell-mode-hook 'company-mode)
+  (setq rlc-attempts 10
+        rlc-timeout 0.05
+        rlc-idle-time 0.1))
+
+;; Easily open/switch to a shell
+;; Please don't open my shells in new windows
+(add-to-list 'display-buffer-alist '("*shell*" display-buffer-same-window))
+(require 'shell-pop)
+(global-set-key (kbd "C-c `") 'shell-pop)
+(setq shell-pop-universal-key "C-c `"
+      shell-pop-window-position "bottom")
 
 (defun rdg/remove-shell-control-chars (op)
+  "Replace control characters in output OP with blank."
   (replace-regexp-in-string "\\[[0-9]+[JGK]" "" op))
 
-(setq comint-buffer-maximum-size 10000)
-
 (defun rdg/setup-shell ()
-  (setq comint-prompt-read-only t)
+  "Hook to set up shell modes."
+  (setq comint-prompt-read-only t
+        comint-process-echoes t
+        comint-buffer-maximum-size 1000)
   (ansi-color-for-comint-mode-on)
-    (add-to-list 'comint-output-filter-functions
-                 'ansi-color-process-output)
-      (add-hook 'comint-output-filter-functions
+  (add-to-list 'comint-output-filter-functions
+               'ansi-color-process-output)
+  (add-hook 'comint-output-filter-functions
             'comint-truncate-buffer)
-  ;; (add-to-list 'comint-preoutput-filter-functions
-  ;;              'rdg/remove-shell-control-chars)
-  )
+  (add-to-list 'comint-preoutput-filter-functions
+               'rdg/remove-shell-control-chars))
 
 (with-eval-after-load 'shell
   (add-hook 'shell-mode-hook 'rdg/setup-shell))
@@ -159,24 +183,6 @@
 (global-set-key (kbd "C-c .") 'counsel-imenu)
 (global-set-key (kbd "M-y") 'counsel-yank-pop)
 (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
-
-;; Set up readline-complete if not on Windows
-(unless (eq system-type 'windows-nt)
-  (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
-        comint-process-echoes t)
-  (require 'readline-complete)
-  (push 'company-readline company-backends)
-  (add-hook 'shell-mode-hook 'company-mode)
-  (setq rlc-attempts 50
-        rlc-timeout 0.001))
-
-;; Easily open/switch to a shell
-;; Please don't open my shells in new windows
-(add-to-list 'display-buffer-alist '("*shell*" display-buffer-same-window))
-(require 'shell-pop)
-(global-set-key (kbd "C-c `") 'shell-pop)
-(setq shell-pop-universal-key "C-c `"
-      shell-pop-window-position "bottom")
 
 ;; google-this
 (require 'google-this)
@@ -249,14 +255,47 @@
 
 ;; JS/Coffee
 (add-to-list 'auto-mode-alist '("\\.cjsx\\'" . coffee-mode))
-(add-hook 'js-mode-hook
-          (lambda () (setq js-indent-level 2)))
+
+(require 'prettier-js)
+(let ((hook (lambda ()
+              (setq js-indent-level 2
+                    sgml-basic-offset 2)
+              (subword-mode)
+              (add-hook 'before-save-hook 'prettier-before-save))))
+  (mapc (lambda (mode-hook) (add-hook mode-hook hook))
+        '(js-mode-hook js2-mode-hook rjsx-mode-hook)))
+
 (push 'company-tern company-backends)
+
 (with-eval-after-load 'flycheck
   (setq flycheck-coffee-executable "cjsx"))
 (with-eval-after-load 'coffee-mode
   (setq coffee-command "cjsx"))
 (add-hook 'coffee-mode-hook 'subword-mode)
+
+(with-eval-after-load 'flycheck
+  ;; (setq-default flycheck-disabled-checkers
+  ;;               (append flycheck-disabled-checkers
+  ;;                       '(javascript-jshint)))
+  ;; This screws up errors in e.g. .erb files. Look into it.
+  (flycheck-add-mode 'javascript-eslint 'web-mode))
+
+;; (add-to-list 'auto-mode-alist '("\\.js[x]?\\'" . web-mode))
+(setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
+
+(add-hook 'web-mode-hook
+          (lambda()
+            (setq web-mode-markup-indent-offset 2
+                  web-mode-code-indent-offset 2
+                  web-mode-css-indent-offset 2
+                  web-mode-attr-indent-offset 2
+                  js-indent-level 2)))
+
+(defadvice web-mode-highlight-part (around tweak-jsx activate)
+  (if (equal web-mode-content-type "jsx")
+      (let ((web-mode-enable-part-face nil))
+        ad-do-it)
+    ad-do-it))
 
 ;; Ruby
 (with-eval-after-load 'ruby-mode
