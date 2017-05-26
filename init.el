@@ -268,7 +268,9 @@
 (push 'company-tern company-backends)
 
 (with-eval-after-load 'flycheck
-  (setq flycheck-coffee-executable "cjsx"))
+  (setq flycheck-coffee-executable "cjsx"
+        flycheck-idle-change-delay 2
+        flycheck-check-syntax-automatically '(idle-change)))
 (with-eval-after-load 'coffee-mode
   (setq coffee-command "cjsx"))
 (add-hook 'coffee-mode-hook 'subword-mode)
