@@ -120,7 +120,7 @@
           shell-file-name shell-name)
     (setenv "SHELL" shell-name)
     (setenv "PAGER" "/bin/cat"))
-  (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
+  (setq explicit-bash-args '("-li" "-c" "export EMACS=; stty echo; bash"))
   (require 'readline-complete)
   (push 'company-readline company-backends)
   (add-hook 'shell-mode-hook 'company-mode)
