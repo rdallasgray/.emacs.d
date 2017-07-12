@@ -109,6 +109,7 @@
 (depends-on "with-editor")
 (depends-on "yaml-mode")
 (depends-on "yard-mode")
-(depends-on "prettier-js"
-            :git "https://github.com/prettier/prettier.git"
-            :files ("editors/emacs/*.el"))
+; (depends-on "prettier-js"
+;             :git "https://github.com/prettier/prettier.git"
+;             :files ("editors/emacs/*.el")
+;             :ref "master")
