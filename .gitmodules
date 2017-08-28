@@ -7,9 +7,6 @@
 [submodule "readline-complete"]
 	path = readline-complete
 	url = git@github.com:rdallasgray/readline-complete.el.git
-[submodule "emacs-pry"]
-	path = emacs-pry
-	url = https://github.com/jacott/emacs-pry.git
 [submodule "project-persist-drawer"]
 	path = project-persist-drawer
 	url = git@github.com:rdallasgray/project-persist-drawer.git

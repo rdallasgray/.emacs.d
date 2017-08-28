@@ -72,6 +72,7 @@
 (depends-on "pkg-info")
 (depends-on "popup")
 (depends-on "pos-tip")
+(depends-on "prettier-js")
 (depends-on "rainbow-mode")
 (depends-on "restclient")
 (depends-on "rjsx-mode")
@@ -109,7 +110,3 @@
 (depends-on "with-editor")
 (depends-on "yaml-mode")
 (depends-on "yard-mode")
-; (depends-on "prettier-js"
-;             :git "https://github.com/prettier/prettier.git"
-;             :files ("editors/emacs/*.el")
-;             :ref "master")
