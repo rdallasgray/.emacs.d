@@ -16,7 +16,8 @@
     (load custom-file))
 
   (setq require-final-newline t
-        warning-minimum-level :error)
+        warning-minimum-level :error
+        ring-bell-function 'ignore)
 
   (require 'server)
   (if (server-running-p)
@@ -127,9 +128,9 @@
     (require 'readline-complete)
     (push 'company-readline company-backends)
     (add-hook 'shell-mode-hook 'company-mode)
-    (setq rlc-attempts 10
-          rlc-timeout 0.05
-          rlc-idle-time 0.1))
+    (setq rlc-attempts 3
+          rlc-timeout 0.025
+          rlc-idle-time 0.05))
 
   ;; Easily open/switch to a shell
   ;; Please don't open my shells in new windows
@@ -253,11 +254,14 @@
   ;; JS/Coffee
   (add-to-list 'auto-mode-alist '("\\.cjsx\\'" . coffee-mode))
 
+  (with-eval-after-load 'prettier-js
+    (setq prettier-js-show-errors nil))
+
   (let ((hook (lambda ()
                 (setq js-indent-level 2
                       sgml-basic-offset 2)
                 (subword-mode)
-                (add-hook 'before-save-hook 'prettier-before-save))))
+                (prettier-js-mode))))
     (mapc (lambda (mode-hook) (add-hook mode-hook hook))
           '(js-mode-hook js2-mode-hook rjsx-mode-hook)))
 
@@ -265,19 +269,24 @@
 
   (with-eval-after-load 'flycheck
     (setq flycheck-coffee-executable "cjsx"
-          flycheck-idle-change-delay 5))
+          flycheck-idle-change-delay 5
+          flycheck-disabled-checkers (append flycheck-disabled-checkers
+                                             '(javascript-jshint json-jsonlist)))
+    (mapc (lambda (mode) (flycheck-add-mode 'javascript-eslint mode))
+          '(js-mode js2-mode rjsx-mode)))
+
   (with-eval-after-load 'coffee-mode
     (setq coffee-command "cjsx"))
+
   (add-hook 'coffee-mode-hook 'subword-mode)
 
-  (with-eval-after-load 'flycheck
-    ;; (setq-default flycheck-disabled-checkers
-    ;;               (append flycheck-disabled-checkers
-    ;;                       '(javascript-jshint)))
-    ;; This screws up errors in e.g. .erb files. Look into it.
-    (flycheck-add-mode 'javascript-eslint 'web-mode))
+  (defun rdg/enable-minor-mode (re-mode)
+  "Enable minor mode if filename matches the regexp. RE-MODE is a cons cell (regexp . minor-mode)."
+  (if (buffer-file-name)
+      (if (string-match (car re-mode) buffer-file-name)
+      (funcall (cdr re-mode)))))
 
-  ;; (add-to-list 'auto-mode-alist '("\\.js[x]?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.js[x]?\\'" . web-mode))
   (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
 
   (add-hook 'web-mode-hook
@@ -286,7 +295,9 @@
                     web-mode-code-indent-offset 2
                     web-mode-css-indent-offset 2
                     web-mode-attr-indent-offset 2
-                    js-indent-level 2)))
+                    js-indent-level 2)
+              (enable-minor-mode
+               '("\\.jsx?\\'" . prettier-js-mode))))
 
   (defadvice web-mode-highlight-part (around tweak-jsx activate)
     (if (equal web-mode-content-type "jsx")
@@ -296,7 +307,8 @@
 
   ;; Ruby
   (with-eval-after-load 'ruby-mode
-    (exec-path-from-shell-copy-env "GEM_HOME"))
+    (exec-path-from-shell-copy-env "GEM_HOME")
+    (setq ruby-insert-encoding-magic-comment nil))
   (add-hook 'ruby-mode-hook 'subword-mode)
   (add-hook 'ruby-mode-hook 'yard-mode)
   (add-hook 'ruby-mode-hook 'ruby-tools-mode)
