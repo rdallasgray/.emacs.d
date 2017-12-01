@@ -77,6 +77,7 @@
   (global-anzu-mode +1)
 
   ;; company
+
   (setq company-idle-delay 0.15)
 
   (set-face-attribute 'anzu-mode-line nil
@@ -166,6 +167,7 @@
 
   ;; company
   (with-eval-after-load 'company
+    (company-statistics-mode)
     (global-set-key (kbd "C-<tab>") #'company-try-hard)
     (define-key company-active-map (kbd "C-<tab>") #'company-try-hard))
 
@@ -254,18 +256,27 @@
   ;; JS/Coffee
   (add-to-list 'auto-mode-alist '("\\.cjsx\\'" . coffee-mode))
 
-  (with-eval-after-load 'prettier-js
-    (setq prettier-js-show-errors nil))
-
   (let ((hook (lambda ()
                 (setq js-indent-level 2
                       sgml-basic-offset 2)
                 (subword-mode)
-                (prettier-js-mode))))
+                (eslintd-fix-mode))))
     (mapc (lambda (mode-hook) (add-hook mode-hook hook))
           '(js-mode-hook js2-mode-hook rjsx-mode-hook)))
 
   (push 'company-tern company-backends)
+
+  (defun rdg/use-eslint-from-node-modules ()
+    (let ((root (locate-dominating-file
+                 (or (buffer-file-name) default-directory)
+                 (lambda (dir)
+                   (let ((eslint (expand-file-name "node_modules/eslint/bin/eslint.js" dir)))
+                     (and eslint (file-executable-p eslint)))))))
+      (when root
+        (let ((eslint (expand-file-name "node_modules/eslint/bin/eslint.js" root)))
+          (setq-local flycheck-javascript-eslint-executable eslint)))))
+
+  (add-hook 'flycheck-mode-hook #'rdg/use-eslint-from-node-modules)
 
   (with-eval-after-load 'flycheck
     (setq flycheck-coffee-executable "cjsx"
@@ -281,13 +292,13 @@
   (add-hook 'coffee-mode-hook 'subword-mode)
 
   (defun rdg/enable-minor-mode (re-mode)
-  "Enable minor mode if filename matches the regexp. RE-MODE is a cons cell (regexp . minor-mode)."
-  (if (buffer-file-name)
-      (if (string-match (car re-mode) buffer-file-name)
-      (funcall (cdr re-mode)))))
+    "Enable minor mode if filename matches the regexp. RE-MODE is a cons cell (regexp . minor-mode)."
+    (if (buffer-file-name)
+        (if (string-match (car re-mode) buffer-file-name)
+            (funcall (cdr re-mode)))))
 
-  (add-to-list 'auto-mode-alist '("\\.js[x]?\\'" . web-mode))
-  (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
+  ;; (add-to-list 'auto-mode-alist '("\\.js[x]?\\'" . web-mode))
+  ;; (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
 
   (add-hook 'web-mode-hook
             (lambda()
@@ -306,12 +317,30 @@
       ad-do-it))
 
   ;; Ruby
+  (setq compilation-finish-function
+        (lambda (buf str)
+          (message "Compilation: %s" str)
+          (kill-buffer buf)))
+  (defun rdg/rubocop-autocorrect-and-revert()
+    (rubocop-autocorrect-current-file)
+    (revert-buffer t t t))
+  (defun rdg/add-rubocop-autocorrect-hook ()
+    (remove-hook 'after-save-hook 'rdg/rubocop-autocorrect-and-revert t)
+    (add-hook 'after-save-hook 'rdg/rubocop-autocorrect-and-revert nil t))
   (with-eval-after-load 'ruby-mode
-    (exec-path-from-shell-copy-env "GEM_HOME")
-    (setq ruby-insert-encoding-magic-comment nil))
-  (add-hook 'ruby-mode-hook 'subword-mode)
-  (add-hook 'ruby-mode-hook 'yard-mode)
-  (add-hook 'ruby-mode-hook 'ruby-tools-mode)
+    (exec-path-from-shell-copy-env "GEM_HOME"))
+  (defun rdg/ruby-mode-hook ()
+    (subword-mode)
+    (yard-mode)
+    (ruby-tools-mode)
+    (setq ruby-insert-encoding-magic-comment nil
+          ruby-deep-arglist nil
+          ruby-deep-indent-paren nil
+          ruby-deep-indent-paren-style nil
+          ruby-use-smie t)
+    ;; (rdg/add-rubocop-autocorrect-hook)
+    )
+  (add-hook 'ruby-mode-hook 'rdg/ruby-mode-hook)
 
   ;; imenu
   (setq imenu-auto-rescan t)
