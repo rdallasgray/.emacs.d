@@ -129,8 +129,8 @@
     (require 'readline-complete)
     (push 'company-readline company-backends)
     (add-hook 'shell-mode-hook 'company-mode)
-    (setq rlc-attempts 3
-          rlc-timeout 0.025
+    (setq rlc-attempts 10
+          rlc-timeout 0.5
           rlc-idle-time 0.05))
 
   ;; Easily open/switch to a shell
