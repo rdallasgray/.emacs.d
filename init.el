@@ -173,17 +173,20 @@
 
   ;; swiper/ivy
   (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t)
+  (setq ivy-use-virtual-buffers t
+        ivy-use-selectable-prompt t)
   (global-set-key "\C-s" 'swiper)
   (global-set-key "\C-r" 'swiper)
   (global-set-key (kbd "C-c C-r") 'ivy-resume)
   (global-set-key (kbd "M-x") 'counsel-M-x)
   (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+  (global-set-key (kbd "C-h a") 'counsel-apropos)
   (global-set-key (kbd "C-h f") 'counsel-describe-function)
   (global-set-key (kbd "C-h v") 'counsel-describe-variable)
   (global-set-key (kbd "C-h i") 'counsel-info-lookup-symbol)
   (global-set-key (kbd "C-c u") 'counsel-unicode-char)
-  (global-set-key (kbd "C-c g") 'counsel-git-grep)
+  (global-set-key (kbd "C-c g c") 'counsel-git-checkout)
+  (global-set-key (kbd "C-c g g") 'counsel-git-grep)
   (global-set-key (kbd "C-c .") 'counsel-imenu)
   (global-set-key (kbd "M-y") 'counsel-yank-pop)
   (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
@@ -260,13 +263,13 @@
                 (setq js-indent-level 2
                       sgml-basic-offset 2)
                 (subword-mode)
-                (eslintd-fix-mode))))
+                (rdg/add-eslint-fix-buffer-hook))))
     (mapc (lambda (mode-hook) (add-hook mode-hook hook))
           '(js-mode-hook js2-mode-hook rjsx-mode-hook)))
 
   (push 'company-tern company-backends)
 
-  (defun rdg/use-eslint-from-node-modules ()
+  (defun rdg/use-eslint-from-node-modules (fn)
     (let ((root (locate-dominating-file
                  (or (buffer-file-name) default-directory)
                  (lambda (dir)
@@ -274,9 +277,24 @@
                      (and eslint (file-executable-p eslint)))))))
       (when root
         (let ((eslint (expand-file-name "node_modules/eslint/bin/eslint.js" root)))
-          (setq-local flycheck-javascript-eslint-executable eslint)))))
+          (funcall fn eslint)))))
 
-  (add-hook 'flycheck-mode-hook #'rdg/use-eslint-from-node-modules)
+  (defun rdg/set-flycheck-eslint-executable ()
+    (rdg/use-eslint-from-node-modules
+     (lambda (eslint) (setq-local flycheck-javascript-eslint-executable eslint))))
+
+  (add-hook 'flycheck-mode-hook #'rdg/set-flycheck-eslint-executable)
+
+  (defun rdg/eslint-fix-buffer ()
+    (rdg/use-eslint-from-node-modules
+     (lambda (eslint)
+       (let ((file (buffer-file-name (current-buffer))))
+         (call-process eslint nil nil nil "--fix" file)
+         (revert-buffer t t t)))))
+
+  (defun rdg/add-eslint-fix-buffer-hook ()
+    (remove-hook 'after-save-hook 'rdg/eslint-fix-buffer t)
+    (add-hook 'after-save-hook 'rdg/eslint-fix-buffer nil t))
 
   (with-eval-after-load 'flycheck
     (setq flycheck-coffee-executable "cjsx"
