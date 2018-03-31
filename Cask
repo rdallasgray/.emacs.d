@@ -66,6 +66,7 @@
 (depends-on "octomacs")
 (depends-on "package-build")
 (depends-on "paradox")
+(depends-on "pcmpl-git")
 (depends-on "perspective")
 (depends-on "php-mode")
 (depends-on "pkg-info")

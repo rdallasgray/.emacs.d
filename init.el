@@ -126,12 +126,15 @@
       (setenv "SHELL" shell-name)
       (setenv "PAGER" "/bin/cat"))
     (setq explicit-bash-args '("-li" "-c" "export EMACS=; stty echo; bash"))
-    (require 'readline-complete)
-    (push 'company-readline company-backends)
+    ;; (require 'readline-complete)
+    ;; (push 'company-readline company-backends)
+    (push 'pcomplete-completions-at-point completion-at-point-functions)
+    (push 'company-capf company-backends)
     (add-hook 'shell-mode-hook 'company-mode)
-    (setq rlc-attempts 10
-          rlc-timeout 0.5
-          rlc-idle-time 0.05))
+    ;; (setq rlc-attempts 10
+    ;;       rlc-timeout 0.01
+    ;;       rlc-idle-time 0.05)
+    )
 
   ;; Easily open/switch to a shell
   ;; Please don't open my shells in new windows
