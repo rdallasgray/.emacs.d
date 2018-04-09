@@ -266,7 +266,7 @@
                 (setq js-indent-level 2
                       sgml-basic-offset 2)
                 (subword-mode)
-                (rdg/add-eslint-fix-buffer-hook))))
+                (prettier-js-mode))))
     (mapc (lambda (mode-hook) (add-hook mode-hook hook))
           '(js-mode-hook js2-mode-hook rjsx-mode-hook)))
 
@@ -288,16 +288,16 @@
 
   (add-hook 'flycheck-mode-hook #'rdg/set-flycheck-eslint-executable)
 
-  (defun rdg/eslint-fix-buffer ()
-    (rdg/use-eslint-from-node-modules
-     (lambda (eslint)
-       (let ((file (buffer-file-name (current-buffer))))
-         (call-process eslint nil nil nil "--fix" file)
-         (revert-buffer t t t)))))
+  ;; (defun rdg/eslint-fix-buffer ()
+  ;;   (rdg/use-eslint-from-node-modules
+  ;;    (lambda (eslint)
+  ;;      (let ((file (buffer-file-name (current-buffer))))
+  ;;        (call-process eslint nil nil nil "--fix" file)
+  ;;        (revert-buffer t t t)))))
 
-  (defun rdg/add-eslint-fix-buffer-hook ()
-    (remove-hook 'after-save-hook 'rdg/eslint-fix-buffer t)
-    (add-hook 'after-save-hook 'rdg/eslint-fix-buffer nil t))
+  ;; (defun rdg/add-eslint-fix-buffer-hook ()
+  ;;   (remove-hook 'after-save-hook 'rdg/eslint-fix-buffer t)
+  ;;   (add-hook 'after-save-hook 'rdg/eslint-fix-buffer nil t))
 
   (with-eval-after-load 'flycheck
     (setq flycheck-coffee-executable "cjsx"
@@ -464,8 +464,7 @@
   ;; Don't create .# lockfiles
   (setq create-lockfiles nil)
 
-  (undo-tree-mode)
-  (define-key undo-tree-map (kbd "C-/") 'undo-tree-undo)
+  (global-undo-tree-mode)
 
   (which-key-mode)
 
