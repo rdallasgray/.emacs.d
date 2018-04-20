@@ -118,24 +118,6 @@
 
   (global-set-key (kbd "C-M-SPC") 'hydra-mark-begin)
 
-  ;; (e)shell-mode
-  (unless (eq system-type 'windows-nt)
-    (let ((shell-name "bash"))
-      (setq explicit-shell-file-name shell-name
-            shell-file-name shell-name)
-      (setenv "SHELL" shell-name)
-      (setenv "PAGER" "/bin/cat"))
-    (setq explicit-bash-args '("-li" "-c" "export EMACS=; stty echo; bash"))
-    ;; (require 'readline-complete)
-    ;; (push 'company-readline company-backends)
-    (push 'pcomplete-completions-at-point completion-at-point-functions)
-    (push 'company-capf company-backends)
-    (add-hook 'shell-mode-hook 'company-mode)
-    ;; (setq rlc-attempts 10
-    ;;       rlc-timeout 0.01
-    ;;       rlc-idle-time 0.05)
-    )
-
   ;; Easily open/switch to a shell
   ;; Please don't open my shells in new windows
   (add-to-list 'display-buffer-alist '("*shell*" display-buffer-same-window))
@@ -147,21 +129,34 @@
     "Replace control characters in output OP with blank."
     (replace-regexp-in-string "\\[[0-9]+[JGK]" "" op))
 
-  (defun rdg/setup-shell ()
-    "Hook to set up shell modes."
-    (setq comint-prompt-read-only t
-          comint-process-echoes t
-          comint-buffer-maximum-size 1000)
-    (ansi-color-for-comint-mode-on)
-    (add-to-list 'comint-output-filter-functions
-                 'ansi-color-process-output)
-    (add-hook 'comint-output-filter-functions
-              'comint-truncate-buffer)
-    (add-to-list 'comint-preoutput-filter-functions
-                 'rdg/remove-shell-control-chars))
+  (unless (eq system-type 'windows-nt)
+    (let ((shell-name "bash"))
+      (setq explicit-shell-file-name shell-name
+            shell-file-name shell-name
+            explicit-bash-args '("-li" "-c" "export EMACS=; stty echo; bash"))
+      (setenv "SHELL" shell-name)
+      (setenv "PAGER" "/bin/cat")))
+  (setq comint-prompt-read-only t
+        comint-process-echoes t
+        comint-buffer-maximum-size 1000)
+  (ansi-color-for-comint-mode-on)
+  (add-to-list 'comint-output-filter-functions
+               'ansi-color-process-output)
+  (add-hook 'comint-output-filter-functions
+            'comint-truncate-buffer)
+  (add-to-list 'comint-preoutput-filter-functions
+               'rdg/remove-shell-control-chars)
+  (require 'readline-complete)
+  (push 'company-readline company-backends)
+  (setq rlc-attempts 5
+        rlc-timeout 0.05
+        rlc-idle-time 0)
 
-  (with-eval-after-load 'shell
-    (add-hook 'shell-mode-hook 'rdg/setup-shell))
+  (add-hook 'shell-mode-hook
+            (lambda ()
+              (company-mode)
+              ;; (push 'pcomplete-completions-at-point completion-at-point-functions)
+              ))
 
   ;; dired
   (with-eval-after-load 'dired+
