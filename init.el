@@ -78,6 +78,17 @@
 
   ;; company
 
+  (defvar rdg/default-company-backends
+    '((company-capf company-dabbrev-code company-keywords company-files company-dabbrev)))
+
+  (defvar rdg/company-shell-backends '(company-readline))
+  (defvar rdg/company-js-backends '(company-tern))
+
+  (defun rdg/company-set-mode-backends (backends)
+    "Set BACKENDS locally"
+    (make-local-variable 'company-backends)
+    (setq company-backends (append backends rdg/default-company-backends)))
+
   (setq company-idle-delay 0.15)
 
   (set-face-attribute 'anzu-mode-line nil
@@ -118,6 +129,8 @@
 
   (global-set-key (kbd "C-M-SPC") 'hydra-mark-begin)
 
+  ;; (e)shell-mode
+
   ;; Easily open/switch to a shell
   ;; Please don't open my shells in new windows
   (add-to-list 'display-buffer-alist '("*shell*" display-buffer-same-window))
@@ -129,34 +142,36 @@
     "Replace control characters in output OP with blank."
     (replace-regexp-in-string "\\[[0-9]+[JGK]" "" op))
 
-  (unless (eq system-type 'windows-nt)
-    (let ((shell-name "bash"))
-      (setq explicit-shell-file-name shell-name
-            shell-file-name shell-name
-            explicit-bash-args '("-li" "-c" "export EMACS=; stty echo; bash"))
-      (setenv "SHELL" shell-name)
-      (setenv "PAGER" "/bin/cat")))
-  (setq comint-prompt-read-only t
-        comint-process-echoes t
-        comint-buffer-maximum-size 1000)
-  (ansi-color-for-comint-mode-on)
-  (add-to-list 'comint-output-filter-functions
-               'ansi-color-process-output)
-  (add-hook 'comint-output-filter-functions
-            'comint-truncate-buffer)
-  (add-to-list 'comint-preoutput-filter-functions
-               'rdg/remove-shell-control-chars)
-  (require 'readline-complete)
-  (push 'company-readline company-backends)
-  (setq rlc-attempts 5
-        rlc-timeout 0.05
-        rlc-idle-time 0)
+  (defun rdg/setup-shell ()
+    "Hook to set up shell modes."
+    (setq comint-prompt-read-only t
+          comint-process-echoes t
+          comint-buffer-maximum-size 1000)
+    (ansi-color-for-comint-mode-on)
+    (add-to-list 'comint-output-filter-functions
+                 'ansi-color-process-output)
+    (add-hook 'comint-output-filter-functions
+              'comint-truncate-buffer)
+    (add-to-list 'comint-preoutput-filter-functions
+                 'rdg/remove-shell-control-chars)
+    (unless (eq system-type 'windows-nt)
+      (let ((shell-name "bash"))
+        (setq explicit-shell-file-name shell-name
+              shell-file-name shell-name)
+        (setenv "SHELL" shell-name)
+        (setenv "PAGER" "/bin/cat"))
+      (setq explicit-bash-args '("-li" "-c" "export EMACS=; stty echo; bash"))
+      (require 'readline-complete)
+      (setq rlc-attempts 3
+            rlc-timeout 0.05
+            rlc-idle-time 0.1)))
 
-  (add-hook 'shell-mode-hook
-            (lambda ()
-              (company-mode)
-              ;; (push 'pcomplete-completions-at-point completion-at-point-functions)
-              ))
+  (with-eval-after-load 'shell
+    (rdg/setup-shell)
+    (add-hook 'shell-mode-hook
+              (lambda ()
+                (push 'pcomplete-completions-at-point completion-at-point-functions)
+                (rdg/company-set-mode-backends rdg/company-shell-backends))))
 
   ;; dired
   (with-eval-after-load 'dired+
@@ -165,6 +180,7 @@
 
   ;; company
   (with-eval-after-load 'company
+    (setq company-backends rdg/default-company-backends)
     (company-statistics-mode)
     (global-set-key (kbd "C-<tab>") #'company-try-hard)
     (define-key company-active-map (kbd "C-<tab>") #'company-try-hard))
@@ -184,6 +200,7 @@
   (global-set-key (kbd "C-h i") 'counsel-info-lookup-symbol)
   (global-set-key (kbd "C-c u") 'counsel-unicode-char)
   (global-set-key (kbd "C-c g c") 'counsel-git-checkout)
+  (global-set-key (kbd "C-c g f") 'counsel-git)
   (global-set-key (kbd "C-c g g") 'counsel-git-grep)
   (global-set-key (kbd "C-c .") 'counsel-imenu)
   (global-set-key (kbd "M-y") 'counsel-yank-pop)
@@ -261,11 +278,11 @@
                 (setq js-indent-level 2
                       sgml-basic-offset 2)
                 (subword-mode)
-                (prettier-js-mode))))
+                (prettier-js-mode)
+                (tern-mode)
+                (rdg/company-set-mode-backends rdg/company-js-backends))))
     (mapc (lambda (mode-hook) (add-hook mode-hook hook))
           '(js-mode-hook js2-mode-hook rjsx-mode-hook)))
-
-  (push 'company-tern company-backends)
 
   (defun rdg/use-eslint-from-node-modules (fn)
     (let ((root (locate-dominating-file
@@ -283,16 +300,16 @@
 
   (add-hook 'flycheck-mode-hook #'rdg/set-flycheck-eslint-executable)
 
-  ;; (defun rdg/eslint-fix-buffer ()
-  ;;   (rdg/use-eslint-from-node-modules
-  ;;    (lambda (eslint)
-  ;;      (let ((file (buffer-file-name (current-buffer))))
-  ;;        (call-process eslint nil nil nil "--fix" file)
-  ;;        (revert-buffer t t t)))))
+  (defun rdg/eslint-fix-buffer ()
+    (rdg/use-eslint-from-node-modules
+     (lambda (eslint)
+       (let ((file (buffer-file-name (current-buffer))))
+         (call-process eslint nil nil nil "--fix" file)
+         (revert-buffer t t t)))))
 
-  ;; (defun rdg/add-eslint-fix-buffer-hook ()
-  ;;   (remove-hook 'after-save-hook 'rdg/eslint-fix-buffer t)
-  ;;   (add-hook 'after-save-hook 'rdg/eslint-fix-buffer nil t))
+  (defun rdg/add-eslint-fix-buffer-hook ()
+    (remove-hook 'after-save-hook 'rdg/eslint-fix-buffer t)
+    (add-hook 'after-save-hook 'rdg/eslint-fix-buffer nil t))
 
   (with-eval-after-load 'flycheck
     (setq flycheck-coffee-executable "cjsx"
@@ -460,7 +477,6 @@
   (setq create-lockfiles nil)
 
   (global-undo-tree-mode)
-
   (which-key-mode)
 
   (setq-default bidi-display-reordering nil)
