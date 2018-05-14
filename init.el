@@ -47,6 +47,8 @@
   (pallet-mode t)
   (require 'graphene)
 
+  (require 'dash)
+
   (add-hook 'graphene-prog-mode-hook 'eldoc-mode)
 
   (add-hook 'before-save-hook 'whitespace-cleanup)
@@ -78,16 +80,27 @@
 
   ;; company
 
-  (defvar rdg/default-company-backends
-    '((company-capf company-dabbrev-code company-keywords company-files company-dabbrev)))
+  (defvar rdg/company-default-backends
+    '(company-safe-capf company-keywords company-dabbrev-code company-dabbrev company-files))
 
-  (defvar rdg/company-shell-backends '(company-readline))
+  (defun company-safe-capf (command &optional arg &rest _args)
+    (interactive (list 'interactive))
+    (or (case command
+          (interactive (company-begin-backend 'company-safe-capf))
+           (prefix
+            (let* ((p (company-capf 'prefix))
+                   (c (company-capf 'candidates p)))
+              (and (consp c) p))))
+        (when (not (eq command 'prefix))
+          (apply 'company-capf command arg _args))))
+
+  (defvar rdg/company-shell-backends '(company-safe-capf company-files company-readline))
   (defvar rdg/company-js-backends '(company-tern))
 
   (defun rdg/company-set-mode-backends (backends)
     "Set BACKENDS locally"
-    (make-local-variable 'company-backends)
-    (setq company-backends (append backends rdg/default-company-backends)))
+    (set (make-local-variable 'company-backends)
+         (-uniq (append backends rdg/company-default-backends))))
 
   (setq company-idle-delay 0.15)
 
@@ -170,7 +183,8 @@
     (rdg/setup-shell)
     (add-hook 'shell-mode-hook
               (lambda ()
-                (push 'pcomplete-completions-at-point completion-at-point-functions)
+                (set (make-local-variable 'completion-at-point-functions)
+                     (append completion-at-point-functions '(pcomplete-completions-at-point)))
                 (rdg/company-set-mode-backends rdg/company-shell-backends))))
 
   ;; dired
@@ -180,7 +194,7 @@
 
   ;; company
   (with-eval-after-load 'company
-    (setq company-backends rdg/default-company-backends)
+    (setq company-backends rdg/company-default-backends)
     (company-statistics-mode)
     (global-set-key (kbd "C-<tab>") #'company-try-hard)
     (define-key company-active-map (kbd "C-<tab>") #'company-try-hard))
