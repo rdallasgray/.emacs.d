@@ -80,21 +80,20 @@
 
   ;; company
 
+  (defun rdg/company-maybe-try-hard (buf win tick pos)
+    (when (not company-candidates)
+      (company-try-hard)
+      (let ((this-command 'company-try-hard))
+        (company-post-command))))
+
+  (defun rdg/advise-company-try-hard ()
+    (advice-remove 'company-idle-begin #'rdg/company-maybe-try-hard)
+    (advice-add 'company-idle-begin :after #'rdg/company-maybe-try-hard))
+
   (defvar rdg/company-default-backends
-    '(company-safe-capf company-keywords company-dabbrev-code company-dabbrev company-files))
+    '(company-capf company-keywords company-dabbrev-code company-dabbrev company-files))
 
-  (defun company-safe-capf (command &optional arg &rest _args)
-    (interactive (list 'interactive))
-    (or (case command
-          (interactive (company-begin-backend 'company-safe-capf))
-           (prefix
-            (let* ((p (company-capf 'prefix))
-                   (c (company-capf 'candidates p)))
-              (and (consp c) p))))
-        (when (not (eq command 'prefix))
-          (apply 'company-capf command arg _args))))
-
-  (defvar rdg/company-shell-backends '(company-safe-capf company-files company-readline))
+  (defvar rdg/company-shell-backends '(company-capf company-files company-readline))
   (defvar rdg/company-js-backends '(company-tern))
 
   (defun rdg/company-set-mode-backends (backends)
@@ -102,7 +101,13 @@
     (set (make-local-variable 'company-backends)
          (-uniq (append backends rdg/company-default-backends))))
 
-  (setq company-idle-delay 0.15)
+  (with-eval-after-load 'company
+    (setq company-backends rdg/company-default-backends
+          company-idle-delay 0.15)
+    (rdg/advise-company-try-hard)
+    (company-statistics-mode)
+    (global-set-key (kbd "C-<tab>") #'company-try-hard)
+    (define-key company-active-map (kbd "<tab>") #'company-try-hard))
 
   (set-face-attribute 'anzu-mode-line nil
                       :foreground 'unspecified
@@ -191,13 +196,6 @@
   (with-eval-after-load 'dired+
     (diredp-make-find-file-keys-reuse-dirs)
     (setq diredp-hide-details-initially-flag nil))
-
-  ;; company
-  (with-eval-after-load 'company
-    (setq company-backends rdg/company-default-backends)
-    (company-statistics-mode)
-    (global-set-key (kbd "C-<tab>") #'company-try-hard)
-    (define-key company-active-map (kbd "C-<tab>") #'company-try-hard))
 
   ;; swiper/ivy
   (ivy-mode 1)
