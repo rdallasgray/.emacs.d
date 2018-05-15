@@ -80,11 +80,22 @@
 
   ;; company
 
+  (defvar rdg/company-no-return-key-modes '(shell-mode))
+
+  (defun rdg/company-complete-on-return-p ()
+    (not (memq major-mode rdg/company-no-return-key-modes)))
+
   (defun rdg/company-maybe-try-hard (buf win tick pos)
     (when (not company-candidates)
       (company-try-hard)
       (let ((this-command 'company-try-hard))
         (company-post-command))))
+
+  (defun rdg/company-maybe-complete-on-return ()
+    (interactive)
+    (if (rdg/company-complete-on-return-p)
+        (company-complete-selection)
+      (newline)))
 
   (defun rdg/advise-company-try-hard ()
     (advice-remove 'company-idle-begin #'rdg/company-maybe-try-hard)
@@ -106,8 +117,10 @@
           company-idle-delay 0.15)
     (rdg/advise-company-try-hard)
     (company-statistics-mode)
-    (global-set-key (kbd "C-<tab>") #'company-try-hard)
-    (define-key company-active-map (kbd "<tab>") #'company-try-hard))
+    (define-key company-active-map (kbd "<tab>") #'company-complete-common)
+    (define-key company-active-map (kbd "C-<tab>") #'company-try-hard)
+    (define-key company-active-map (kbd "RET") #'rdg/company-maybe-complete-on-return)
+    (define-key company-active-map [return] #'rdg/company-maybe-complete-on-return))
 
   (set-face-attribute 'anzu-mode-line nil
                       :foreground 'unspecified
