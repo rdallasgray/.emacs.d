@@ -4,6 +4,14 @@
 ;; You may delete these explanatory comments.
 ;; (package-initialize)
 
+;; Use Alt-3 1o insert a #, unbind right alt
+(fset 'insert-pound "#")
+(define-key global-map "\M-3" 'insert-pound)
+(setq ns-right-alternate-modifier nil)
+;; Mac-port specific key settings
+(setq mac-option-modifier 'meta)
+(setq mac-command-modifier 'hyper)
+
 (let ((file-name-handler-alist nil))
 
   (setq gc-cons-threshold 8000000)
@@ -57,6 +65,10 @@
     "Kill up to, but not including ARGth occurrence of CHAR.")
   (global-set-key (kbd "M-Z") 'zap-up-to-char)
 
+  (defun rdg/remove-fringe-and-margin ()
+    (fringe-mode nil)
+    (set-window-margins nil 0))
+
   ;; git-wip
   (let ((git-wip-path "/Users/robertdallasgray/Documents/Code/git-wip"))
     (add-to-list 'exec-path git-wip-path)
@@ -83,10 +95,10 @@
   (defvar rdg/company-no-return-key-modes '(shell-mode))
 
   (defun rdg/company-complete-on-return-p ()
-    (not (memq major-mode rdg/company-no-return-key-modes)))
+    (not (derived-mode-p 'comint-mode)))
 
   (defun rdg/company-maybe-try-hard (buf win tick pos)
-    (when (not company-candidates)
+    (when (and (not company-candidates) (looking-back "[A-Za-z0-9_\-\/]" 1))
       (company-try-hard)
       (let ((this-command 'company-try-hard))
         (company-post-command))))
@@ -95,16 +107,20 @@
     (interactive)
     (if (rdg/company-complete-on-return-p)
         (company-complete-selection)
-      (newline)))
+      (if (functionp 'comint-send-input)
+          (comint-send-input)
+        (newline))))
 
   (defun rdg/advise-company-try-hard ()
     (advice-remove 'company-idle-begin #'rdg/company-maybe-try-hard)
     (advice-add 'company-idle-begin :after #'rdg/company-maybe-try-hard))
 
-  (defvar rdg/company-default-backends
-    '(company-capf company-keywords company-dabbrev-code company-dabbrev company-files))
+  (setq tags-revert-without-query 1)
 
-  (defvar rdg/company-shell-backends '(company-capf company-files company-readline))
+  (defvar rdg/company-default-backends
+    '(company-dabbrev company-dabbrev-code company-etags company-capf company-keywords company-files))
+
+  (defvar rdg/company-shell-backends '(company-capf company-files company-readline company-dabbrev))
   (defvar rdg/company-js-backends '(company-tern))
 
   (defun rdg/company-set-mode-backends (backends)
@@ -117,10 +133,10 @@
           company-idle-delay 0.15)
     (rdg/advise-company-try-hard)
     (company-statistics-mode)
-    (define-key company-active-map (kbd "<tab>") #'company-complete-common)
+    (define-key company-active-map (kbd "<tab>") #'company-complete-selection)
     (define-key company-active-map (kbd "C-<tab>") #'company-try-hard)
-    (define-key company-active-map (kbd "RET") #'rdg/company-maybe-complete-on-return)
-    (define-key company-active-map [return] #'rdg/company-maybe-complete-on-return))
+    (define-key company-active-map [return] #'rdg/company-maybe-complete-on-return)
+    (define-key company-active-map (kbd "RET") #'rdg/company-maybe-complete-on-return))
 
   (set-face-attribute 'anzu-mode-line nil
                       :foreground 'unspecified
@@ -193,6 +209,7 @@
         (setenv "PAGER" "/bin/cat"))
       (setq explicit-bash-args '("-li" "-c" "export EMACS=; stty echo; bash"))
       (require 'readline-complete)
+      (define-key shell-mode-map (kbd "<tab>") #'company-complete)
       (setq rlc-attempts 3
             rlc-timeout 0.05
             rlc-idle-time 0.1)))
@@ -203,7 +220,8 @@
               (lambda ()
                 (set (make-local-variable 'completion-at-point-functions)
                      (append completion-at-point-functions '(pcomplete-completions-at-point)))
-                (rdg/company-set-mode-backends rdg/company-shell-backends))))
+                (rdg/company-set-mode-backends rdg/company-shell-backends)
+                (rdg/remove-fringe-and-margin))))
 
   ;; dired
   (with-eval-after-load 'dired+
@@ -375,18 +393,32 @@
       ad-do-it))
 
   ;; Ruby
+  (defun rdg/ruby-update-tags ()
+    (let ((root (locate-dominating-file default-directory ".git")))
+      (when root
+        (cd root)
+        (call-process-shell-command "ripper-tags -R -e --exclude=vendor"))))
+
+  (defun rdg/add-ruby-update-tags-hook ()
+    (remove-hook 'after-save-hook 'rdg/ruby-update-tags t)
+    (add-hook 'after-save-hook 'rdg/ruby-update-tags nil t))
+
   (setq compilation-finish-function
         (lambda (buf str)
           (message "Compilation: %s" str)
           (kill-buffer buf)))
+
   (defun rdg/rubocop-autocorrect-and-revert()
     (rubocop-autocorrect-current-file)
     (revert-buffer t t t))
+
   (defun rdg/add-rubocop-autocorrect-hook ()
     (remove-hook 'after-save-hook 'rdg/rubocop-autocorrect-and-revert t)
     (add-hook 'after-save-hook 'rdg/rubocop-autocorrect-and-revert nil t))
+
   (with-eval-after-load 'ruby-mode
     (exec-path-from-shell-copy-env "GEM_HOME"))
+
   (defun rdg/ruby-mode-hook ()
     (subword-mode)
     (yard-mode)
@@ -397,7 +429,8 @@
           ruby-deep-indent-paren-style nil
           ruby-use-smie t)
     ;; (rdg/add-rubocop-autocorrect-hook)
-    )
+    (rdg/add-ruby-update-tags-hook))
+
   (add-hook 'ruby-mode-hook 'rdg/ruby-mode-hook)
 
   ;; imenu
@@ -497,6 +530,8 @@
   (let ((re "^\\.\\.?\\(\\(DS_Store\\)\\|\\(#.+\\)\\)?$"))
     (setq speedbar-directory-unshown-regexp re
           speedbar-file-unshown-regexp re))
+
+  (add-hook 'speedbar-mode-hook 'rdg/remove-fringe-and-margin)
 
   ;; Don't create .# lockfiles
   (setq create-lockfiles nil)
