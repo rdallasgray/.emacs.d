@@ -4,14 +4,6 @@
 ;; You may delete these explanatory comments.
 ;; (package-initialize)
 
-;; Use Alt-3 1o insert a #, unbind right alt
-(fset 'insert-pound "#")
-(define-key global-map "\M-3" 'insert-pound)
-(setq ns-right-alternate-modifier nil)
-;; Mac-port specific key settings
-(setq mac-option-modifier 'meta)
-(setq mac-command-modifier 'hyper)
-
 (let ((file-name-handler-alist nil))
 
   (setq gc-cons-threshold 8000000)
@@ -22,6 +14,15 @@
   (setq custom-file "~/.emacs.d/custom.el")
   (when (file-exists-p custom-file)
     (load custom-file))
+
+  ;; Use Alt-3 1o insert a #, unbind right alt
+  (fset 'insert-pound "#")
+  (define-key global-map "\M-3" 'insert-pound)
+  (setq ns-right-alternate-modifier nil)
+
+  ;; Mac-port specific key settings
+  (setq mac-option-modifier 'meta)
+  (setq mac-command-modifier 'hyper)
 
   (setq require-final-newline t
         warning-minimum-level :error
@@ -91,14 +92,13 @@
   (global-anzu-mode +1)
 
   ;; company
-
   (defvar rdg/company-no-return-key-modes '(shell-mode))
 
   (defun rdg/company-complete-on-return-p ()
     (not (derived-mode-p 'comint-mode)))
 
   (defun rdg/company-maybe-try-hard (buf win tick pos)
-    (when (and (not company-candidates) (looking-back "[A-Za-z0-9_\-\/]" 1))
+    (when (and (not company-candidates) (looking-back "[A-Za-z0-9_\-\/\.]" 1))
       (company-try-hard)
       (let ((this-command 'company-try-hard))
         (company-post-command))))
@@ -118,9 +118,9 @@
   (setq tags-revert-without-query 1)
 
   (defvar rdg/company-default-backends
-    '(company-dabbrev company-dabbrev-code company-etags company-capf company-keywords company-files))
+    '(company-files company-dabbrev-code company-etags company-capf company-keywords company-dabbrev))
 
-  (defvar rdg/company-shell-backends '(company-capf company-files company-readline company-dabbrev))
+  (defvar rdg/company-shell-backends '(company-files company-capf company-readline company-dabbrev))
   (defvar rdg/company-js-backends '(company-tern))
 
   (defun rdg/company-set-mode-backends (backends)
@@ -132,12 +132,28 @@
     (setq company-backends rdg/company-default-backends
           company-idle-delay 0.15)
     (rdg/advise-company-try-hard)
-    (company-statistics-mode)
+    (company-prescient-mode t)
     (define-key company-active-map (kbd "<tab>") #'company-complete-selection)
     (define-key company-active-map (kbd "C-<tab>") #'company-try-hard)
     (define-key company-active-map [return] #'rdg/company-maybe-complete-on-return)
     (define-key company-active-map (kbd "RET") #'rdg/company-maybe-complete-on-return))
 
+  ;;counsel/swiper/ivy
+  (ivy-prescient-mode t)
+  (global-set-key (kbd "C-s") 'counsel-grep-or-swiper)
+  (global-set-key (kbd "C-r") 'counsel-grep-or-swiper)
+  (global-set-key (kbd "C-x f") 'counsel-recentf)
+  (global-set-key (kbd "C-c C-s") 'isearch-forward)
+  (global-set-key (kbd "C-c C-r") 'isearch-backward)
+  (global-set-key (kbd "C-c C-r") 'ivy-resume)
+  (global-set-key (kbd "C-c u") 'counsel-unicode-char)
+  (global-set-key (kbd "C-c g c") 'counsel-git-checkout)
+  (global-set-key (kbd "C-c g f") 'counsel-git)
+  (global-set-key (kbd "C-c g g") 'counsel-git-grep)
+  (global-set-key (kbd "C-c e f") 'counsel-etags-find-tag)
+  (global-set-key (kbd "C-c //") 'counsel-tramp)
+
+  ;; anzu
   (set-face-attribute 'anzu-mode-line nil
                       :foreground 'unspecified
                       :inherit 'company-tooltip-search)
@@ -193,7 +209,7 @@
     "Hook to set up shell modes."
     (setq comint-prompt-read-only t
           comint-process-echoes t
-          comint-buffer-maximum-size 1000)
+          comint-buffer-maximum-size 10000)
     (ansi-color-for-comint-mode-on)
     (add-to-list 'comint-output-filter-functions
                  'ansi-color-process-output)
@@ -227,27 +243,6 @@
   (with-eval-after-load 'dired+
     (diredp-make-find-file-keys-reuse-dirs)
     (setq diredp-hide-details-initially-flag nil))
-
-  ;; swiper/ivy
-  (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t
-        ivy-use-selectable-prompt t)
-  (global-set-key "\C-s" 'swiper)
-  (global-set-key "\C-r" 'swiper)
-  (global-set-key (kbd "C-c C-r") 'ivy-resume)
-  (global-set-key (kbd "M-x") 'counsel-M-x)
-  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-  (global-set-key (kbd "C-h a") 'counsel-apropos)
-  (global-set-key (kbd "C-h f") 'counsel-describe-function)
-  (global-set-key (kbd "C-h v") 'counsel-describe-variable)
-  (global-set-key (kbd "C-h i") 'counsel-info-lookup-symbol)
-  (global-set-key (kbd "C-c u") 'counsel-unicode-char)
-  (global-set-key (kbd "C-c g c") 'counsel-git-checkout)
-  (global-set-key (kbd "C-c g f") 'counsel-git)
-  (global-set-key (kbd "C-c g g") 'counsel-git-grep)
-  (global-set-key (kbd "C-c .") 'counsel-imenu)
-  (global-set-key (kbd "M-y") 'counsel-yank-pop)
-  (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
 
   ;; sp
   (setq sp-escape-quotes-after-insert nil)
@@ -300,11 +295,6 @@
 
   ;; Sane magit window creation
   (setq magit-status-buffer-switch-function 'switch-to-buffer)
-
-  ;; Use Alt-3 1o insert a #, unbind right alt
-  (fset 'insert-pound "#")
-  (define-key global-map "\M-3" 'insert-pound)
-  (setq ns-right-alternate-modifier nil)
 
   ;; Scroll up and down a line at a time
   (global-set-key (kbd "C-S-v") 'scroll-up-line)
@@ -373,24 +363,8 @@
         (if (string-match (car re-mode) buffer-file-name)
             (funcall (cdr re-mode)))))
 
-  ;; (add-to-list 'auto-mode-alist '("\\.js[x]?\\'" . web-mode))
-  ;; (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
-
-  (add-hook 'web-mode-hook
-            (lambda()
-              (setq web-mode-markup-indent-offset 2
-                    web-mode-code-indent-offset 2
-                    web-mode-css-indent-offset 2
-                    web-mode-attr-indent-offset 2
-                    js-indent-level 2)
-              (enable-minor-mode
-               '("\\.jsx?\\'" . prettier-js-mode))))
-
-  (defadvice web-mode-highlight-part (around tweak-jsx activate)
-    (if (equal web-mode-content-type "jsx")
-        (let ((web-mode-enable-part-face nil))
-          ad-do-it)
-      ad-do-it))
+  ;; Web Mode
+  (add-hook 'web-mode-hook (lambda () (setq web-mode-markup-indent-offset 2)))
 
   ;; Ruby
   (defun rdg/ruby-update-tags ()
@@ -435,8 +409,7 @@
 
   ;; imenu
   (setq imenu-auto-rescan t)
-  (global-set-key (kbd "C-c .") 'idomenu)
-  (global-set-key (kbd "C-c C-.") 'imenu-anywhere)
+  (global-set-key (kbd "C-c .") 'ivy-imenu-anywhere)
 
   ;; bm
   (setq bm-highlight-style 'bm-highlight-only-line)
@@ -452,14 +425,6 @@
     ("$" bm-last "last")
     ("d" bm-remove-all-current-buffer "delete all (current buffer)")
     ("D" bm-remove-all-all-buffers "delete all (all buffers)"))
-
-  ;; multi-occur
-  (defun multi-occur-in-open-buffers (regexp &optional allbufs)
-    "Occur in all open buffers."
-    (interactive (occur-read-primary-args))
-    (multi-occur-in-matching-buffers ".*" regexp))
-
-  (global-set-key (kbd "M-s O") 'multi-occur-in-open-buffers)
 
   ;; No visible region on C-x C-x
   (defun exchange-point-and-mark-no-region ()
