@@ -45,7 +45,7 @@
   (add-to-list 'load-path "~/.emacs.d/readline-complete/")
 
   (require 'package)
-  (require 'cask "/usr/local/Cellar/cask/0.8.1/cask.el")
+  (require 'cask "/usr/local/Cellar/cask/0.8.4/cask.el")
   (cask-initialize)
   (add-to-list 'auto-mode-alist '("\\Cask\\'" . emacs-lisp-mode))
 
