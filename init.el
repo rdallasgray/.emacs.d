@@ -42,7 +42,6 @@
   (add-to-list 'load-path "~/.emacs.d/project-persist-git/")
   (add-to-list 'load-path "~/.emacs.d/project-persist-drawer/")
   (add-to-list 'load-path "~/.emacs.d/ppd-sr-speedbar/")
-  (add-to-list 'load-path "~/.emacs.d/readline-complete/")
 
   (require 'package)
   (require 'cask "/usr/local/Cellar/cask/0.8.4/cask.el")
@@ -120,7 +119,7 @@
   (defvar rdg/company-default-backends
     '(company-files company-dabbrev-code company-etags company-capf company-keywords company-dabbrev))
 
-  (defvar rdg/company-shell-backends '(company-files company-capf company-readline company-dabbrev))
+  (defvar rdg/company-shell-backends '(company-files company-capf company-dabbrev company-native-complete))
   (defvar rdg/company-js-backends '(company-tern))
 
   (defun rdg/company-set-mode-backends (backends)
@@ -224,14 +223,12 @@
         (setenv "SHELL" shell-name)
         (setenv "PAGER" "/bin/cat"))
       (setq explicit-bash-args '("-li" "-c" "export EMACS=; stty echo; bash"))
-      (require 'readline-complete)
-      (define-key shell-mode-map (kbd "<tab>") #'company-complete)
-      (setq rlc-attempts 3
-            rlc-timeout 0.05
-            rlc-idle-time 0.1)))
+      (define-key shell-mode-map (kbd "<tab>") #'company-complete)))
 
   (with-eval-after-load 'shell
+    (require 'native-complete)
     (rdg/setup-shell)
+    (native-complete-setup-bash)
     (add-hook 'shell-mode-hook
               (lambda ()
                 (set (make-local-variable 'completion-at-point-functions)
