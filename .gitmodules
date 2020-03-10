@@ -1,21 +1,18 @@
 [submodule "graphene"]
-	path = graphene
-	url = git@github.com:rdallasgray/graphene.git
+  path = graphene
+  url = git@github.com:rdallasgray/graphene.git
 [submodule "pallet"]
-	path = pallet
-	url = git@github.com:rdallasgray/pallet.git
-[submodule "readline-complete"]
-	path = readline-complete
-	url = git@github.com:rdallasgray/readline-complete.el.git
+  path = pallet
+  url = git@github.com:rdallasgray/pallet.git
 [submodule "project-persist-drawer"]
-	path = project-persist-drawer
-	url = git@github.com:rdallasgray/project-persist-drawer.git
+  path = project-persist-drawer
+  url = git@github.com:rdallasgray/project-persist-drawer.git
 [submodule "project-persist-git"]
-	path = project-persist-git
-	url = git@github.com:rdallasgray/project-persist.git
+  path = project-persist-git
+  url = git@github.com:rdallasgray/project-persist.git
 [submodule "ppd-sr-speedbar"]
-	path = ppd-sr-speedbar
-	url = git@github.com:rdallasgray/ppd-sr-speedbar.git
+  path = ppd-sr-speedbar
+  url = git@github.com:rdallasgray/ppd-sr-speedbar.git
 [submodule "graphene-meta-theme"]
-	path = graphene-meta-theme
-	url = git@github.com:rdallasgray/graphene-meta-theme.git
+  path = graphene-meta-theme
+  url = git@github.com:rdallasgray/graphene-meta-theme.git

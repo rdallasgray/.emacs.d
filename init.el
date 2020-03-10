@@ -119,7 +119,7 @@
   (defvar rdg/company-default-backends
     '(company-files company-dabbrev-code company-etags company-capf company-keywords company-dabbrev))
 
-  (defvar rdg/company-shell-backends '(company-files company-capf company-dabbrev company-native-complete))
+  (defvar rdg/company-shell-backends '(company-native-complete company-files company-capf company-dabbrev))
   (defvar rdg/company-js-backends '(company-tern))
 
   (defun rdg/company-set-mode-backends (backends)
@@ -207,22 +207,22 @@
   (defun rdg/setup-shell ()
     "Hook to set up shell modes."
     (setq comint-prompt-read-only t
-          comint-process-echoes t
+          ;; comint-process-echoes t
           comint-buffer-maximum-size 10000)
     (ansi-color-for-comint-mode-on)
     (add-to-list 'comint-output-filter-functions
                  'ansi-color-process-output)
     (add-hook 'comint-output-filter-functions
               'comint-truncate-buffer)
-    (add-to-list 'comint-preoutput-filter-functions
-                 'rdg/remove-shell-control-chars)
+    ;; (add-to-list 'comint-preoutput-filter-functions
+    ;;              'rdg/remove-shell-control-chars)
     (unless (eq system-type 'windows-nt)
       (let ((shell-name "bash"))
         (setq explicit-shell-file-name shell-name
               shell-file-name shell-name)
         (setenv "SHELL" shell-name)
         (setenv "PAGER" "/bin/cat"))
-      (setq explicit-bash-args '("-li" "-c" "export EMACS=; stty echo; bash"))
+      ;; (setq explicit-bash-args '("-li" "-c" "export EMACS=; stty echo; bash"))
       (define-key shell-mode-map (kbd "<tab>") #'company-complete)))
 
   (with-eval-after-load 'shell
