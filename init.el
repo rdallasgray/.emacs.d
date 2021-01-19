@@ -320,6 +320,8 @@
   ;; JS/Coffee
   (add-to-list 'auto-mode-alist '("\\.cjsx\\'" . coffee-mode))
 
+  (defvar rdg/company-js-backends '())
+
   (let ((hook (lambda ()
                 (setq js-indent-level 2
                       sgml-basic-offset 2)
