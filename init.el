@@ -5,6 +5,9 @@
 ;; (package-initialize)
 
 (let ((file-name-handler-alist nil))
+  (setq history-length 100)
+  (put 'minibuffer-history 'history-length 50)
+  (put 'kill-ring 'history-length 25)
 
   (setq gc-cons-threshold 8000000)
 
@@ -56,6 +59,17 @@
   (require 'graphene)
 
   (require 'dash)
+  (require 's)
+
+  ;; long lines
+  (require 'so-long)
+  (defvar so-long-target-modes)
+  (defvar so-long-threshold)
+  (defvar so-long-max-lines)
+  (add-to-list 'so-long-target-modes 'shell-mode)
+  (setq so-long-threshold 500
+        so-long-max-lines nil)
+  (global-so-long-mode t)
 
   (add-hook 'graphene-prog-mode-hook 'eldoc-mode)
 
@@ -79,6 +93,9 @@
               (require 'git-wip-mode)
               (git-wip-mode t)))
 
+  ;; drawer
+  (global-set-key (kbd "C-c d d") 'project-persist-drawer-toggle)
+
   ;; midnight
   (setq clean-buffer-list-delay-general 7)
   (midnight-delay-set 'midnight-delay "12:00am")
@@ -88,7 +105,7 @@
   (global-set-key (kbd "C-M--") 'default-text-scale-decrease)
 
   ;; anzu
-  (global-anzu-mode +1)
+  (global-anzu-mode t)
 
   ;; company
   (defvar rdg/company-no-return-key-modes '(shell-mode))
@@ -119,8 +136,7 @@
   (defvar rdg/company-default-backends
     '(company-files company-dabbrev-code company-etags company-capf company-keywords company-dabbrev))
 
-  (defvar rdg/company-shell-backends '(company-native-complete company-files company-capf company-dabbrev))
-  (defvar rdg/company-js-backends '(company-tern))
+  (defvar rdg/company-shell-backends '(company-files company-native-complete company-capf company-dabbrev))
 
   (defun rdg/company-set-mode-backends (backends)
     "Set BACKENDS locally"
@@ -137,7 +153,7 @@
     (define-key company-active-map [return] #'rdg/company-maybe-complete-on-return)
     (define-key company-active-map (kbd "RET") #'rdg/company-maybe-complete-on-return))
 
-  ;;counsel/swiper/ivy
+  ;; counsel/swiper/ivy
   (ivy-prescient-mode t)
   (global-set-key (kbd "C-s") 'counsel-grep-or-swiper)
   (global-set-key (kbd "C-r") 'counsel-grep-or-swiper)
@@ -150,6 +166,7 @@
   (global-set-key (kbd "C-c g f") 'counsel-git)
   (global-set-key (kbd "C-c g g") 'counsel-git-grep)
   (global-set-key (kbd "C-c e f") 'counsel-etags-find-tag)
+  (global-set-key (kbd "C-c ! !") 'counsel-flycheck)
   (global-set-key (kbd "C-c //") 'counsel-tramp)
 
   ;; anzu
@@ -178,11 +195,6 @@
 
   (defhydra hydra-mark (global-map "C-M-SPC")
     "Mark"
-    ("w" er/mark-word "Word")
-    ("s" er/mark-sexp "Sexp")
-    ("d" er/mark-defun "Defun")
-    ("i" er/mark-inside-pairs "Inside pairs")
-    ("o" er/mark-outside-pairs "Outside pairs")
     ("+" er/expand-region "Expand")
     ("-" er/contract-region "Contract")
     (">" mc/mark-next-like-this "Next")
@@ -195,6 +207,7 @@
 
   ;; Easily open/switch to a shell
   ;; Please don't open my shells in new windows
+  (setq native-complete-style-regex-alist '((".+*(pry|guard).*> " . tab)))
   (add-to-list 'display-buffer-alist '("*shell*" display-buffer-same-window))
   (global-set-key (kbd "C-c `") 'shell-pop)
   (setq shell-pop-universal-key "C-c `"
@@ -235,6 +248,9 @@
                      (append completion-at-point-functions '(pcomplete-completions-at-point)))
                 (rdg/company-set-mode-backends rdg/company-shell-backends)
                 (rdg/remove-fringe-and-margin))))
+
+  ;; sqlformat
+  (setq sqlformat-command 'pgformatter)
 
   ;; dired
   (with-eval-after-load 'dired+
@@ -309,7 +325,6 @@
                       sgml-basic-offset 2)
                 (subword-mode)
                 (prettier-js-mode)
-                (tern-mode)
                 (rdg/company-set-mode-backends rdg/company-js-backends))))
     (mapc (lambda (mode-hook) (add-hook mode-hook hook))
           '(js-mode-hook js2-mode-hook rjsx-mode-hook)))
@@ -364,6 +379,8 @@
   (add-hook 'web-mode-hook (lambda () (setq web-mode-markup-indent-offset 2)))
 
   ;; Ruby
+  (setq rubocop-prefer-system-executable t)
+
   (defun rdg/ruby-update-tags ()
     (let ((root (locate-dominating-file default-directory ".git")))
       (when root
@@ -374,18 +391,38 @@
     (remove-hook 'after-save-hook 'rdg/ruby-update-tags t)
     (add-hook 'after-save-hook 'rdg/ruby-update-tags nil t))
 
-  (setq compilation-finish-function
-        (lambda (buf str)
+  (defvar rdg/ignored-compilation-buffer-match '("*RuboCop"))
+
+  (defun rdg/maybe-write-and-close-compilation-buffer (buf str)
+    (if (-any? (lambda (it) (s-contains? it (buffer-name buf)))
+               rdg/ignored-compilation-buffer-match)
+        (progn
           (message "Compilation: %s" str)
-          (kill-buffer buf)))
+          (kill-buffer buf))))
+
+  (-each rdg/ignored-compilation-buffer-match
+    (lambda (it) (add-to-list 'display-buffer-alist
+                              `(,it (display-buffer-no-window)))))
+
+  (add-hook 'compilation-finish-functions
+            'rdg/maybe-write-and-close-compilation-buffer)
 
   (defun rdg/rubocop-autocorrect-and-revert()
     (rubocop-autocorrect-current-file)
     (revert-buffer t t t))
 
+  (defun rdg/rubocop-fix-layout-and-revert()
+    (require 'rubocop)
+    (rubocop--file-command "rubocop --fix-layout --format emacs")
+    (revert-buffer t t t))
+
   (defun rdg/add-rubocop-autocorrect-hook ()
     (remove-hook 'after-save-hook 'rdg/rubocop-autocorrect-and-revert t)
     (add-hook 'after-save-hook 'rdg/rubocop-autocorrect-and-revert nil t))
+
+  (defun rdg/add-rubocop-fix-layout-hook ()
+    (remove-hook 'after-save-hook 'rdg/rubocop-fix-layout-and-revert t)
+    (add-hook 'after-save-hook 'rdg/rubocop-fix-layout-and-revert nil t))
 
   (with-eval-after-load 'ruby-mode
     (exec-path-from-shell-copy-env "GEM_HOME"))
@@ -399,6 +436,7 @@
           ruby-deep-indent-paren nil
           ruby-deep-indent-paren-style nil
           ruby-use-smie t)
+    (rdg/add-rubocop-fix-layout-hook)
     ;; (rdg/add-rubocop-autocorrect-hook)
     (rdg/add-ruby-update-tags-hook))
 
