@@ -38,6 +38,8 @@
       (message "Starting server")
       (server-start)))
 
+  (require 'org)
+
   (add-to-list 'load-path "~/.emacs.d/graphene/")
   (add-to-list 'load-path "~/.emacs.d/graphene-meta-theme/")
   (add-to-list 'custom-theme-load-path "~/.emacs.d/graphene-meta-theme/")
@@ -47,7 +49,7 @@
   (add-to-list 'load-path "~/.emacs.d/ppd-sr-speedbar/")
 
   (require 'package)
-  (require 'cask "/usr/local/Cellar/cask/0.8.4/cask.el")
+  (require 'cask "/usr/local/Cellar/cask/0.8.7/cask.el")
   (cask-initialize)
   (add-to-list 'auto-mode-alist '("\\Cask\\'" . emacs-lisp-mode))
 
@@ -220,21 +222,22 @@
   (defun rdg/setup-shell ()
     "Hook to set up shell modes."
     (setq comint-prompt-read-only t
-          ;; comint-process-echoes t
+          ;; comint-process-echoes t;
           comint-buffer-maximum-size 10000)
-    (ansi-color-for-comint-mode-on)
-    (add-to-list 'comint-output-filter-functions
-                 'ansi-color-process-output)
-    (add-hook 'comint-output-filter-functions
-              'comint-truncate-buffer)
+    ;; (ansi-color-for-comint-mode-on)
+    ;; (add-to-list 'comint-output-filter-functions
+    ;;              'ansi-color-process-output)
+    ;; (add-hook 'comint-output-filter-functions
+    ;;           'comint-truncate-buffer)
     ;; (add-to-list 'comint-preoutput-filter-functions
     ;;              'rdg/remove-shell-control-chars)
     (unless (eq system-type 'windows-nt)
       (let ((shell-name "bash"))
-        (setq explicit-shell-file-name shell-name
-              shell-file-name shell-name)
-        (setenv "SHELL" shell-name)
-        (setenv "PAGER" "/bin/cat"))
+        ;; (setq explicit-shell-file-name shell-name
+        ;;       shell-file-name shell-name)
+        ;; (setenv "SHELL" shell-name)
+        ;; (setenv "PAGER" "/bin/cat")
+        )
       ;; (setq explicit-bash-args '("-li" "-c" "export EMACS=; stty echo; bash"))
       (define-key shell-mode-map (kbd "<tab>") #'company-complete)))
 
@@ -434,9 +437,7 @@
     (yard-mode)
     (ruby-tools-mode)
     (setq ruby-insert-encoding-magic-comment nil
-          ruby-deep-arglist nil
-          ruby-deep-indent-paren nil
-          ruby-deep-indent-paren-style nil
+          ruby-align-chained-calls t
           ruby-use-smie t)
     (rdg/add-rubocop-fix-layout-hook)
     ;; (rdg/add-rubocop-autocorrect-hook)
