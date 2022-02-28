@@ -276,6 +276,9 @@
   (global-set-key (kbd "M-F") 'sp-forward-symbol)
   (global-set-key (kbd "M-B") 'sp-backward-symbol)
 
+  ;; cfn
+  (add-hook 'graphene-prog-mode-hook 'cfn-mode)
+
   ;; easier defun navigation
   (defun beginning-of-next-defun ()
     (interactive)
@@ -444,6 +447,11 @@
     (rdg/add-ruby-update-tags-hook))
 
   (add-hook 'ruby-mode-hook 'rdg/ruby-mode-hook)
+
+  ;; cloudformation
+  ;; (add-hook 'cfn-mode-hook
+  ;;           (setq flycheck-checkers
+  ;;                 (append flycheck-checkers '(cfn-lint cfn-nag))))
 
   ;; imenu
   (setq imenu-auto-rescan t)
