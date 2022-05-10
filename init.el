@@ -4,9 +4,9 @@
       (bootstrap-version 5))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
-  (url-retrieve-synchronously
-   "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-   'silent 'inhibit-cookies)
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
@@ -42,6 +42,8 @@
       pop-up-windows nil)
 
 (setq create-lockfiles nil)
+
+(setq tags-revert-without-query 1)
 
 (setq-default bidi-display-reordering nil)
 
@@ -85,10 +87,10 @@
   (interactive)
   (let ((buffers (buffer-list)))
     (mapc (lambda (buf)
-      (let ((filename (buffer-file-name buf)))
-        (when (and filename (not (file-exists-p filename)))
-    (kill-buffer buf))))
-    buffers)))
+            (let ((filename (buffer-file-name buf)))
+              (when (and filename (not (file-exists-p filename)))
+                (kill-buffer buf))))
+          buffers)))
 
 ;; Sensible window movement
 (global-set-key (kbd "C-c <up>") 'windmove-up)
@@ -98,9 +100,9 @@
 
 (defun buf-stack (direction)
   (let* ((other-win (windmove-find-other-window direction))
-   (buf-this-buf (window-buffer (selected-window))))
+         (buf-this-buf (window-buffer (selected-window))))
     (if (null other-win)
-  (error "No window in that direction")
+        (error "No window in that direction")
       (set-window-buffer other-win buf-this-buf)
       (switch-to-prev-buffer (selected-window) t))))
 
@@ -125,6 +127,15 @@
 (global-set-key (kbd "C-c S-<up>") 'buf-stack-up)
 (global-set-key (kbd "C-c S-<down>") 'buf-stack-down)
 
+(defun rdg/beginning-of-next-defun ()
+  (interactive)
+  (end-of-defun)
+  (end-of-defun)
+  (beginning-of-defun))
+
+(global-set-key (kbd "M-<down>") 'rdg/beginning-of-next-defun)
+(global-set-key (kbd "M-<up>") 'beginning-of-defun)
+
 ;; No visible region on C-x C-x
 (defun exchange-point-and-mark-no-region ()
   "Suppress region visibility when exchanging point and mark."
@@ -136,17 +147,19 @@
 
 (defun rdg/maybe-write-and-close-compilation-buffer (buf str)
   (if (-any? (lambda (it) (s-contains? it (buffer-name buf)))
-       rdg/ignored-compilation-buffer-match)
+             rdg/ignored-compilation-buffer-match)
       (progn
-  (message "Compilation: %s" str)
-  (kill-buffer buf))))
+        (message "Compilation: %s" str)
+        (kill-buffer buf))))
 
 (-each rdg/ignored-compilation-buffer-match
   (lambda (it) (add-to-list 'display-buffer-alist
-          `(,it (display-buffer-no-window)))))
+                            `(,it (display-buffer-no-window)))))
 
 (add-hook 'compilation-finish-functions
-    'rdg/maybe-write-and-close-compilation-buffer)
+          'rdg/maybe-write-and-close-compilation-buffer)
+
+(use-package bury-successful-compilation)
 
 (use-package server
   :config
@@ -157,15 +170,8 @@
       (server-start))))
 
 (use-package smartparens
+  :custom (sp-escape-quotes-after-insert nil)
   :config
-  (setq sp-escape-quotes-after-insert nil)
-  (defun beginning-of-next-defun ()
-    (interactive)
-    (end-of-defun)
-    (end-of-defun)
-    (beginning-of-defun))
-  (global-set-key (kbd "M-<down>") 'beginning-of-next-defun)
-  (global-set-key (kbd "M-<up>") 'beginning-of-defun)
   (defun rdg/unwrap-and-mark-sexp (&optional arg)
     (interactive)
     (let ((sexp-info (sp-unwrap-sexp arg)))
@@ -206,69 +212,34 @@
   ;; TODO fix this to not show files ending in ~
   (let ((re "^\\.\\.?\\(\\(DS_Store\\)\\|\\(#.+\\)\\)?$"))
     (setq speedbar-directory-unshown-regexp re
-    speedbar-file-unshown-regexp re))
+          speedbar-file-unshown-regexp re))
   (add-hook 'speedbar-mode-hook 'rdg/remove-fringe-and-margin))
 
 (use-package sr-speedbar)
 
-(use-package ppd-sr-speedbar
-  :load-path "ppd-sr-speedbar/")
-
-(use-package project-persist
-  :load-path "project-persist-git/")
-
-(use-package project-persist-drawer
-  :load-path "project-persist-drawer/"
-  :bind ("C-c d d" . project-persist-drawer-toggle))
-
-(use-package graphene-meta-theme
-  :load-path "graphene-meta-theme/"
-  :config
-  (add-to-list 'custom-theme-load-path
-         "~/.emacs.d/graphene-meta-theme/"))
-
-(use-package graphene
-  :load-path "graphene/"
-  :config
-  (add-hook 'graphene-prog-mode-hook 'eldoc-mode))
-
-(use-package solarized-theme
-  :init
-  (setq solarized-use-variable-pitch nil)
-  (setq solarized-high-contrast-mode-line t)
-  (setq solarized-use-less-bold t)
-  ;; (setq solarized-emphasize-indicators nil)
-  ;; Avoid all font-size changes
-  (setq solarized-height-minus-1 1.0)
-  (setq solarized-height-plus-1 1.0)
-  (setq solarized-height-plus-2 1.0)
-  (setq solarized-height-plus-3 1.0)
-  (setq solarized-height-plus-4 1.0)
-  (when window-system
-    (load-theme 'solarized-light t)))
-
-(use-package prescient)
+(use-package prescient
+  :config (prescient-persist-mode t))
 
 (use-package so-long
   :straight t
+  :custom
+  (so-long-threshold 500)
+  (so-long-max-lines nil)
   :config
   (defvar so-long-target-modes)
-  (defvar so-long-threshold)
-  (defvar so-long-max-lines)
   (add-to-list 'so-long-target-modes 'shell-mode)
-  (setq so-long-threshold 500
-  so-long-max-lines nil)
-  (global-so-long-mode t)) ;; straight
+  (global-so-long-mode t))
 
 (use-package anzu
+  :custom
+  (anzu-mode-lighter "")
+  (anzu-deactivate-region t)
+  (anzu-replace-to-string-separator " => ")
   :config
   (global-anzu-mode t)
   (set-face-attribute 'anzu-mode-line nil
-          :foreground 'unspecified
-          :inherit 'company-tooltip-search)
-  (setq anzu-mode-lighter ""
-  anzu-deactivate-region t
-  anzu-replace-to-string-separator " => ")
+                      :foreground 'unspecified
+                      :inherit 'company-tooltip-search)
   (define-key (current-global-map) [remap query-replace]
     #'anzu-query-replace)
   (define-key (current-global-map) [remap query-replace-regexp]
@@ -278,10 +249,10 @@
   (define-key isearch-mode-map [remap isearch-query-replace-regexp]
     #'anzu-isearch-query-replace-regexp))
 
-(use-package prescient)
-
+(use-package native-complete
+  :custom (native-complete-style-regex-alist '((".+*(pry|guard).*> " . tab))))
 (use-package company-try-hard)
-
+(use-package company-prescient)
 (use-package company
   :config
   (defvar rdg/company-no-return-key-modes '(shell-mode))
@@ -289,36 +260,35 @@
     (not (derived-mode-p 'comint-mode)))
   (defun rdg/company-maybe-try-hard (buf win tick pos)
     (when (and (not company-candidates)
-         (looking-back "[A-Za-z0-9_\-\/\.]" 1))
+               (looking-back "[A-Za-z0-9_\-\/\.]" 1))
       (company-try-hard)
       (let ((this-command 'company-try-hard))
-  (company-post-command))))
+        (company-post-command))))
   (defun rdg/company-maybe-complete-on-return ()
     (interactive)
     (if (rdg/company-complete-on-return-p)
-  (company-complete-selection)
+        (company-complete-selection)
       (if (functionp 'comint-send-input)
-    (comint-send-input)
-  (newline))))
+          (comint-send-input)
+        (newline))))
   (defun rdg/advise-company-try-hard ()
     (advice-remove 'company-idle-begin
-       #'rdg/company-maybe-try-hard)
+                   #'rdg/company-maybe-try-hard)
     (advice-add 'company-idle-begin :after
-    #'rdg/company-maybe-try-hard))
-  (setq tags-revert-without-query 1)
+                #'rdg/company-maybe-try-hard))
   (defvar rdg/company-default-backends
     '(company-files company-dabbrev-code company-etags
-        company-capf company-keywords
-        company-dabbrev))
+                    company-capf company-keywords
+                    company-dabbrev))
   (defvar rdg/company-shell-backends
     '(company-files company-native-complete company-capf
-        company-dabbrev))
+                    company-dabbrev))
   (defun rdg/company-set-mode-backends (backends)
     "Set BACKENDS locally"
     (set (make-local-variable 'company-backends)
-   (-uniq (append backends rdg/company-default-backends))))
+         (-uniq (append backends rdg/company-default-backends))))
   (setq company-backends rdg/company-default-backends
-  company-idle-delay 0.15)
+        company-idle-delay 0.15)
   (rdg/advise-company-try-hard)
   (company-prescient-mode t)
   (define-key company-active-map (kbd "<tab>")
@@ -329,10 +299,7 @@
     #'rdg/company-maybe-complete-on-return)
   (define-key company-active-map (kbd "RET")
     #'rdg/company-maybe-complete-on-return))
-
-(use-package ivy
-  :config
-  (ivy-prescient-mode t))
+    (add-to-list 'display-buffer-alist '("*shell*" display-buffer-same-window))
 
 (use-package counsel
   :bind
@@ -350,6 +317,13 @@
    ("C-c ! !" . counsel-flycheck)
    ("C-c //" . counsel-tramp)))
 
+(use-package counsel-etags)
+
+(use-package ivy-prescient)
+(use-package ivy
+  :config
+  (ivy-prescient-mode t))
+
 (use-package hydra)
 
 (use-package expand-region
@@ -365,86 +339,70 @@
   (global-set-key (kbd "C-M-SPC") 'hydra-mark-begin))
 
 (use-package shell-pop
-  :bind ("C-c `" . shell-pop)
-  :config
-  (setq shell-pop-universal-key "C-c `"
-  shell-pop-window-position "bottom"))
+  :custom
+  (shell-pop-universal-key "C-c `")
+  (shell-pop-window-position "bottom")
+  :bind ("C-c `" . shell-pop))
 
-(use-package native-complete
-  :config
-  (setq comint-prompt-read-only t
-  comint-buffer-maximum-size 10000)
-  (unless (eq system-type 'windows-nt)
-    (let ((shell-name "bash")))
-    (define-key shell-mode-map (kbd "<tab>")
-      #'company-complete))
-  (native-complete-setup-bash))
+(use-package comint
+  :custom
+  (comint-prompt-read-only t)
+  (comint-buffer-maximum-size 10000))
 
 (use-package shell
-  :config
-  (setq comint-prompt-read-only t
-  comint-buffer-maximum-size 10000)
-  (unless (eq system-type 'windows-nt)
-    (let ((shell-name "bash")))
-    (define-key shell-mode-map (kbd "<tab>")
-      #'company-complete))
+  :config (native-complete-setup-bash)
+  :init
+  (add-to-list 'display-buffer-alist '("*shell*" display-buffer-same-window))
+  (define-key shell-mode-map (kbd "<tab>") #'company-complete)
   (add-hook 'shell-mode-hook
-      (lambda ()
-        (set (make-local-variable
-        'completion-at-point-functions)
-       (append completion-at-point-functions
-         '(pcomplete-completions-at-point)))
-        (rdg/company-set-mode-backends
-         rdg/company-shell-backends)
-        (rdg/remove-fringe-and-margin))))
+            (lambda ()
+              (set (make-local-variable
+                    'completion-at-point-functions)
+                   (append completion-at-point-functions
+                           '(pcomplete-completions-at-point)))
+              (rdg/company-set-mode-backends rdg/company-shell-backends)
+              (rdg/remove-fringe-and-margin))))
 
 (use-package sqlformat
-  :config
-  (setq sqlformat-command 'pgformatter))
-
-(use-package cfn-mode
-  :config
-  (add-to-list 'graphene-prog-mode-hooks 'cfn-mode)
-  (add-hook 'cfn-mode-hook (lambda () (flycheck-cfn-setup))))
+  :custom (sqlformat-command 'pgformatter))
 
 (use-package magit
-  :config
-  (setq magit-status-buffer-switch-function 'switch-to-buffer))
+  :custom (magit-status-buffer-switch-function 'switch-to-buffer))
 
 (use-package scss-mode
-  :config
-  (setq scss-compile-at-save nil))
+  :custom (scss-compile-at-save nil))
 
 (use-package flycheck
+  :custom
+  (flycheck-idle-change-delay 5)
   :config
-  (setq flycheck-idle-change-delay 5
-  flycheck-disabled-checkers (append flycheck-disabled-checkers
-             '(javascript-jshint json-jsonlist)))
+  (setq flycheck-disabled-checkers (append flycheck-disabled-checkers
+                                           '(javascript-jshint json-jsonlist)))
   (mapc (lambda (mode) (flycheck-add-mode 'javascript-eslint mode))
-  '(js-mode js2-mode rjsx-mode)))
+        '(js-mode js2-mode rjsx-mode)))
 
-(use-package prettier)
+(use-package prettier-js)
 
 (use-package js
   :config
   (defvar rdg/company-js-backends '())
   (let ((hook (lambda ()
-    (setq js-indent-level 2
-          sgml-basic-offset 2)
-    (subword-mode)
-    (prettier-js-mode)
-    (rdg/company-set-mode-backends rdg/company-js-backends))))
+                (setq js-indent-level 2
+                      sgml-basic-offset 2)
+                (subword-mode)
+                (prettier-js-mode)
+                (rdg/company-set-mode-backends rdg/company-js-backends))))
     (mapc (lambda (mode-hook) (add-hook mode-hook hook))
-    '(js-mode-hook js2-mode-hook rjsx-mode-hook)))
+          '(js-mode-hook js2-mode-hook rjsx-mode-hook)))
   (defun rdg/use-eslint-from-node-modules (fn)
     (let ((root (locate-dominating-file
-     (or (buffer-file-name) default-directory)
-     (lambda (dir)
-       (let ((eslint (expand-file-name "node_modules/eslint/bin/eslint.js" dir)))
-         (and eslint (file-executable-p eslint)))))))
+                 (or (buffer-file-name) default-directory)
+                 (lambda (dir)
+                   (let ((eslint (expand-file-name "node_modules/eslint/bin/eslint.js" dir)))
+                     (and eslint (file-executable-p eslint)))))))
       (when root
-  (let ((eslint (expand-file-name "node_modules/eslint/bin/eslint.js" root)))
-    (funcall fn eslint)))))
+        (let ((eslint (expand-file-name "node_modules/eslint/bin/eslint.js" root)))
+          (funcall fn eslint)))))
   (defun rdg/set-flycheck-eslint-executable ()
     (rdg/use-eslint-from-node-modules
      (lambda (eslint) (setq-local flycheck-javascript-eslint-executable eslint))))
@@ -462,8 +420,8 @@
   (add-hook 'after-save-hook 'rdg/eslint-fix-buffer nil t))
 
 (use-package rubocop
+  :custom (rubocop-prefer-system-executable t)
   :config
-  (setq rubocop-prefer-system-executable t)
   (defun rdg/rubocop-autocorrect-and-revert()
     (rubocop-autocorrect-current-file)
     (revert-buffer t t t))
@@ -477,31 +435,75 @@
     (remove-hook 'after-save-hook 'rdg/rubocop-fix-layout-and-revert t)
     (add-hook 'after-save-hook 'rdg/rubocop-fix-layout-and-revert nil t)))
 
+(use-package ruby-tools)
+
 (use-package ruby-mode
   :config
   (defun rdg/ruby-update-tags ()
     (let ((root (locate-dominating-file default-directory ".git")))
       (when root
-  (cd root)
-  (call-process-shell-command "ripper-tags -R -e --exclude=vendor"))))
+        (cd root)
+        (call-process-shell-command "ripper-tags -R -e --exclude=vendor"))))
   (defun rdg/add-ruby-update-tags-hook ()
     (remove-hook 'after-save-hook 'rdg/ruby-update-tags t)
     (add-hook 'after-save-hook 'rdg/ruby-update-tags nil t))
   (exec-path-from-shell-copy-env "GEM_HOME")
   (defun rdg/ruby-mode-hook ()
     (subword-mode)
-    (yard-mode)
     (ruby-tools-mode)
     (setq ruby-insert-encoding-magic-comment nil
-    ruby-align-chained-calls t
-    ruby-use-smie t)
+          ruby-align-chained-calls t
+          ruby-use-smie t)
     (rdg/add-rubocop-fix-layout-hook)
     (rdg/add-ruby-update-tags-hook))
   (add-hook 'ruby-mode-hook 'rdg/ruby-mode-hook))
 
 ;; imenu
 (use-package imenu
+  :custom (imenu-auto-rescan t)
+  :bind ("C-c ." . ivy-imenu-anywhere))
+
+(use-package project-persist
+  :load-path "project-persist-git/")
+
+(use-package project-persist-drawer
+  :load-path "project-persist-drawer/"
+  :bind ("C-c d d" . project-persist-drawer-toggle))
+
+(use-package ppd-sr-speedbar
+  :load-path "ppd-sr-speedbar/")
+
+(use-package graphene-meta-theme
+  :load-path "graphene-meta-theme/"
   :config
-  (setq imenu-auto-rescan t)
-  :bind
-  ("C-c ." . ivy-imenu-anywhere))
+  (add-to-list 'custom-theme-load-path
+               "~/.emacs.d/graphene-meta-theme/"))
+
+(use-package graphene
+  :load-path "graphene/"
+  :config
+  (add-hook 'graphene-prog-mode-hook 'eldoc-mode))
+
+(use-package cfn-mode
+  :config
+  (add-to-list 'graphene-prog-mode-hooks 'cfn-mode)
+  (add-hook 'cfn-mode-hook (lambda () (flycheck-cfn-setup))))
+
+(use-package dockerfile-mode)
+
+(use-package feature-mode)
+
+(use-package json-mode)
+
+(use-package markdown-mode)
+
+(use-package yaml-mode)
+
+(use-package smart-tab
+  :config (global-smart-tab-mode 1))
+
+(use-package solarized-theme
+  :straight (solarized-theme :host github :repo "sellout/emacs-color-theme-solarized")
+  :init
+  (when window-system
+    (load-theme 'solarized t)))
