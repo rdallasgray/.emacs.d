@@ -277,7 +277,8 @@
   (global-set-key (kbd "M-B") 'sp-backward-symbol)
 
   ;; cfn
-  (add-hook 'graphene-prog-mode-hook 'cfn-mode)
+  (add-to-list 'graphene-prog-mode-hooks 'cfn-mode)
+  (add-hook 'cfn-mode-hook (lambda () (flycheck-cfn-setup)))
 
   ;; easier defun navigation
   (defun beginning-of-next-defun ()
