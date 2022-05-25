@@ -1,4 +1,6 @@
 .DS_Store
+/.cache
+/projects
 /auto-save-list
 /var
 /url
