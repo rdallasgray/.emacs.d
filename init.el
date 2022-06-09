@@ -451,6 +451,7 @@
     (add-hook 'after-save-hook 'rdg/rubocop-fix-layout-and-revert nil t)))
 
 (use-package ruby-tools)
+(use-package ruby-hash-syntax)
 
 (use-package ruby-mode
   :config
