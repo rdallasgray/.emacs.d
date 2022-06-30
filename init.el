@@ -122,10 +122,13 @@
   (interactive)
   (buf-stack 'down))
 
-(global-set-key (kbd "C-c S-<left>") 'buf-stack-left)
-(global-set-key (kbd "C-c S-<right>") 'buf-stack-right)
-(global-set-key (kbd "C-c S-<up>") 'buf-stack-up)
-(global-set-key (kbd "C-c S-<down>") 'buf-stack-down)
+(defun buf-stack-set-keys()
+  (global-set-key (kbd "C-c S-<left>") 'buf-stack-left)
+  (global-set-key (kbd "C-c S-<right>") 'buf-stack-right)
+  (global-set-key (kbd "C-c S-<up>") 'buf-stack-up)
+  (global-set-key (kbd "C-c S-<down>") 'buf-stack-down))
+
+(buf-stack-set-keys)
 
 (defun rdg/beginning-of-next-defun ()
   (interactive)
@@ -304,6 +307,8 @@
   (define-key company-active-map (kbd "RET")
     #'rdg/company-maybe-complete-on-return))
     (add-to-list 'display-buffer-alist '("*shell*" display-buffer-same-window))
+
+(use-package wgrep)
 
 (use-package counsel
   :bind
@@ -511,7 +516,12 @@
 
 (use-package json-mode)
 
-(use-package markdown-mode)
+(use-package markdown-mode
+  :config
+  (define-key markdown-mode-map (kbd "C-c <up>") nil)
+  (define-key markdown-mode-map (kbd "C-c <down>") nil)
+  (define-key markdown-mode-map (kbd "C-c <left>") nil)
+  (define-key markdown-mode-map (kbd "C-c <right>") nil))
 
 (use-package yaml-mode)
 
