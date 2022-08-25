@@ -122,10 +122,13 @@
   (interactive)
   (buf-stack 'down))
 
-(global-set-key (kbd "C-c S-<left>") 'buf-stack-left)
-(global-set-key (kbd "C-c S-<right>") 'buf-stack-right)
-(global-set-key (kbd "C-c S-<up>") 'buf-stack-up)
-(global-set-key (kbd "C-c S-<down>") 'buf-stack-down)
+(defun buf-stack-set-keys()
+  (global-set-key (kbd "C-c S-<left>") 'buf-stack-left)
+  (global-set-key (kbd "C-c S-<right>") 'buf-stack-right)
+  (global-set-key (kbd "C-c S-<up>") 'buf-stack-up)
+  (global-set-key (kbd "C-c S-<down>") 'buf-stack-down))
+
+(buf-stack-set-keys)
 
 (defun rdg/beginning-of-next-defun ()
   (interactive)
@@ -305,6 +308,8 @@
     #'rdg/company-maybe-complete-on-return))
     (add-to-list 'display-buffer-alist '("*shell*" display-buffer-same-window))
 
+(use-package wgrep)
+
 (use-package counsel
   :bind
   (("C-s" . counsel-grep-or-swiper)
@@ -451,6 +456,7 @@
     (add-hook 'after-save-hook 'rdg/rubocop-fix-layout-and-revert nil t)))
 
 (use-package ruby-tools)
+(use-package ruby-hash-syntax)
 
 (use-package ruby-mode
   :config
@@ -510,7 +516,12 @@
 
 (use-package json-mode)
 
-(use-package markdown-mode)
+(use-package markdown-mode
+  :config
+  (define-key markdown-mode-map (kbd "C-c <up>") nil)
+  (define-key markdown-mode-map (kbd "C-c <down>") nil)
+  (define-key markdown-mode-map (kbd "C-c <left>") nil)
+  (define-key markdown-mode-map (kbd "C-c <right>") nil))
 
 (use-package yaml-mode)
 
