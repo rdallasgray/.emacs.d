@@ -66,7 +66,9 @@
       warning-minimum-level :error
       ring-bell-function 'ignore)
 
-(add-hook 'before-save-hook 'whitespace-cleanup)
+;; whitespace cleanup
+(use-package whitespace-cleanup-mode)
+(add-hook 'graphene-prog-mode-hook 'whitespace-cleanup-mode)
 
 ;; midnight
 (setq clean-buffer-list-delay-general 7)
@@ -327,6 +329,7 @@
    ("C-c //" . counsel-tramp)))
 
 (use-package counsel-etags)
+(use-package counsel-tramp)
 
 (use-package ivy-prescient)
 (use-package ivy
@@ -508,9 +511,11 @@
 (use-package cfn-mode
   :config
   (add-to-list 'graphene-prog-mode-hooks 'cfn-mode)
-  (add-hook 'cfn-mode-hook (lambda () (flycheck-cfn-setup))))
+  (add-hook 'cfn-mode-hook (lambda () (flycheck-cfn-setup)))
+  (add-to-list 'auto-mode-alist '("\\.template\\'" . cfn-mode)))
 
 (use-package dockerfile-mode)
+(use-package docker-tramp)
 
 (use-package feature-mode)
 
