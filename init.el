@@ -350,12 +350,6 @@
     ("-" er/contract-region "Contract"))
   (global-set-key (kbd "C-M-SPC") 'hydra-mark-begin))
 
-;; (use-package shell-pop
-;;   :custom
-;;   (shell-pop-universal-key "C-c `")
-;;   (shell-pop-window-position "bottom")
-;;   :bind ("C-c `" . shell-pop))
-
 (use-package multi-vterm
   :custom (multi-vterm-dedicated-window-height 20)
   :config
@@ -366,25 +360,6 @@
         (multi-vterm)
       (multi-vterm-dedicated-open)))
   (global-set-key (kbd "C-c `") 'rdg/multi-vterm-dwim))
-
-;; (use-package comint
-;;   :custom
-;;   (comint-prompt-read-only t)
-;;   (comint-buffer-maximum-size 10000))
-
-;; (use-package shell
-;;   :config (native-complete-setup-bash)
-;;   :init
-;;   (add-to-list 'display-buffer-alist '("*shell*" display-buffer-same-window))
-;;   (define-key shell-mode-map (kbd "<tab>") #'company-complete)
-;;   (add-hook 'shell-mode-hook
-;;             (lambda ()
-;;               (set (make-local-variable
-;;                     'completion-at-point-functions)
-;;                    (append completion-at-point-functions
-;;                            '(pcomplete-completions-at-point)))
-;;               (rdg/company-set-mode-backends rdg/company-shell-backends)
-;;               (rdg/remove-fringe-and-margin))))
 
 (use-package sqlformat
   :custom (sqlformat-command 'pgformatter))
