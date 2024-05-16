@@ -1,3 +1,5 @@
+;; (setq debug-on-error t)
+
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -33,9 +35,69 @@
 (use-package dash)
 (use-package s)
 
+(auto-compression-mode nil)
+
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
+
+(use-package treesit-auto
+  :config
+  (setq treesit-auto-install-all t)
+  ;; (global-treesit-auto-mode)
+  )
+
+(use-package which-key
+  :config (which-key-mode))
+
+;; (use-package lsp-mode
+;;   :custom
+;;   (lsp-headerline-breadcrumb-enable nil)
+;;   :init
+;;   (setq lsp-keymap-prefix "C-c l")
+;;   :hook ((ruby-mode . lsp)
+;;          (ruby-ts-mode . lsp)
+;;          (javascript-mode . lsp)
+;;          (javascript-ts-mode . lsp)
+;;          (lsp-mode . lsp-enable-which-key-integration))
+;;   :commands lsp)
+
+;; (use-package lsp-ivy)
+
+;; (use-package copilot
+;;   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+;;   :ensure t
+;;   :config
+;;   (add-to-list 'load-path "/path/to/copilot.el")
+;;   (require 'copilot)
+;;   (add-hook 'prog-mode-hook 'copilot-mode))
+
 (setq custom-file "~/.emacs.d/custom.el")
 (when (file-exists-p custom-file)
   (load custom-file))
+
+;;----OLD----
+;; (use-package project-persist
+;;   :load-path "project-persist-git/")
+
+;; (use-package project-persist-drawer
+;;   :load-path "project-persist-drawer/"
+;;   :bind ("C-c d d" . project-persist-drawer-toggle))
+
+;; (use-package ppd-sr-speedbar
+;;   :load-path "ppd-sr-speedbar/")
+
+;; (use-package graphene
+;;   :load-path "graphene/"
+;;   :config
+;;   (add-hook 'graphene-prog-mode-hook 'eldoc-mode))
+;;-----------
+
+;; ;; ----NEW----
+(add-to-list 'load-path "~/.emacs.d/rdg/")
+(require 'rdg-helper-functions)
+(require 'rdg-editing)
+(require 'rdg-env)
+(require 'rdg-look)
+;; ;; -----------
 
 ;; No pop-ups
 (setq pop-up-frames nil
@@ -164,7 +226,98 @@
 (add-hook 'compilation-finish-functions
           'rdg/maybe-write-and-close-compilation-buffer)
 
-(use-package treemacs)
+(use-package treemacs
+  :config
+  (progn
+    (setq treemacs-file-event-delay                2000
+          treemacs-follow-after-init               nil
+          treemacs-expand-after-init               t
+          treemacs-expand-added-projects           t
+          treemacs-find-workspace-method           'find-for-file-or-pick-first
+          treemacs-header-scroll-indicators        '(nil . "^^^^^^")
+          treemacs-indentation                     1
+          treemacs-indentation-string              " "
+          treemacs-no-png-images                   t
+          treemacs-no-delete-other-windows         t
+          treemacs-project-follow-cleanup          nil
+          treemacs-recenter-after-project-jump     'always
+          treemacs-silent-filewatch                nil
+          treemacs-silent-refresh                  nil
+          treemacs-space-between-root-nodes        nil
+          treemacs-wrap-around                     nil)
+
+    ;; The default width and height of the icons is 22 pixels. If you are
+    ;; using a Hi-DPI display, uncomment this to double the icon size.
+    ;;(treemacs-resize-icons 44)
+
+    (treemacs-git-mode 'simple)
+    (treemacs-filewatch-mode t)
+    ;; (treemacs-project-follow-mode nil)
+    ;; (treemacs-tag-follow-mode nil)
+    (add-hook 'treemacs-mode-hook
+              (lambda ()
+                (treemacs--disable-fringe-indicator))))
+:bind
+(:map global-map
+      ("C-c t t" . treemacs)
+      ("C-c t d" . treemacs-select-directory)
+      ("C-c t b" . treemacs-bookmark)
+      ("C-c t f" . treemacs-find-file)
+      :map treemacs-mode-map
+      ("<left>" . treemacs-toggle-node)
+      ("<right>" . treemacs-toggle-node)))
+
+(defvar rdg/current-project-root nil)
+(defun rdg/get-project-root (&rest args)
+  "Return the currently set project root"
+  rdg/current-project-root)
+
+(use-package projectile
+  :init
+  (setq projectile-project-search-path '("~/Documents/Code/Geome"))
+  (setq projectile-switch-project-action
+        (lambda ()
+          (message "Switched project; project root is %s" (projectile-project-root))
+          (setq rdg/current-project-root (projectile-project-root))
+          (treemacs-add-and-display-current-project-exclusively)))
+  (projectile-mode)
+  :bind
+  ("C-c p" . projectile-command-map)
+  ;; :config
+  ;; (add-to-list 'projectile-project-root-functions #'rdg/get-project-root)
+  )
+
+(use-package perspective
+  :bind
+  ("C-x C-b" . persp-counsel-switch-buffer)
+  :custom
+  (persp-mode-prefix-key (kbd "C-c P"))
+  :init
+  (persp-mode))
+
+(use-package counsel-projectile)
+;; (use-package treemacs-projectile)
+
+(defun rdg/after-switch-project-persp (project-to-switch)
+    "Run after switching project perspective"
+    (message "Switched perspective; project is %s" project-to-switch)
+    (when (not (eq rdg/current-project-root project-to-switch))
+      (projectile-switch-project-by-name project-to-switch))
+    ;; (when (eq (treemacs-current-visibility) 'visible)
+    ;;   (treemacs-add-and-display-current-project-exclusively))
+    )
+
+(use-package persp-projectile
+  :config
+  (advice-add 'projectile-persp-switch-project
+              :after
+              #'rdg/after-switch-project-persp))
+
+(use-package treemacs-perspective
+  :after (treemacs perspective))
+(use-package treemacs-magit)
+(use-package treemacs-projectile
+  :after (treemacs projectile))
 
 (use-package bury-successful-compilation)
 
@@ -209,20 +362,24 @@
    ("M-B". sp-backward-symbol)
    ("C-M-<backspace>" . rdg/unwrap-and-mark-sexp)))
 
-(use-package web-mode)
+(use-package web-mode
+  :custom
+  (web-mode-code-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  (web-mode-markup-indent-offset 2))
 
 (use-package exec-path-from-shell)
 
-(use-package speedbar
-  :config
-  ;; Show all files in speedbar
-  ;; TODO fix this to not show files ending in ~
-  (let ((re "^\\.\\.?\\(\\(DS_Store\\)\\|\\(#.+\\)\\)?$"))
-    (setq speedbar-directory-unshown-regexp re
-          speedbar-file-unshown-regexp re))
-  (add-hook 'speedbar-mode-hook 'rdg/remove-fringe-and-margin))
+;; (use-package speedbar
+;;   :config
+;;   ;; Show all files in speedbar
+;;   ;; TODO fix this to not show files ending in ~
+;;   (let ((re "^\\.\\.?\\(\\(DS_Store\\)\\|\\(#.+\\)\\)?$"))
+;;     (setq speedbar-directory-unshown-regexp re
+;;           speedbar-file-unshown-regexp re))
+;;   (add-hook 'speedbar-mode-hook 'rdg/remove-fringe-and-margin))
 
-(use-package sr-speedbar)
+;; (use-package sr-speedbar)
 
 (use-package prescient
   :config (prescient-persist-mode t))
@@ -312,11 +469,19 @@
 
 (use-package wgrep)
 
+(use-package counsel-etags)
+(use-package counsel-tramp)
+
 (use-package counsel
   :bind
-  (("C-s" . counsel-grep-or-swiper)
+  (("M-x" . counsel-M-x)
+   ("M-y" . counsel-yank-pop)
+   ("C-s" . counsel-grep-or-swiper)
    ("C-r" . counsel-grep-or-swiper)
+   ("C-c ." . counsel-imenu)
    ("C-x f" . counsel-recentf)
+   ("C-x C-f" . counsel-find-file)
+   ("C-h f" . counsel-describe-function)
    ("C-c C-s" . isearch-forward)
    ("C-c C-r" . isearch-backward)
    ("C-c C-r" . ivy-resume)
@@ -328,12 +493,10 @@
    ("C-c ! !" . counsel-flycheck)
    ("C-c //" . counsel-tramp)))
 
-(use-package counsel-etags)
-(use-package counsel-tramp)
-
 (use-package ivy-prescient)
 (use-package ivy
   :config
+  (ivy-mode t)
   (ivy-prescient-mode t))
 
 (use-package hydra)
@@ -353,12 +516,19 @@
 (use-package multi-vterm
   :custom (multi-vterm-dedicated-window-height 20)
   :config
+  (setq vterm-shell "screen"
+        vterm-min-window-width 120
+        vterm-max-scrollback 5000
+        vterm-clear-scrollback-when-clearing t)
   (defun rdg/multi-vterm-dwim ()
     (interactive)
-    "Toggle the dedicated window or create a new vterm."
-    (if (multi-vterm-dedicated-exist-p)
-        (multi-vterm)
-      (multi-vterm-dedicated-open)))
+    "Toggle the dedicated window or create a new dedicated vterm."
+    (let ((default-directory (or rdg/current-project-root "~/")))
+      (progn
+        (if (not (multi-vterm-dedicated-exist-p))
+            (multi-vterm-dedicated-open)
+          (multi-vterm)
+          (set-window-dedicated-p (frame-selected-window) t)))))
   (global-set-key (kbd "C-c `") 'rdg/multi-vterm-dwim))
 
 (use-package sqlformat
@@ -370,6 +540,8 @@
 (use-package scss-mode
   :custom (scss-compile-at-save nil))
 
+(use-package add-node-modules-path)
+
 (use-package flycheck
   :custom
   (flycheck-idle-change-delay 5)
@@ -377,7 +549,8 @@
   (setq flycheck-disabled-checkers (append flycheck-disabled-checkers
                                            '(javascript-jshint json-jsonlist)))
   (mapc (lambda (mode) (flycheck-add-mode 'javascript-eslint mode))
-        '(js-mode js2-mode rjsx-mode)))
+        '(js-mode js2-mode rjsx-mode))
+  (add-hook 'flycheck-mode-hook 'add-node-modules-path))
 
 (use-package prettier-js)
 
@@ -392,19 +565,20 @@
                 (rdg/company-set-mode-backends rdg/company-js-backends))))
     (mapc (lambda (mode-hook) (add-hook mode-hook hook))
           '(js-mode-hook js2-mode-hook rjsx-mode-hook)))
-  (defun rdg/use-eslint-from-node-modules (fn)
-    (let ((root (locate-dominating-file
-                 (or (buffer-file-name) default-directory)
-                 (lambda (dir)
-                   (let ((eslint (expand-file-name "node_modules/eslint/bin/eslint.js" dir)))
-                     (and eslint (file-executable-p eslint)))))))
-      (when root
-        (let ((eslint (expand-file-name "node_modules/eslint/bin/eslint.js" root)))
-          (funcall fn eslint)))))
-  (defun rdg/set-flycheck-eslint-executable ()
-    (rdg/use-eslint-from-node-modules
-     (lambda (eslint) (setq-local flycheck-javascript-eslint-executable eslint))))
-  (add-hook 'flycheck-mode-hook #'rdg/set-flycheck-eslint-executable))
+  ;; (defun rdg/use-eslint-from-node-modules (fn)
+  ;;   (let ((root (locate-dominating-file
+  ;;                (or (buffer-file-name) default-directory)
+  ;;                (lambda (dir)
+  ;;                  (let ((eslint (expand-file-name "node_modules/eslint/bin/eslint.js" dir)))
+  ;;                    (and eslint (file-executable-p eslint)))))))
+  ;;     (when root
+  ;;       (let ((eslint (expand-file-name "node_modules/eslint/bin/eslint.js" root)))
+  ;;         (funcall fn eslint)))))
+  ;; (defun rdg/set-flycheck-eslint-executable ()
+  ;;   (rdg/use-eslint-from-node-modules
+  ;;    (lambda (eslint) (setq-local flycheck-javascript-eslint-executable eslint))))
+  ;; (add-hook 'flycheck-mode-hook #'rdg/set-flycheck-eslint-executable)
+  )
 
 (defun rdg/eslint-fix-buffer ()
   (rdg/use-eslint-from-node-modules
@@ -457,40 +631,26 @@
     (rdg/add-ruby-update-tags-hook))
   (add-hook 'ruby-mode-hook 'rdg/ruby-mode-hook))
 
-;; imenu
-(use-package imenu
-  :custom (imenu-auto-rescan t)
-  :bind ("C-c ." . ivy-imenu-anywhere))
-
-(use-package project-persist
-  :load-path "project-persist-git/")
-
-(use-package project-persist-drawer
-  :load-path "project-persist-drawer/"
-  :bind ("C-c d d" . project-persist-drawer-toggle))
-
-(use-package ppd-sr-speedbar
-  :load-path "ppd-sr-speedbar/")
-
 (use-package graphene-meta-theme
   :load-path "graphene-meta-theme/"
   :config
   (add-to-list 'custom-theme-load-path
                "~/.emacs.d/graphene-meta-theme/"))
 
-(use-package graphene
-  :load-path "graphene/"
-  :config
-  (add-hook 'graphene-prog-mode-hook 'eldoc-mode))
+;; imenu
+(use-package imenu
+  :custom (imenu-auto-rescan t))
 
 (use-package cfn-mode
+  ;; :config
+  ;; (add-to-list 'graphene-prog-mode-hooks 'cfn-mode)
+  )
+
+(use-package flycheck-cfn
   :config
-  (add-to-list 'graphene-prog-mode-hooks 'cfn-mode)
-  (add-hook 'cfn-mode-hook (lambda () (flycheck-cfn-setup)))
-  (add-to-list 'auto-mode-alist '("\\.template\\'" . cfn-mode)))
+  (flycheck-cfn-setup))
 
 (use-package dockerfile-mode)
-(use-package docker-tramp)
 
 (use-package feature-mode)
 

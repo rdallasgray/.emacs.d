@@ -33,3 +33,7 @@ persp-confs/
 /transient
 /straight
 .last-package-update*
+.lsp-session*
+.rdg-*
+amx-items
+tree-sitter/
