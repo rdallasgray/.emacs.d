@@ -347,6 +347,7 @@
     (add-to-list 'display-buffer-alist '("*shell*" display-buffer-same-window))
 
 (use-package wgrep)
+
 (use-package treemacs
   :config
   (progn
@@ -371,12 +372,13 @@
     ;; using a Hi-DPI display, uncomment this to double the icon size.
     ;;(treemacs-resize-icons 44)
 
-    (treemacs-git-mode 'simple)
-    (treemacs-filewatch-mode t)
-    ;; (treemacs-project-follow-mode nil)
-    ;; (treemacs-tag-follow-mode nil)
     (add-hook 'treemacs-mode-hook
               (lambda ()
+                (treemacs-project-follow-mode nil )
+                (treemacs-tag-follow-mode nil)
+                (treemacs-git-mode 'simple)
+                (treemacs-filewatch-mode t)
+                (treemacs-follow-mode nil)
                 (treemacs--disable-fringe-indicator))))
 :bind
 (:map global-map
