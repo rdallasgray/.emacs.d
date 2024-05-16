@@ -78,7 +78,6 @@
 (require 'rdg-helper-functions)
 (require 'rdg-editing)
 (require 'rdg-env)
-;;(require 'rdg-theme)
 (require 'rdg-look)
 
 (add-to-list 'custom-theme-load-path "~/.emacs.d/rdg/")
@@ -209,98 +208,6 @@
 
 (add-hook 'compilation-finish-functions
           'rdg/maybe-write-and-close-compilation-buffer)
-
-(use-package treemacs
-  :config
-  (progn
-    (setq treemacs-file-event-delay                2000
-          treemacs-follow-after-init               nil
-          treemacs-expand-after-init               t
-          treemacs-expand-added-projects           t
-          treemacs-find-workspace-method           'find-for-file-or-pick-first
-          treemacs-header-scroll-indicators        '(nil . "^^^^^^")
-          treemacs-indentation                     1
-          treemacs-indentation-string              " "
-          treemacs-no-png-images                   t
-          treemacs-no-delete-other-windows         t
-          treemacs-project-follow-cleanup          nil
-          treemacs-recenter-after-project-jump     'always
-          treemacs-silent-filewatch                nil
-          treemacs-silent-refresh                  nil
-          treemacs-space-between-root-nodes        nil
-          treemacs-wrap-around                     nil)
-
-    ;; The default width and height of the icons is 22 pixels. If you are
-    ;; using a Hi-DPI display, uncomment this to double the icon size.
-    ;;(treemacs-resize-icons 44)
-
-    (treemacs-git-mode 'simple)
-    (treemacs-filewatch-mode t)
-    ;; (treemacs-project-follow-mode nil)
-    ;; (treemacs-tag-follow-mode nil)
-    (add-hook 'treemacs-mode-hook
-              (lambda ()
-                (treemacs--disable-fringe-indicator))))
-:bind
-(:map global-map
-      ("C-c t t" . treemacs)
-      ("C-c t d" . treemacs-select-directory)
-      ("C-c t b" . treemacs-bookmark)
-      ("C-c t f" . treemacs-find-file)
-      :map treemacs-mode-map
-      ("<left>" . treemacs-toggle-node)
-      ("<right>" . treemacs-toggle-node)))
-
-(defvar rdg/current-project-root nil)
-(defun rdg/get-project-root (&rest args)
-  "Return the currently set project root"
-  rdg/current-project-root)
-
-(use-package projectile
-  :init
-  (setq projectile-project-search-path '("~/Documents/Code/Geome"))
-  (setq projectile-switch-project-action
-        (lambda ()
-          (message "Switched project; project root is %s" (projectile-project-root))
-          (setq rdg/current-project-root (projectile-project-root))
-          (treemacs-add-and-display-current-project-exclusively)))
-  (projectile-mode)
-  :bind
-  ("C-c p" . projectile-command-map)
-  ;; :config
-  ;; (add-to-list 'projectile-project-root-functions #'rdg/get-project-root)
-  )
-
-(use-package perspective
-  ;; :bind
-  ;; ("C-x C-b" . persp-counsel-switch-buffer)
-  :custom
-  (persp-mode-prefix-key (kbd "C-c P"))
-  :init
-  (persp-mode))
-
-;; (use-package treemacs-projectile)
-
-(defun rdg/after-switch-project-persp (project-to-switch)
-    "Run after switching project perspective"
-    (message "Switched perspective; project is %s" project-to-switch)
-    (when (not (eq rdg/current-project-root project-to-switch))
-      (projectile-switch-project-by-name project-to-switch))
-    ;; (when (eq (treemacs-current-visibility) 'visible)
-    ;;   (treemacs-add-and-display-current-project-exclusively))
-    )
-
-(use-package persp-projectile
-  :config
-  (advice-add 'projectile-persp-switch-project
-              :after
-              #'rdg/after-switch-project-persp))
-
-(use-package treemacs-perspective
-  :after (treemacs perspective))
-(use-package treemacs-magit)
-(use-package treemacs-projectile
-  :after (treemacs projectile))
 
 (use-package bury-successful-compilation)
 
@@ -440,8 +347,92 @@
     (add-to-list 'display-buffer-alist '("*shell*" display-buffer-same-window))
 
 (use-package wgrep)
+(use-package treemacs
+  :config
+  (progn
+    (setq treemacs-file-event-delay                2000
+          treemacs-follow-after-init               nil
+          treemacs-expand-after-init               t
+          treemacs-expand-added-projects           t
+          treemacs-find-workspace-method           'find-for-file-or-pick-first
+          treemacs-header-scroll-indicators        '(nil . "^^^^^^")
+          treemacs-indentation                     1
+          treemacs-indentation-string              " "
+          treemacs-no-png-images                   t
+          treemacs-no-delete-other-windows         t
+          treemacs-project-follow-cleanup          nil
+          treemacs-recenter-after-project-jump     'always
+          treemacs-silent-filewatch                nil
+          treemacs-silent-refresh                  nil
+          treemacs-space-between-root-nodes        nil
+          treemacs-wrap-around                     nil)
 
-(use-package consult)
+    ;; The default width and height of the icons is 22 pixels. If you are
+    ;; using a Hi-DPI display, uncomment this to double the icon size.
+    ;;(treemacs-resize-icons 44)
+
+    (treemacs-git-mode 'simple)
+    (treemacs-filewatch-mode t)
+    ;; (treemacs-project-follow-mode nil)
+    ;; (treemacs-tag-follow-mode nil)
+    (add-hook 'treemacs-mode-hook
+              (lambda ()
+                (treemacs--disable-fringe-indicator))))
+:bind
+(:map global-map
+      ("C-c t t" . treemacs)
+      ("C-c t d" . treemacs-select-directory)
+      ("C-c t b" . treemacs-bookmark)
+      ("C-c t f" . treemacs-find-file)
+      :map treemacs-mode-map
+      ("<left>" . treemacs-toggle-node)
+      ("<right>" . treemacs-toggle-node)))
+
+(defvar rdg/current-project-root nil)
+(defun rdg/get-project-root (&rest args)
+  "Return the currently set project root"
+  rdg/current-project-root)
+
+(use-package projectile
+  :init
+  (setq projectile-project-search-path '("~/Documents/Code/Geome"))
+  (setq projectile-switch-project-action
+        (lambda ()
+          (message "Switched project; project root is %s" (projectile-project-root))
+          (setq rdg/current-project-root (projectile-project-root))
+          (treemacs-add-and-display-current-project-exclusively)))
+  (projectile-mode)
+  :bind
+  ("C-c p" . projectile-command-map))
+
+(use-package perspective
+  ;; :bind
+  ;; ("C-x C-b" . persp-counsel-switch-buffer)
+  :custom
+  (persp-mode-prefix-key (kbd "C-c P"))
+  :init
+  (persp-mode))
+
+;; (use-package treemacs-projectile)
+
+(defun rdg/after-switch-project-persp (project-to-switch)
+    "Run after switching project perspective"
+    (message "Switched perspective; project is %s" project-to-switch)
+    (when (not (eq rdg/current-project-root project-to-switch))
+      (projectile-switch-project-by-name project-to-switch)))
+
+(use-package persp-projectile
+  :config
+  (advice-add 'projectile-persp-switch-project
+              :after
+              #'rdg/after-switch-project-persp))
+
+(use-package treemacs-perspective
+  :after (treemacs perspective))
+(use-package treemacs-magit)
+(use-package treemacs-projectile
+  :after (treemacs projectile))
+
 (use-package vertico-prescient)
 (use-package vertico
   :init
@@ -458,6 +449,8 @@
   :init
   (marginalia-mode))
 
+(use-package consult-flycheck)
+(use-package consult-projectile)
 (use-package consult
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings in `mode-specific-map'
@@ -474,7 +467,7 @@
          ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
          ("C-x t b" . consult-buffer-other-tab)    ;; orig. switch-to-buffer-other-tab
          ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
-         ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+         ("C-c p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
          ;; Custom M-# bindings for fast register access
          ("M-#" . consult-register-load)
          ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
@@ -483,22 +476,22 @@
          ("M-y" . consult-yank-pop)                ;; orig. yank-pop
          ;; M-g bindings in `goto-map'
          ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ("C-c !" . consult-flycheck)               ;; Alternative: consult-flycheck
          ("M-g g" . consult-goto-line)             ;; orig. goto-line
          ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
          ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
-         ("M-g m" . consult-mark)
-         ("M-g k" . consult-global-mark)
-         ("M-g i" . consult-imenu)
-         ("M-g I" . consult-imenu-multi)
+         ("C-x C-x" . consult-mark)
+         ("C-c C-x C-x" . consult-global-mark)
+         ("C-c ." . consult-imenu)
+         ("C-c ," . consult-imenu-multi)
          ;; M-s bindings in `search-map'
          ("M-s d" . consult-find)                  ;; Alternative: consult-fd
          ("M-s c" . consult-locate)
          ("M-s g" . consult-grep)
-         ("M-s G" . consult-git-grep)
+         ("C-c g g" . consult-git-grep)
          ("M-s r" . consult-ripgrep)
-         ("M-s l" . consult-line)
-         ("M-s L" . consult-line-multi)
+         ("C-c s" . consult-line)
+         ("C-c S" . consult-line-multi)
          ("M-s k" . consult-keep-lines)
          ("M-s u" . consult-focus-lines)
          ;; Isearch integration
@@ -570,16 +563,15 @@
   ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
   ;;;; 3. locate-dominating-file
   ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
-  ;;;; 4. projectile.el (projectile-project-root)
-  ;; (autoload 'projectile-project-root "projectile")
-  ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
+  ;; 4. projectile.el (projectile-project-root)
+  (autoload 'projectile-project-root "projectile")
+  (setq consult-project-function (lambda (_) (projectile-project-root)))
   ;;;; 5. No project support
   ;; (setq consult-project-function nil)
-)
+  )
 
 (use-package embark
   :ensure t
-
   :bind
   (("C-." . embark-act)         ;; pick some comfortable binding
    ("C-;" . embark-dwim)        ;; good alternative: M-.
@@ -612,6 +604,13 @@
   :ensure t ; only need to install it, embark loads it after consult if found
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
+
+(use-package orderless
+  :ensure t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles basic partial-completion)))))
+
 
 ;; ---- OLD ----
 ;; (use-package counsel
