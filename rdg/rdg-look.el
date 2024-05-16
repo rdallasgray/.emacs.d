@@ -67,12 +67,11 @@
         (set-face-font 'fixed-pitch "Menlo-12")
         (add-to-list 'default-frame-alist '(internal-border-width . 0))
         (set-fringe-mode '(8 . 0))
-        (load-theme 'graphene-meta t)
+        (load-theme 'rdg t)
         (defadvice load-theme
-          (after load-graphene-meta-theme (theme &optional no-confirm no-enable) activate)
-          "Load the graphene theme extensions after loading a theme."
-          (when (not (equal theme 'graphene-meta))
-            (load-theme 'graphene-meta t))))
+          (after load-rdg-theme (theme &optional no-confirm no-enable) activate)
+          (when (not (equal theme 'rdg))
+            (load-theme 'rdg t))))
     (when (not (eq system-type 'darwin))
       (menu-bar-mode -1))
     ;; Menu bar always off in text mode

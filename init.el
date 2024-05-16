@@ -74,30 +74,14 @@
 (when (file-exists-p custom-file)
   (load custom-file))
 
-;;----OLD----
-;; (use-package project-persist
-;;   :load-path "project-persist-git/")
-
-;; (use-package project-persist-drawer
-;;   :load-path "project-persist-drawer/"
-;;   :bind ("C-c d d" . project-persist-drawer-toggle))
-
-;; (use-package ppd-sr-speedbar
-;;   :load-path "ppd-sr-speedbar/")
-
-;; (use-package graphene
-;;   :load-path "graphene/"
-;;   :config
-;;   (add-hook 'graphene-prog-mode-hook 'eldoc-mode))
-;;-----------
-
-;; ;; ----NEW----
 (add-to-list 'load-path "~/.emacs.d/rdg/")
 (require 'rdg-helper-functions)
 (require 'rdg-editing)
 (require 'rdg-env)
+;;(require 'rdg-theme)
 (require 'rdg-look)
-;; ;; -----------
+
+(add-to-list 'custom-theme-load-path "~/.emacs.d/rdg/")
 
 ;; No pop-ups
 (setq pop-up-frames nil
@@ -130,7 +114,7 @@
 
 ;; whitespace cleanup
 (use-package whitespace-cleanup-mode)
-(add-hook 'graphene-prog-mode-hook 'whitespace-cleanup-mode)
+(add-hook 'prog-mode-hook 'whitespace-cleanup-mode)
 
 ;; midnight
 (setq clean-buffer-list-delay-general 7)
@@ -369,17 +353,6 @@
   (web-mode-markup-indent-offset 2))
 
 (use-package exec-path-from-shell)
-
-;; (use-package speedbar
-;;   :config
-;;   ;; Show all files in speedbar
-;;   ;; TODO fix this to not show files ending in ~
-;;   (let ((re "^\\.\\.?\\(\\(DS_Store\\)\\|\\(#.+\\)\\)?$"))
-;;     (setq speedbar-directory-unshown-regexp re
-;;           speedbar-file-unshown-regexp re))
-;;   (add-hook 'speedbar-mode-hook 'rdg/remove-fringe-and-margin))
-
-;; (use-package sr-speedbar)
 
 (use-package prescient
   :config (prescient-persist-mode t))
@@ -631,20 +604,11 @@
     (rdg/add-ruby-update-tags-hook))
   (add-hook 'ruby-mode-hook 'rdg/ruby-mode-hook))
 
-(use-package graphene-meta-theme
-  :load-path "graphene-meta-theme/"
-  :config
-  (add-to-list 'custom-theme-load-path
-               "~/.emacs.d/graphene-meta-theme/"))
-
 ;; imenu
 (use-package imenu
   :custom (imenu-auto-rescan t))
 
-(use-package cfn-mode
-  ;; :config
-  ;; (add-to-list 'graphene-prog-mode-hooks 'cfn-mode)
-  )
+(use-package cfn-mode)
 
 (use-package flycheck-cfn
   :config
@@ -672,4 +636,4 @@
   :straight (solarized-theme :host github :repo "sellout/emacs-color-theme-solarized")
   :init
   (when window-system
-    (load-theme 'solarized t)))
+      (load-theme 'solarized t)))
