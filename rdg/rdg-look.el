@@ -1,11 +1,6 @@
-(defun rdg/resize-minibuffer-p ()
-  (or (-any? 'featurep '(ivy grizzl ido-vertical-mode))
-      rdg/resize-minibuffer))
-
 (defun rdg/minibuffer-setup-hook ()
-  (if (rdg/resize-minibuffer-p)
-      (set (make-local-variable 'line-spacing) 0)
-    (setq resize-mini-windows nil)))
+  (set (make-local-variable 'line-spacing) 0)
+  (setq resize-mini-windows nil))
 
 (add-hook 'minibuffer-setup-hook
           'rdg/minibuffer-setup-hook)
