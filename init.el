@@ -375,7 +375,7 @@
     (add-hook 'treemacs-mode-hook
               (lambda ()
                 (treemacs-project-follow-mode nil )
-                (treemacs-tag-follow-mode nil)
+                ;; (treemacs-tag-follow-mode nil)
                 (treemacs-git-mode 'simple)
                 (treemacs-filewatch-mode t)
                 (treemacs-follow-mode nil)
