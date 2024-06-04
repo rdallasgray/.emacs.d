@@ -35,6 +35,8 @@
 (use-package dash)
 (use-package s)
 
+(use-package magit)
+
 (auto-compression-mode nil)
 
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
@@ -125,9 +127,9 @@
 
 (defvar rdg/ignored-compilation-buffer-match '("*RuboCop"))
 
-(defun rdg/remove-fringe-and-margin ()
-  (fringe-mode nil)
-  (set-window-margins nil 0))
+;; (defun rdg/remove-fringe-and-margin ()
+;;   (fringe-mode nil)
+;;   (set-window-margins nil 0))
 
 (defun kill-zombie-buffers ()
   "Kill buffers no longer associated with a file."
@@ -294,8 +296,8 @@
   (define-key isearch-mode-map [remap isearch-query-replace-regexp]
     #'anzu-isearch-query-replace-regexp))
 
-(use-package native-complete
-  :custom (native-complete-style-regex-alist '((".+*(pry|guard).*> " . tab))))
+;; (use-package native-complete
+;;   :custom (native-complete-style-regex-alist '((".+*(pry|guard).*> " . tab))))
 (use-package company-try-hard)
 (use-package company-prescient)
 (use-package company
@@ -348,9 +350,19 @@
 
 (use-package wgrep)
 
+(defun rdg/setup-treemacs ()
+  ;; (treemacs-project-follow-mode nil )
+  ;; (treemacs-tag-follow-mode nil)
+  (message "Setting up treemacs ...")
+  (treemacs-git-mode 'simple)
+  (treemacs-filewatch-mode t)
+  (treemacs-follow-mode nil)
+  (treemacs--disable-fringe-indicator))
+
 (use-package treemacs
   :config
   (progn
+    (rdg/setup-treemacs)
     (setq treemacs-file-event-delay                2000
           treemacs-follow-after-init               nil
           treemacs-expand-after-init               t
@@ -372,14 +384,8 @@
     ;; using a Hi-DPI display, uncomment this to double the icon size.
     ;;(treemacs-resize-icons 44)
 
-    (add-hook 'treemacs-mode-hook
-              (lambda ()
-                (treemacs-project-follow-mode nil )
-                ;; (treemacs-tag-follow-mode nil)
-                (treemacs-git-mode 'simple)
-                (treemacs-filewatch-mode t)
-                (treemacs-follow-mode nil)
-                (treemacs--disable-fringe-indicator))))
+    (add-hook 'treemacs-mode-hook 'rdg/setup-treemacs))
+
 :bind
 (:map global-map
       ("C-c t t" . treemacs)
@@ -392,7 +398,7 @@
 
 (defvar rdg/current-project-root nil)
 (defun rdg/get-project-root (&rest args)
-  "Return the currently set project root"
+  "Return the current project root"
   rdg/current-project-root)
 
 (use-package projectile
@@ -402,8 +408,10 @@
         (lambda ()
           (message "Switched project; project root is %s" (projectile-project-root))
           (setq rdg/current-project-root (projectile-project-root))
-          (treemacs-add-and-display-current-project-exclusively)))
+          (treemacs-add-and-display-current-project-exclusively)
+          (rdg/setup-treemacs)))
   (projectile-mode)
+  ;; (add-to-list 'projectile-project-root-functions 'rdg/get-project-root)
   :bind
   ("C-c p" . projectile-command-map))
 
@@ -431,7 +439,7 @@
 
 (use-package treemacs-perspective
   :after (treemacs perspective))
-(use-package treemacs-magit)
+;; (use-package treemacs-magit)
 (use-package treemacs-projectile
   :after (treemacs projectile))
 
@@ -492,8 +500,8 @@
          ("M-s g" . consult-grep)
          ("C-c g g" . consult-git-grep)
          ("M-s r" . consult-ripgrep)
-         ("C-c s" . consult-line)
-         ("C-c S" . consult-line-multi)
+         ("C-c C-s" . consult-line)
+         ("C-c C-S" . consult-line-multi)
          ("M-s k" . consult-keep-lines)
          ("M-s u" . consult-focus-lines)
          ;; Isearch integration
@@ -501,8 +509,8 @@
          :map isearch-mode-map
          ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
          ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
-         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
-         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+         ("C-c C-s" . consult-line)                  ;; needed by consult-line to detect isearch
+         ("C-c C-S" . consult-line-multi)            ;; needed by consult-line to detect isearch
          ;; Minibuffer history
          :map minibuffer-local-map
          ("M-s" . consult-history)                 ;; orig. next-matching-history-element
