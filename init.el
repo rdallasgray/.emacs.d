@@ -1,4 +1,4 @@
-;; (setq debug-on-error t)
+;;(setq debug-on-error t)
 
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -284,9 +284,7 @@
   (anzu-replace-to-string-separator " => ")
   :config
   (global-anzu-mode t)
-  (set-face-attribute 'anzu-mode-line nil
-                      :foreground 'unspecified
-                      :inherit 'company-tooltip-search)
+  (set-face-attribute 'anzu-mode-line nil :inherit 'mode-line)
   (define-key (current-global-map) [remap query-replace]
     #'anzu-query-replace)
   (define-key (current-global-map) [remap query-replace-regexp]
@@ -298,55 +296,111 @@
 
 ;; (use-package native-complete
 ;;   :custom (native-complete-style-regex-alist '((".+*(pry|guard).*> " . tab))))
-(use-package company-try-hard)
-(use-package company-prescient)
-(use-package company
+
+(use-package cape
+  :init
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
+  (add-to-list 'completion-at-point-functions #'cape-file))
+
+(use-package eglot
   :config
-  (defvar rdg/company-no-return-key-modes '(shell-mode))
-  (defun rdg/company-complete-on-return-p ()
-    (not (derived-mode-p 'comint-mode)))
-  (defun rdg/company-maybe-try-hard (buf win tick pos)
-    (when (and (not company-candidates)
-               (looking-back "[A-Za-z0-9_\-\/\.]" 1))
-      (company-try-hard)
-      (let ((this-command 'company-try-hard))
-        (company-post-command))))
-  (defun rdg/company-maybe-complete-on-return ()
-    (interactive)
-    (if (rdg/company-complete-on-return-p)
-        (company-complete-selection)
-      (if (functionp 'comint-send-input)
-          (comint-send-input)
-        (newline))))
-  (defun rdg/advise-company-try-hard ()
-    (advice-remove 'company-idle-begin
-                   #'rdg/company-maybe-try-hard)
-    (advice-add 'company-idle-begin :after
-                #'rdg/company-maybe-try-hard))
-  (defvar rdg/company-default-backends
-    '(company-files company-dabbrev-code company-etags
-                    company-capf company-keywords
-                    company-dabbrev))
-  (defvar rdg/company-shell-backends
-    '(company-files company-native-complete company-capf
-                    company-dabbrev))
-  (defun rdg/company-set-mode-backends (backends)
-    "Set BACKENDS locally"
-    (set (make-local-variable 'company-backends)
-         (-uniq (append backends rdg/company-default-backends))))
-  (setq company-backends rdg/company-default-backends
-        company-idle-delay 0.15)
-  (rdg/advise-company-try-hard)
-  (company-prescient-mode t)
-  (define-key company-active-map (kbd "<tab>")
-    #'company-complete-selection)
-  (define-key company-active-map (kbd "C-<tab>")
-    #'company-try-hard)
-  (define-key company-active-map [return]
-    #'rdg/company-maybe-complete-on-return)
-  (define-key company-active-map (kbd "RET")
-    #'rdg/company-maybe-complete-on-return))
-    (add-to-list 'display-buffer-alist '("*shell*" display-buffer-same-window))
+  (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+  :hook
+  (prog-mode . eglot-ensure))
+
+(use-package corfu
+  ;; Optional customizations
+  :custom
+  (corfu-auto-delay 0.1)
+  (corfu-auto t)
+  (corfu-auto-prefix 1)
+  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  ;; (corfu-auto t)                 ;; Enable auto completion
+  ;; (corfu-separator ?\s)          ;; Orderless field separator
+  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
+  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+  ;; Enable Corfu only for certain modes.
+  ;; :hook ((prog-mode . corfu-mode)
+  ;;        (shell-mode . corfu-mode)
+  ;;        (eshell-mode . corfu-mode))
+
+  ;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
+  ;; be used globally (M-/).  See also the customization variable
+  ;; `global-corfu-modes' to exclude certain modes.
+  :init
+  (global-corfu-mode))
+
+(use-package corfu-prescient
+  :config
+  (corfu-prescient-mode))
+
+(use-package corfu-candidate-overlay)
+
+;; (use-package company-try-hard)
+;; (use-package company-prescient)
+;; (use-package company
+;;   :config
+;;   (global-company-mode t)
+;;   (define-key company-active-map (kbd "RET") nil)
+;;   (setq company-idle-delay 0.125
+;;         company-minimum-prefix-length 1
+;;         company-require-match nil
+;;         company-transformers '(company-sort-by-occurrence)
+;;         company-dabbrev-ignore-case nil
+;;         company-dabbrev-downcase nil
+;;         company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
+;;                             company-preview-frontend
+;;                             company-echo-metadata-frontend))
+;;   (defvar rdg/company-no-return-key-modes '(shell-mode))
+;;   (defun rdg/company-complete-on-return-p ()
+;;     (not (derived-mode-p 'comint-mode)))
+;;   (defun rdg/company-maybe-try-hard (buf win tick pos)
+;;     (when (and (not company-candidates)
+;;                (looking-back "[A-Za-z0-9_\-\/\.]" 1))
+;;       (company-try-hard)
+;;       (let ((this-command 'company-try-hard))
+;;         (company-post-command))))
+;;   (defun rdg/company-maybe-complete-on-return ()
+;;     (interactive)
+;;     (if (rdg/company-complete-on-return-p)
+;;         (company-complete-selection)
+;;       (if (functionp 'comint-send-input)
+;;           (comint-send-input)
+;;         (newline))))
+;;   (defun rdg/advise-company-try-hard ()
+;;     (advice-remove 'company-idle-begin
+;;                    #'rdg/company-maybe-try-hard)
+;;     (advice-add 'company-idle-begin :after
+;;                 #'rdg/company-maybe-try-hard))
+;;   (defvar rdg/company-default-backends
+;;     '(company-files company-dabbrev-code company-etags
+;;                     company-capf company-keywords
+;;                     company-dabbrev))
+;;   (defvar rdg/company-shell-backends
+;;     '(company-files company-native-complete company-capf
+;;                     company-dabbrev))
+;;   (defun rdg/company-set-mode-backends (backends)
+;;     "Set BACKENDS locally"
+;;     (set (make-local-variable 'company-backends)
+;;          (-uniq (append backends rdg/company-default-backends))))
+;;   (setq company-backends rdg/company-default-backends
+;;         company-idle-delay 0.15)
+;;   (rdg/advise-company-try-hard)
+;;   (company-prescient-mode t)
+;;   (define-key company-active-map (kbd "<tab>")
+;;     #'company-complete-selection)
+;;   (define-key company-active-map (kbd "C-<tab>")
+;;     #'company-try-hard)
+;;   (define-key company-active-map [return]
+;;     #'rdg/company-maybe-complete-on-return)
+;;   (define-key company-active-map (kbd "RET")
+;;     #'rdg/company-maybe-complete-on-return)
+;;   (add-to-list 'display-buffer-alist '("*shell*" display-buffer-same-window)))
 
 (use-package wgrep)
 
@@ -461,6 +515,11 @@
 
 (use-package consult-flycheck)
 (use-package consult-projectile)
+(use-package consult-eglot)
+(use-package consult-eglot-embark
+  :config
+  (consult-eglot-embark-mode))
+
 (use-package consult
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings in `mode-specific-map'
@@ -698,6 +757,12 @@
   :custom (scss-compile-at-save nil))
 
 (use-package add-node-modules-path)
+
+(use-package flycheck-eglot
+  :ensure t
+  :after (flycheck eglot)
+  :config
+  (global-flycheck-eglot-mode 1))
 
 (use-package flycheck
   :custom

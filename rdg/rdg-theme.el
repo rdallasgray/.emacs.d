@@ -114,6 +114,21 @@
    ((t (:background unspecified
                     :inherit popup-face))))
 
+ `(corfu-default
+   ((t (:background unspecified
+                    :foreground unspecified
+                    :inherit highlight))))
+ `(corfu-current
+   ((t :background unspecified
+       :foreground unspecified
+       :inherit font-lock-variable-name-face
+       :inverse-video t)))
+ `(corfu-bar
+   ((t :foreground unspecified
+       :background unspecified
+       :inherit default
+       :inverse-video t)))
+
  `(company-preview
    ((t (:background unspecified
                     :foreground unspecified
@@ -130,12 +145,12 @@
  `(company-tooltip
    ((t (:background unspecified
                     :foreground unspecified
-                    :inherit linum
+                    :inherit highlight
                     :height ,rdg-font-height))))
  `(company-tooltip-common
    ((t (:background unspecified
                     :foreground unspecified
-                    :inherit linum
+                    :inherit highlight
                     :weight bold
                     :height ,rdg-font-height))))
  `(company-tooltip-selection
