@@ -729,23 +729,40 @@
     ("-" er/contract-region "Contract"))
   (global-set-key (kbd "C-M-SPC") 'hydra-mark-begin))
 
-(use-package multi-vterm
-  :custom (multi-vterm-dedicated-window-height 20)
-  :config
-  (setq vterm-shell "screen"
-        vterm-min-window-width 120
-        vterm-max-scrollback 5000
-        vterm-clear-scrollback-when-clearing t)
-  (defun rdg/multi-vterm-dwim ()
-    (interactive)
-    "Toggle the dedicated window or create a new dedicated vterm."
-    (let ((default-directory (or rdg/current-project-root "~/")))
-      (progn
-        (if (not (multi-vterm-dedicated-exist-p))
-            (multi-vterm-dedicated-open)
-          (multi-vterm)
-          (set-window-dedicated-p (frame-selected-window) t)))))
-  (global-set-key (kbd "C-c `") 'rdg/multi-vterm-dwim))
+(use-package eat)
+(use-package eshell
+  :hook
+  (eshell-mode . eat-eshell-mode)
+  :custom
+  (eshell-banner-message ""))
+(use-package shell-pop
+  :custom
+  (shell-pop-shell-type '("eshell" "*eshell*" (lambda () (eshell))))
+  (shell-pop-universal-key "C-c `")
+  (shell-pop-window-size 30)
+  (shell-pop-full-span nil)
+  (shell-pop-window-position "bottom")
+  (shell-pop-autocd-to-working-dir t)
+  (shell-pop-restore-window-configuration t)
+  (shell-pop-cleanup-buffer-at-process-exit t))
+
+;; (use-package multi-vterm
+;;   :custom (multi-vterm-dedicated-window-height 20)
+;;   :config
+;;   (setq vterm-shell "screen"
+;;         vterm-min-window-width 120
+;;         vterm-max-scrollback 5000
+;;         vterm-clear-scrollback-when-clearing t)
+;;   (defun rdg/multi-vterm-dwim ()
+;;     (interactive)
+;;     "Toggle the dedicated window or create a new dedicated vterm."
+;;     (let ((default-directory (or rdg/current-project-root "~/")))
+;;       (progn
+;;         (if (not (multi-vterm-dedicated-exist-p))
+;;             (multi-vterm-dedicated-open)
+;;           (multi-vterm)
+;;           (set-window-dedicated-p (frame-selected-window) t)))))
+;;   (global-set-key (kbd "C-c `") 'rdg/multi-vterm-dwim))
 
 (use-package sqlformat
   :custom (sqlformat-command 'pgformatter))
