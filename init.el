@@ -277,23 +277,6 @@
 
 (use-package visual-regexp)
 
-(use-package anzu
-  :custom
-  (anzu-mode-lighter "")
-  (anzu-deactivate-region t)
-  (anzu-replace-to-string-separator " => ")
-  :config
-  (global-anzu-mode t)
-  (set-face-attribute 'anzu-mode-line nil :inherit 'mode-line)
-  (define-key (current-global-map) [remap query-replace]
-    #'anzu-query-replace)
-  (define-key (current-global-map) [remap query-replace-regexp]
-    #'anzu-query-replace-regexg)
-  (define-key isearch-mode-map [remap isearch-query-replace]
-    #'anzu-isearch-query-replace)
-  (define-key isearch-mode-map [remap isearch-query-replace-regexp]
-    #'anzu-isearch-query-replace-regexp))
-
 ;; (use-package native-complete
 ;;   :custom (native-complete-style-regex-alist '((".+*(pry|guard).*> " . tab))))
 
@@ -328,6 +311,17 @@
   ;; :hook ((prog-mode . corfu-mode)
   ;;        (shell-mode . corfu-mode)
   ;;        (eshell-mode . corfu-mode))
+
+  :config
+  (defun corfu-send-shell (&rest _)
+    "Send completion candidate when inside comint/eshell."
+    (cond
+     ((and (derived-mode-p 'eshell-mode) (fboundp 'eshell-send-input))
+      (eshell-send-input))
+     ((and (derived-mode-p 'comint-mode)  (fboundp 'comint-send-input))
+      (comint-send-input))))
+
+  (advice-add #'corfu-insert :after #'corfu-send-shell)
 
   ;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
   ;; be used globally (M-/).  See also the customization variable
@@ -404,51 +398,50 @@
 
 (use-package wgrep)
 
-(defun rdg/setup-treemacs ()
+(defun rdg/setup-treemacs (&rest _args)
   ;; (treemacs-project-follow-mode nil )
   ;; (treemacs-tag-follow-mode nil)
   (message "Setting up treemacs ...")
   (treemacs-git-mode 'simple)
   (treemacs-filewatch-mode t)
-  (treemacs-follow-mode nil)
+  (treemacs-follow-mode -1)
   (treemacs--disable-fringe-indicator))
 
 (use-package treemacs
   :config
-  (progn
-    (rdg/setup-treemacs)
-    (setq treemacs-file-event-delay                2000
-          treemacs-follow-after-init               nil
-          treemacs-expand-after-init               t
-          treemacs-expand-added-projects           t
-          treemacs-find-workspace-method           'find-for-file-or-pick-first
-          treemacs-header-scroll-indicators        '(nil . "^^^^^^")
-          treemacs-indentation                     1
-          treemacs-indentation-string              " "
-          treemacs-no-png-images                   t
-          treemacs-no-delete-other-windows         t
-          treemacs-project-follow-cleanup          nil
-          treemacs-recenter-after-project-jump     'always
-          treemacs-silent-filewatch                nil
-          treemacs-silent-refresh                  nil
-          treemacs-space-between-root-nodes        nil
-          treemacs-wrap-around                     nil)
+  (setq treemacs-file-event-delay                2000
+        treemacs-follow-after-init               nil
+        treemacs-expand-after-init               t
+        treemacs-expand-added-projects           t
+        treemacs-find-workspace-method           'find-for-file-or-pick-first
+        treemacs-header-scroll-indicators        '(nil . "^^^^^^")
+        treemacs-indentation                     1
+        treemacs-indentation-string              " "
+        treemacs-no-png-images                   t
+        treemacs-no-delete-other-windows         t
+        treemacs-project-follow-cleanup          nil
+        treemacs-recenter-after-project-jump     'always
+        treemacs-silent-filewatch                nil
+        treemacs-silent-refresh                  nil
+        treemacs-space-between-root-nodes        nil
+        treemacs-wrap-around                     nil)
+  (rdg/setup-treemacs)
 
-    ;; The default width and height of the icons is 22 pixels. If you are
-    ;; using a Hi-DPI display, uncomment this to double the icon size.
-    ;;(treemacs-resize-icons 44)
+  ;; The default width and height of the icons is 22 pixels. If you are
+  ;; using a Hi-DPI display, uncomment this to double the icon size.
+  ;;(treemacs-resize-icons 44)
+  :hook
+  (treemacs-mode . rdg/setup-treemacs)
 
-    (add-hook 'treemacs-mode-hook 'rdg/setup-treemacs))
-
-:bind
-(:map global-map
-      ("C-c t t" . treemacs)
-      ("C-c t d" . treemacs-select-directory)
-      ("C-c t b" . treemacs-bookmark)
-      ("C-c t f" . treemacs-find-file)
-      :map treemacs-mode-map
-      ("<left>" . treemacs-toggle-node)
-      ("<right>" . treemacs-toggle-node)))
+  :bind
+  (:map global-map
+        ("C-c t t" . treemacs)
+        ("C-c t d" . treemacs-select-directory)
+        ("C-c t b" . treemacs-bookmark)
+        ("C-c t f" . treemacs-find-file)
+        :map treemacs-mode-map
+        ("<left>" . treemacs-toggle-node)
+        ("<right>" . treemacs-toggle-node)))
 
 (defvar rdg/current-project-root nil)
 (defun rdg/get-project-root (&rest args)
@@ -730,21 +723,36 @@
   (global-set-key (kbd "C-M-SPC") 'hydra-mark-begin))
 
 (use-package eat)
+
 (use-package eshell
   :hook
   (eshell-mode . eat-eshell-mode)
   :custom
   (eshell-banner-message ""))
+
+(defun rdg/shell-pop-dwim ()
+  (interactive)
+  (if (string= (buffer-name) shell-pop-last-shell-buffer-name)
+      (progn
+        (shell-pop--switch-to-shell-buffer (+ 1 shell-pop-last-shell-buffer-index))
+        (set-window-dedicated-p (selected-window) t))
+    (progn
+      (shell-pop nil)
+      (set-window-dedicated-p (selected-window) t))))
+
 (use-package shell-pop
   :custom
   (shell-pop-shell-type '("eshell" "*eshell*" (lambda () (eshell))))
-  (shell-pop-universal-key "C-c `")
   (shell-pop-window-size 30)
   (shell-pop-full-span nil)
   (shell-pop-window-position "bottom")
   (shell-pop-autocd-to-working-dir t)
   (shell-pop-restore-window-configuration t)
-  (shell-pop-cleanup-buffer-at-process-exit t))
+  (shell-pop-cleanup-buffer-at-process-exit t)
+  :bind
+  (("C-c `" . rdg/shell-pop-dwim))
+  :hook
+  (shell-pop-in . (lambda () (cd (rdg/get-project-root)))))
 
 ;; (use-package multi-vterm
 ;;   :custom (multi-vterm-dedicated-window-height 20)
