@@ -35,8 +35,6 @@
 (use-package dash)
 (use-package s)
 
-(use-package magit)
-
 (auto-compression-mode nil)
 
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
@@ -277,14 +275,11 @@
 
 (use-package visual-regexp)
 
-;; (use-package native-complete
-;;   :custom (native-complete-style-regex-alist '((".+*(pry|guard).*> " . tab))))
-
 (use-package cape
   :init
+  (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-keyword)
-  (add-to-list 'completion-at-point-functions #'cape-file))
+  (add-to-list 'completion-at-point-functions #'cape-keyword))
 
 (use-package eglot
   :config
@@ -295,9 +290,9 @@
 (use-package corfu
   ;; Optional customizations
   :custom
-  (corfu-auto-delay 0.1)
+  (corfu-auto-delay 0.125)
   (corfu-auto t)
-  (corfu-auto-prefix 1)
+  (corfu-auto-prefix 2)
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   ;; (corfu-auto t)                 ;; Enable auto completion
   ;; (corfu-separator ?\s)          ;; Orderless field separator
@@ -722,7 +717,66 @@
     ("-" er/contract-region "Contract"))
   (global-set-key (kbd "C-M-SPC") 'hydra-mark-begin))
 
+(use-package anzu
+  :config
+  (global-anzu-mode +1)
+  (set-face-attribute 'anzu-mode-line nil
+                      :foreground 'unspecified
+                      :inherit 'mode-line)
+  (custom-set-variables
+   '(anzu-mode-lighter "")
+   '(anzu-deactivate-region t)
+   '(anzu-replace-to-string-separator " => "))
+  (define-key (current-global-map) [remap query-replace]
+              #'anzu-query-replace)
+  (define-key (current-global-map) [remap query-replace-regexp]
+              #'anzu-query-replace-regexg)
+  (define-key isearch-mode-map [remap isearch-query-replace]
+              #'anzu-isearch-query-replace)
+  (define-key isearch-mode-map [remap isearch-query-replace-regexp]
+              #'anzu-isearch-query-replace-regexp))
+
+(defun rdg/setup-shell ()
+    "Hook to set up shell modes."
+    (setq comint-prompt-read-only t
+          ;; comint-process-echoes t
+          comint-scroll-show-maximum-output t
+          comint-scroll-to-bottom-on-input 'this
+          comint-buffer-maximum-size 10000
+          comint-prompt-regexp "^.+[$%>] ")
+    ;; (ansi-color-for-comint-mode-on)
+    ;; (add-to-list 'comint-output-filter-functions
+    ;;              'ansi-color-process-output)
+    ;; (add-hook 'comint-output-filter-functions
+    ;;           'comint-truncate-buffer)
+    (unless (eq system-type 'windows-nt)
+      (let ((shell-name "bash"))
+        (setq explicit-shell-file-name shell-name
+              shell-file-name shell-name)
+        (setenv "SHELL" shell-name)
+        (set (make-local-variable 'completion-at-point-functions)
+             '(cape-file native-complete-at-point cape-dabbrev)))))
+
+(use-package native-complete
+  :config
+  (native-complete-setup-bash)
+  :custom (native-complete-style-regex-alist '((".+*(pry|guard).*> " . tab))))
+
+(use-package shell
+  :hook
+  (shell-mode . rdg/setup-shell))
+
 (use-package eat)
+
+(use-package coterm
+  :config
+  (coterm-mode))
+
+;; (use-package bash-completion
+;;   :hook
+;;   (shell-mode . (lambda ()
+;;                   (add-hook 'completion-at-point-functions
+;;                             'bash-completion-capf-nonexclusive nil t))))
 
 (use-package eshell
   :hook
@@ -732,45 +786,50 @@
 
 (defun rdg/shell-pop-dwim ()
   (interactive)
-  (if (string= (buffer-name) shell-pop-last-shell-buffer-name)
+  (if (not (boundp 'shell-pop-last-shell-buffer-name))
       (progn
-        (shell-pop--switch-to-shell-buffer (+ 1 shell-pop-last-shell-buffer-index))
+        (shell-pop nil)
         (set-window-dedicated-p (selected-window) t))
+    (if (string= (buffer-name) shell-pop-last-shell-buffer-name)
+        (progn
+          (shell-pop--switch-to-shell-buffer (+ 1 shell-pop-last-shell-buffer-index))
+          (set-window-dedicated-p (selected-window) t))
     (progn
       (shell-pop nil)
-      (set-window-dedicated-p (selected-window) t))))
+      (set-window-dedicated-p (selected-window) t)))))
 
 (use-package shell-pop
   :custom
-  (shell-pop-shell-type '("eshell" "*eshell*" (lambda () (eshell))))
+  (shell-pop-shell-type '("shell" "*shell*" (lambda () (shell))))
   (shell-pop-window-size 30)
   (shell-pop-full-span nil)
   (shell-pop-window-position "bottom")
   (shell-pop-autocd-to-working-dir t)
   (shell-pop-restore-window-configuration t)
   (shell-pop-cleanup-buffer-at-process-exit t)
-  :bind
-  (("C-c `" . rdg/shell-pop-dwim))
+  ;; :bind
+  ;; (("C-c `" . rdg/shell-pop-dwim))
   :hook
-  (shell-pop-in . (lambda () (cd (rdg/get-project-root)))))
+  (shell-pop-in . (lambda ()
+                    (cd (or (rdg/get-project-root) default-directory)))))
 
-;; (use-package multi-vterm
-;;   :custom (multi-vterm-dedicated-window-height 20)
-;;   :config
-;;   (setq vterm-shell "screen"
-;;         vterm-min-window-width 120
-;;         vterm-max-scrollback 5000
-;;         vterm-clear-scrollback-when-clearing t)
-;;   (defun rdg/multi-vterm-dwim ()
-;;     (interactive)
-;;     "Toggle the dedicated window or create a new dedicated vterm."
-;;     (let ((default-directory (or rdg/current-project-root "~/")))
-;;       (progn
-;;         (if (not (multi-vterm-dedicated-exist-p))
-;;             (multi-vterm-dedicated-open)
-;;           (multi-vterm)
-;;           (set-window-dedicated-p (frame-selected-window) t)))))
-;;   (global-set-key (kbd "C-c `") 'rdg/multi-vterm-dwim))
+(use-package multi-vterm
+  :custom (multi-vterm-dedicated-window-height 20)
+  :config
+  (setq vterm-shell "screen"
+        vterm-min-window-width 120
+        vterm-max-scrollback 5000
+        vterm-clear-scrollback-when-clearing t)
+  (defun rdg/multi-vterm-dwim ()
+    (interactive)
+    "Toggle the dedicated window or create a new dedicated vterm."
+    (let ((default-directory (or rdg/current-project-root "~/")))
+      (progn
+        (if (not (multi-vterm-dedicated-exist-p))
+            (multi-vterm-dedicated-open)
+          (multi-vterm)
+          (set-window-dedicated-p (frame-selected-window) t)))))
+  (global-set-key (kbd "C-c `") 'rdg/multi-vterm-dwim))
 
 (use-package sqlformat
   :custom (sqlformat-command 'pgformatter))
@@ -803,13 +862,14 @@
 
 (use-package js
   :config
-  (defvar rdg/company-js-backends '())
+  ;; (defvar rdg/company-js-backends '())
   (let ((hook (lambda ()
                 (setq js-indent-level 2
                       sgml-basic-offset 2)
                 (subword-mode)
                 (prettier-js-mode)
-                (rdg/company-set-mode-backends rdg/company-js-backends))))
+                ;; (rdg/company-set-mode-backends rdg/company-js-backends)
+                )))
     (mapc (lambda (mode-hook) (add-hook mode-hook hook))
           '(js-mode-hook js2-mode-hook rjsx-mode-hook)))
   ;; (defun rdg/use-eslint-from-node-modules (fn)
@@ -827,16 +887,16 @@
   ;; (add-hook 'flycheck-mode-hook #'rdg/set-flycheck-eslint-executable)
   )
 
-(defun rdg/eslint-fix-buffer ()
-  (rdg/use-eslint-from-node-modules
-   (lambda (eslint)
-     (let ((file (buffer-file-name (current-buffer))))
-       (call-process eslint nil nil nil "--fix" file)
-       (revert-buffer t t t)))))
+;; (defun rdg/eslint-fix-buffer ()
+;;   (rdg/use-eslint-from-node-modules
+;;    (lambda (eslint)
+;;      (let ((file (buffer-file-name (current-buffer))))
+;;        (call-process eslint nil nil nil "--fix" file)
+;;        (revert-buffer t t t)))))
 
-(defun rdg/add-eslint-fix-buffer-hook ()
-  (remove-hook 'after-save-hook 'rdg/eslint-fix-buffer t)
-  (add-hook 'after-save-hook 'rdg/eslint-fix-buffer nil t))
+;; (defun rdg/add-eslint-fix-buffer-hook ()
+;;   (remove-hook 'after-save-hook 'rdg/eslint-fix-buffer t)
+;;   (add-hook 'after-save-hook 'rdg/eslint-fix-buffer nil t))
 
 (use-package rubocop
   :custom (rubocop-prefer-system-executable t)

@@ -20,30 +20,12 @@
     (mapc (lambda (buf) (kill-buffer-if-file buf))
      (buffer-list)))
 
-(defun kill-buffer-and-window ()
-  "Close the current window and kill the buffer it's visiting."
-  (interactive)
-  (progn
-    (kill-buffer)
-    (delete-window)))
-
-(global-set-key (kbd "C-x C-k") 'kill-buffer-and-window)
-
 (defun create-new-buffer ()
   "Create a new buffer named *new*[num]."
   (interactive)
   (switch-to-buffer (generate-new-buffer-name "*new*")))
 
 (global-set-key (kbd "C-c n") 'create-new-buffer)
-
-(defun insert-semicolon-at-end-of-line ()
-  "Add a closing semicolon from anywhere in the line."
-  (interactive)
-  (save-excursion
-    (end-of-line)
-    (insert ";")))
-
-(global-set-key (kbd "C-;") 'insert-semicolon-at-end-of-line)
 
 (defun comment-current-line-dwim ()
   "Comment or uncomment the current line."
@@ -70,27 +52,26 @@
 
 (global-set-key (kbd "C->") 'increase-window-height)
 
+;; (defun decrease-window-height (&optional arg)
+;;   "Make the window shorter by one line. Useful when bound to a repeatable key combination."
+;;   (interactive "p")
+;;   (enlarge-window (- 0 arg)))
 
-(defun decrease-window-height (&optional arg)
-  "Make the window shorter by one line. Useful when bound to a repeatable key combination."
-  (interactive "p")
-  (enlarge-window (- 0 arg)))
+;; (global-set-key (kbd "C-<") 'decrease-window-height)
 
-(global-set-key (kbd "C-<") 'decrease-window-height)
+;; (defun decrease-window-width (&optional arg)
+;;   "Make the window narrower by one column. Useful when bound to a repeatable key combination."
+;;   (interactive "p")
+;;   (enlarge-window (- 0 arg) t))
 
-(defun decrease-window-width (&optional arg)
-  "Make the window narrower by one column. Useful when bound to a repeatable key combination."
-  (interactive "p")
-  (enlarge-window (- 0 arg) t))
+;; (global-set-key (kbd "C-,") 'decrease-window-width)
 
-(global-set-key (kbd "C-,") 'decrease-window-width)
+;; (defun increase-window-width (&optional arg)
+;;   "Make the window wider by one column. Useful when bound to a repeatable key combination."
+;;   (interactive "p")
+;;   (enlarge-window arg t))
 
-(defun increase-window-width (&optional arg)
-  "Make the window wider by one column. Useful when bound to a repeatable key combination."
-  (interactive "p")
-  (enlarge-window arg t))
-
-(global-set-key (kbd "C-.") 'increase-window-width)
+;; (global-set-key (kbd "C-.") 'increase-window-width)
 
 (when window-system
   (defun new-emacs-instance ()
