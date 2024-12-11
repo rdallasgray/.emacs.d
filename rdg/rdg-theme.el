@@ -61,6 +61,10 @@
    ((t (:inherit (error treemacs-file-face)))))
 
 
+ `(tree-sitter-hl-face:property
+   ((t (:inherit :inherit font-lock-constant-face))))
+
+
  `(linum
    ((t (:height ,rdg-small-font-height
                 :foreground unspecified

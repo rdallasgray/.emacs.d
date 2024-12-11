@@ -39,11 +39,23 @@
 
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
-(use-package treesit-auto
+(use-package highlight-indent-guides)
+
+(use-package tree-sitter
   :config
-  (setq treesit-auto-install-all t)
-  ;; (global-treesit-auto-mode)
+  (global-tree-sitter-mode)
+  ;; (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
   )
+
+(use-package tree-sitter-langs
+  :ensure t
+  :after tree-sitter)
+
+;; (use-package treesit-auto
+;;   :config
+;;   (setq treesit-auto-install-all t)
+;;   ;; (global-treesit-auto-mode)
+;;   )
 
 (use-package which-key
   :config (which-key-mode))
@@ -112,8 +124,8 @@
       ring-bell-function 'ignore)
 
 ;; whitespace cleanup
-(use-package whitespace-cleanup-mode)
-(add-hook 'prog-mode-hook 'whitespace-cleanup-mode)
+(use-package whitespace-cleanup-mode
+  :config (global-whitespace-cleanup-mode))
 
 ;; midnight
 (setq clean-buffer-list-delay-general 7)
@@ -960,6 +972,12 @@
   (define-key markdown-mode-map (kbd "C-c <down>") nil)
   (define-key markdown-mode-map (kbd "C-c <left>") nil)
   (define-key markdown-mode-map (kbd "C-c <right>") nil))
+
+(use-package yasnippet)
+(use-package yasnippet-capf
+  :after cape
+  :config
+  (add-to-list 'completion-at-point-functions #'yasnippet-capf))
 
 (use-package yaml-mode)
 
