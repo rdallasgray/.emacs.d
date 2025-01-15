@@ -43,19 +43,25 @@
 
 (use-package tree-sitter
   :config
-  (global-tree-sitter-mode)
-  ;; (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
-  )
+  ;; (global-tree-sitter-mode)
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 
 (use-package tree-sitter-langs
   :ensure t
-  :after tree-sitter)
+  :after tree-sitter
+  :config
+  (setq treesit-language-source-alist
+        '((tsx        "https://github.com/tree-sitter/tree-sitter-typescript"
+                      "v0.20.3"
+                      "tsx/src")
+          (typescript "https://github.com/tree-sitter/tree-sitter-typescript"
+                      "v0.20.3"
+                      "typescript/src"))))
 
-;; (use-package treesit-auto
-;;   :config
-;;   (setq treesit-auto-install-all t)
-;;   ;; (global-treesit-auto-mode)
-;;   )
+(use-package treesit-auto
+  :config
+  (setq treesit-auto-install-all t)
+  (global-treesit-auto-mode))
 
 (use-package which-key
   :config (which-key-mode))
@@ -870,7 +876,14 @@
         '(js-mode js2-mode rjsx-mode))
   (add-hook 'flycheck-mode-hook 'add-node-modules-path))
 
-(use-package prettier-js)
+(use-package typescript-ts-mode
+  :mode ("\\.tsx?\\'" . typescript-mode)
+  :config
+  (add-hook 'after-after-hook #'prettier-js-mode))
+
+(use-package prettier-js
+  :commands (prettier-js-mode prettier-js)
+  :hook ((typescript-ts-mode . prettier-js-mode)))
 
 (use-package js
   :config
@@ -929,26 +942,38 @@
 (use-package ruby-tools)
 (use-package ruby-hash-syntax)
 
+(defun rdg/ruby-update-tags ()
+  (let ((root (locate-dominating-file default-directory ".git")))
+    (when root
+      (cd root)
+      (call-process-shell-command "ripper-tags -R -e --exclude=vendor"))))
+
+(defun rdg/add-ruby-update-tags-hook ()
+  (remove-hook 'after-save-hook 'rdg/ruby-update-tags t)
+  (add-hook 'after-save-hook 'rdg/ruby-update-tags nil t))
+
+(defun rdg/ruby-mode-config ()
+  (rdg/ruby-update-tags)
+  (rdg/add-ruby-update-tags-hook)
+  (add-hook 'ruby-mode-hook 'rdg/ruby-mode-hook)
+  (exec-path-from-shell-copy-env "GEM_HOME"))
+
+(defun rdg/ruby-mode-hook ()
+  (subword-mode)
+  (ruby-tools-mode)
+  (setq ruby-insert-encoding-magic-comment nil
+        ruby-align-chained-calls t
+        ruby-use-smie t)
+  (rdg/add-rubocop-fix-layout-hook)
+  (rdg/add-ruby-update-tags-hook))
+
 (use-package ruby-mode
   :config
-  (defun rdg/ruby-update-tags ()
-    (let ((root (locate-dominating-file default-directory ".git")))
-      (when root
-        (cd root)
-        (call-process-shell-command "ripper-tags -R -e --exclude=vendor"))))
-  (defun rdg/add-ruby-update-tags-hook ()
-    (remove-hook 'after-save-hook 'rdg/ruby-update-tags t)
-    (add-hook 'after-save-hook 'rdg/ruby-update-tags nil t))
-  (exec-path-from-shell-copy-env "GEM_HOME")
-  (defun rdg/ruby-mode-hook ()
-    (subword-mode)
-    (ruby-tools-mode)
-    (setq ruby-insert-encoding-magic-comment nil
-          ruby-align-chained-calls t
-          ruby-use-smie t)
-    (rdg/add-rubocop-fix-layout-hook)
-    (rdg/add-ruby-update-tags-hook))
-  (add-hook 'ruby-mode-hook 'rdg/ruby-mode-hook))
+  (rdg/ruby-mode-config))
+
+(use-package ruby-ts-mode
+  :config
+  (rdg/ruby-mode-config))
 
 ;; imenu
 (use-package imenu

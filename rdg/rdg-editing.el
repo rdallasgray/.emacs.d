@@ -13,14 +13,25 @@
                 '(:add ("||\n[i]" "RET"))))
      pairs))
 
+  (defun rdg/sp-ruby-mode-hook ()
+    (lambda ()
+      (sp-local-pair 'ruby-mode
+                     "{"
+                     nil
+                     :post-handlers
+                     '(:add ("||\n[i]" "RET")))))
+
+  (defun rdg/sp-ruby-ts-mode-hook ()
+    (lambda ()
+      (sp-local-pair 'ruby-ts-mode
+                     "{"
+                     nil
+                     :post-handlers
+                     '(:add ("||\n[i]" "RET")))))
+
   ;; Fix for ruby-mode, which appears to override handlers
-  (add-hook 'ruby-mode-hook
-            (lambda ()
-              (sp-local-pair 'ruby-mode
-                             "{"
-                             nil
-                             :post-handlers
-                             '(:add ("||\n[i]" "RET")))))
+  (add-hook 'ruby-mode-hook (rdg/sp-ruby-mode-hook))
+  (add-hook 'ruby-ts-mode-hook (rdg/sp-ruby-ts-mode-hook))
 
   (sp-local-pair
    '(markdown-mode gfm-mode) "*" "*"
@@ -85,6 +96,7 @@
          '("\\.watchr$" "\\.arb$" "\\.rake$" "\\.gemspec$" "\\.ru$" "Rakefile$"
            "Gemfile$" "Capfile$" "Guardfile$" "Rakefile$" "Cheffile$" "Vagrantfile$"
            "Berksfile$" "\\.builder$"))
-  (add-to-list 'auto-mode-alist `(,regex . ruby-mode)))
+  (add-to-list 'auto-mode-alist `(,regex . ruby-mode))
+  (add-to-list 'auto-mode-alist `(,regex . ruby-ts-mode)))
 
 (provide 'rdg-editing)
