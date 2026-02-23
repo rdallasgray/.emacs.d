@@ -41,12 +41,13 @@
 
 (use-package flycheck
   :config
-  (flycheck-mode)
+  (global-flycheck-mode)
+  ;; (flycheck-mode)
   (defun rdg/flycheck-display-errors-function (errors)
     (mapc (lambda (err)
             (message "FlyC: %s" (flycheck-error-message err)) (sit-for 1))
           errors))
-  (setq flycheck-highlighting-mode nil
+  (setq flycheck-highlighting-mode 'symbols
         flycheck-display-errors-function 'rdg/flycheck-display-errors-function))
 
 (use-package web-mode
@@ -92,11 +93,9 @@
 (setq css-indent-offset 2)
 
 ;; Default Ruby filetypes
-(dolist (regex
-         '("\\.watchr$" "\\.arb$" "\\.rake$" "\\.gemspec$" "\\.ru$" "Rakefile$"
-           "Gemfile$" "Capfile$" "Guardfile$" "Rakefile$" "Cheffile$" "Vagrantfile$"
-           "Berksfile$" "\\.builder$"))
-  (add-to-list 'auto-mode-alist `(,regex . ruby-mode))
-  (add-to-list 'auto-mode-alist `(,regex . ruby-ts-mode)))
+;; (dolist (regex
+;;          '("\\.arb$" "\\.rake$" "\\.gemspec$" "\\.ru$" "Rakefile$"
+;;            "Gemfile" "Guardfile$"))
+;;   (add-to-list 'auto-mode-alist `(,regex . ruby-mode)))
 
 (provide 'rdg-editing)

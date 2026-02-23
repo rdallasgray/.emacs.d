@@ -1,4 +1,4 @@
-;;(setq debug-on-error t)
+;; (setq debug-on-error t)
 
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -30,10 +30,9 @@
   (setq auto-package-update-hide-results t)
   (auto-package-update-maybe))
 
-(use-package use-package-ensure-system-package)
-
 (use-package dash)
 (use-package s)
+(use-package org)
 
 (auto-compression-mode nil)
 
@@ -41,44 +40,29 @@
 
 (use-package highlight-indent-guides)
 
-(use-package tree-sitter
-  :config
-  ;; (global-tree-sitter-mode)
-  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+(use-package vlf
+  :config (require 'vlf-setup))
 
-(use-package tree-sitter-langs
-  :ensure t
-  :after tree-sitter
-  :config
-  (setq treesit-language-source-alist
-        '((tsx        "https://github.com/tree-sitter/tree-sitter-typescript"
-                      "v0.20.3"
-                      "tsx/src")
-          (typescript "https://github.com/tree-sitter/tree-sitter-typescript"
-                      "v0.20.3"
-                      "typescript/src"))))
+;; (use-package structured-log-mode
+;;   :straight (:host github :repo "lgfang/structured-log-mode" :files ("*.el"))
+;;   :ensure t
+;;   :commands structured-log-mode)
 
-(use-package treesit-auto
-  :config
-  (setq treesit-auto-install-all t)
-  (global-treesit-auto-mode))
+ ;; (use-package json-ts-mode
+ ;;   :mode "\\.jsonl?\\'")
+
+;; (use-package tree-sitter
+;;   :config
+;;   (global-tree-sitter-mode)
+;;   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+
+;; (use-package treesit-auto
+;;   :config
+;;   (setq treesit-auto-install-all t)
+;;   (global-treesit-auto-mode))
 
 (use-package which-key
   :config (which-key-mode))
-
-;; (use-package lsp-mode
-;;   :custom
-;;   (lsp-headerline-breadcrumb-enable nil)
-;;   :init
-;;   (setq lsp-keymap-prefix "C-c l")
-;;   :hook ((ruby-mode . lsp)
-;;          (ruby-ts-mode . lsp)
-;;          (javascript-mode . lsp)
-;;          (javascript-ts-mode . lsp)
-;;          (lsp-mode . lsp-enable-which-key-integration))
-;;   :commands lsp)
-
-;; (use-package lsp-ivy)
 
 ;; (use-package copilot
 ;;   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
@@ -302,15 +286,19 @@
 (use-package eglot
   :config
   (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+  ;; (add-to-list 'eglot-server-programs
+  ;;              '((ruby-mode ruby-ts-mode)
+  ;;                . ("solargraph" "socket" "--port" :autoport :initializationOptions (:formatting t))))
   :hook
   (prog-mode . eglot-ensure))
 
 (use-package corfu
   ;; Optional customizations
   :custom
-  (corfu-auto-delay 0.125)
+  (corfu-auto-delay 0.25)
   (corfu-auto t)
   (corfu-auto-prefix 2)
+  (corfu-history-mode)
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   ;; (corfu-auto t)                 ;; Enable auto completion
   ;; (corfu-separator ?\s)          ;; Orderless field separator
@@ -531,6 +519,7 @@
   :bind (;; C-c bindings in `mode-specific-map'
          ("C-c M-x" . consult-mode-command)
          ("C-c h" . consult-history)
+         ("C-c e" . consult-eglot-symbols)
          ("C-c k" . consult-kmacro)
          ("C-c m" . consult-man)
          ("C-c i" . consult-info)
@@ -644,6 +633,10 @@
   ;;;; 5. No project support
   ;; (setq consult-project-function nil)
   )
+
+(use-package eldoc
+  :init
+  (global-eldoc-mode))
 
 (use-package embark
   :ensure t
@@ -855,20 +848,21 @@
 (use-package magit
   :custom (magit-status-buffer-switch-function 'switch-to-buffer))
 
-(use-package scss-mode
-  :custom (scss-compile-at-save nil))
+;; (use-package scss-mode
+;;   :custom (scss-compile-at-save nil))
 
 (use-package add-node-modules-path)
 
 (use-package flycheck-eglot
   :ensure t
   :after (flycheck eglot)
+  :custom (flycheck-eglot-exclusive nil)
   :config
   (global-flycheck-eglot-mode 1))
 
 (use-package flycheck
   :custom
-  (flycheck-idle-change-delay 5)
+  (flycheck-idle-change-delay 2)
   :config
   (setq flycheck-disabled-checkers (append flycheck-disabled-checkers
                                            '(javascript-jshint json-jsonlist)))
@@ -924,20 +918,9 @@
 ;;   (add-hook 'after-save-hook 'rdg/eslint-fix-buffer nil t))
 
 (use-package rubocop
-  :custom (rubocop-prefer-system-executable t)
-  :config
-  (defun rdg/rubocop-autocorrect-and-revert()
-    (rubocop-autocorrect-current-file)
-    (revert-buffer t t t))
-  (defun rdg/rubocop-fix-layout-and-revert()
-    (rubocop--file-command "rubocop --fix-layout --format emacs")
-    (revert-buffer t t t))
-  (defun rdg/add-rubocop-autocorrect-hook ()
-    (remove-hook 'after-save-hook 'rdg/rubocop-autocorrect-and-revert t)
-    (add-hook 'after-save-hook 'rdg/rubocop-autocorrect-and-revert nil t))
-  (defun rdg/add-rubocop-fix-layout-hook ()
-    (remove-hook 'after-save-hook 'rdg/rubocop-fix-layout-and-revert t)
-    (add-hook 'after-save-hook 'rdg/rubocop-fix-layout-and-revert nil t)))
+  :custom
+  (rubocop-prefer-system-executable t)
+  (rubocop-format-on-save t))
 
 (use-package ruby-tools)
 (use-package ruby-hash-syntax)
@@ -961,19 +944,32 @@
 (defun rdg/ruby-mode-hook ()
   (subword-mode)
   (ruby-tools-mode)
+  (rubocop-mode)
   (setq ruby-insert-encoding-magic-comment nil
         ruby-align-chained-calls t
         ruby-use-smie t)
-  (rdg/add-rubocop-fix-layout-hook)
-  (rdg/add-ruby-update-tags-hook))
+  (rdg/add-ruby-update-tags-hook)
+  (require 'smartparens-ruby)
+  (show-smartparens-mode))
 
 (use-package ruby-mode
   :config
   (rdg/ruby-mode-config))
 
-(use-package ruby-ts-mode
-  :config
-  (rdg/ruby-mode-config))
+(defun rdg/proxy-ruby-mode-hook ()
+  (run-hooks 'ruby-mode-hook))
+
+;; (use-package ruby-ts-mode
+;;   :mode "\\.gemspec\\'"
+;;   :mode "\\.\\'"
+;;   :mode "Rakefile\\'"
+;;   :mode "Gemfile\\'"
+;;   :mode "Guardfile\\'"
+;;   :init
+;;   (setq treesit-font-lock-level 4)
+;;   (add-hook 'ruby-ts-mode-hook 'rdg/proxy-ruby-mode-hook)
+;;   :config
+;;   (rdg/ruby-mode-config))
 
 ;; imenu
 (use-package imenu
