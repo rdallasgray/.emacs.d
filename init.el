@@ -48,8 +48,8 @@
 ;;   :ensure t
 ;;   :commands structured-log-mode)
 
- ;; (use-package json-ts-mode
- ;;   :mode "\\.jsonl?\\'")
+;; (use-package json-ts-mode
+;;   :mode "\\.jsonl?\\'")
 
 ;; (use-package tree-sitter
 ;;   :config
@@ -71,6 +71,16 @@
 ;;   (add-to-list 'load-path "/path/to/copilot.el")
 ;;   (require 'copilot)
 ;;   (add-hook 'prog-mode-hook 'copilot-mode))
+
+(use-package apheleia
+  :config
+  (apheleia-global-mode +1)
+  (setf (alist-get 'rubocop apheleia-formatters)
+        '("rubocop" "--stdin" filepath "-x"
+          "--stderr" "--format" "quiet" "--fail-level" "fatal"
+          "--force-exclusion"))
+  (setf (alist-get 'ruby-mode apheleia-mode-alist)
+        '(rubocop)))
 
 (setq custom-file "~/.emacs.d/custom.el")
 (when (file-exists-p custom-file)
@@ -256,6 +266,7 @@
 
 (use-package web-mode
   :custom
+  (apheleia-inhibit t)
   (web-mode-code-indent-offset 2)
   (web-mode-css-indent-offset 2)
   (web-mode-markup-indent-offset 2))
@@ -287,8 +298,7 @@
   :config
   (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
   ;; (add-to-list 'eglot-server-programs
-  ;;              '((ruby-mode ruby-ts-mode)
-  ;;                . ("solargraph" "socket" "--port" :autoport :initializationOptions (:formatting t))))
+  ;;              '((ruby-mode ruby-ts-mode). ("ruby-lsp")))
   :hook
   (prog-mode . eglot-ensure))
 
@@ -474,10 +484,10 @@
 ;; (use-package treemacs-projectile)
 
 (defun rdg/after-switch-project-persp (project-to-switch)
-    "Run after switching project perspective"
-    (message "Switched perspective; project is %s" project-to-switch)
-    (when (not (eq rdg/current-project-root project-to-switch))
-      (projectile-switch-project-by-name project-to-switch)))
+  "Run after switching project perspective"
+  (message "Switched perspective; project is %s" project-to-switch)
+  (when (not (eq rdg/current-project-root project-to-switch))
+    (projectile-switch-project-by-name project-to-switch)))
 
 (use-package persp-projectile
   :config
@@ -503,7 +513,7 @@
 
 (use-package marginalia
   :bind (:map minibuffer-local-map
-         ("M-A" . marginalia-cycle))
+              ("M-A" . marginalia-cycle))
   :init
   (marginalia-mode))
 
@@ -748,25 +758,25 @@
               #'anzu-isearch-query-replace-regexp))
 
 (defun rdg/setup-shell ()
-    "Hook to set up shell modes."
-    (setq comint-prompt-read-only t
-          ;; comint-process-echoes t
-          comint-scroll-show-maximum-output t
-          comint-scroll-to-bottom-on-input 'this
-          comint-buffer-maximum-size 10000
-          comint-prompt-regexp "^.+[$%>] ")
-    ;; (ansi-color-for-comint-mode-on)
-    ;; (add-to-list 'comint-output-filter-functions
-    ;;              'ansi-color-process-output)
-    ;; (add-hook 'comint-output-filter-functions
-    ;;           'comint-truncate-buffer)
-    (unless (eq system-type 'windows-nt)
-      (let ((shell-name "bash"))
-        (setq explicit-shell-file-name shell-name
-              shell-file-name shell-name)
-        (setenv "SHELL" shell-name)
-        (set (make-local-variable 'completion-at-point-functions)
-             '(cape-file native-complete-at-point cape-dabbrev)))))
+  "Hook to set up shell modes."
+  (setq comint-prompt-read-only t
+        ;; comint-process-echoes t
+        comint-scroll-show-maximum-output t
+        comint-scroll-to-bottom-on-input 'this
+        comint-buffer-maximum-size 10000
+        comint-prompt-regexp "^.+[$%>] ")
+  ;; (ansi-color-for-comint-mode-on)
+  ;; (add-to-list 'comint-output-filter-functions
+  ;;              'ansi-color-process-output)
+  ;; (add-hook 'comint-output-filter-functions
+  ;;           'comint-truncate-buffer)
+  (unless (eq system-type 'windows-nt)
+    (let ((shell-name "bash"))
+      (setq explicit-shell-file-name shell-name
+            shell-file-name shell-name)
+      (setenv "SHELL" shell-name)
+      (set (make-local-variable 'completion-at-point-functions)
+           '(cape-file native-complete-at-point cape-dabbrev)))))
 
 (use-package native-complete
   :config
@@ -805,9 +815,9 @@
         (progn
           (shell-pop--switch-to-shell-buffer (+ 1 shell-pop-last-shell-buffer-index))
           (set-window-dedicated-p (selected-window) t))
-    (progn
-      (shell-pop nil)
-      (set-window-dedicated-p (selected-window) t)))))
+      (progn
+        (shell-pop nil)
+        (set-window-dedicated-p (selected-window) t)))))
 
 (use-package shell-pop
   :custom
@@ -825,6 +835,7 @@
                     (cd (or (rdg/get-project-root) default-directory)))))
 
 (use-package multi-vterm
+  :straight (multi-vterm :type git :host github :repo "suonlight/multi-vterm")
   :custom (multi-vterm-dedicated-window-height 20)
   :config
   (setq vterm-shell "screen"
@@ -870,57 +881,19 @@
         '(js-mode js2-mode rjsx-mode))
   (add-hook 'flycheck-mode-hook 'add-node-modules-path))
 
-(use-package typescript-ts-mode
-  :mode ("\\.tsx?\\'" . typescript-mode)
-  :config
-  (add-hook 'after-after-hook #'prettier-js-mode))
-
-(use-package prettier-js
-  :commands (prettier-js-mode prettier-js)
-  :hook ((typescript-ts-mode . prettier-js-mode)))
-
 (use-package js
   :config
   ;; (defvar rdg/company-js-backends '())
   (let ((hook (lambda ()
                 (setq js-indent-level 2
                       sgml-basic-offset 2)
-                (subword-mode)
-                (prettier-js-mode)
-                ;; (rdg/company-set-mode-backends rdg/company-js-backends)
-                )))
+                (subword-mode))))
     (mapc (lambda (mode-hook) (add-hook mode-hook hook))
-          '(js-mode-hook js2-mode-hook rjsx-mode-hook)))
-  ;; (defun rdg/use-eslint-from-node-modules (fn)
-  ;;   (let ((root (locate-dominating-file
-  ;;                (or (buffer-file-name) default-directory)
-  ;;                (lambda (dir)
-  ;;                  (let ((eslint (expand-file-name "node_modules/eslint/bin/eslint.js" dir)))
-  ;;                    (and eslint (file-executable-p eslint)))))))
-  ;;     (when root
-  ;;       (let ((eslint (expand-file-name "node_modules/eslint/bin/eslint.js" root)))
-  ;;         (funcall fn eslint)))))
-  ;; (defun rdg/set-flycheck-eslint-executable ()
-  ;;   (rdg/use-eslint-from-node-modules
-  ;;    (lambda (eslint) (setq-local flycheck-javascript-eslint-executable eslint))))
-  ;; (add-hook 'flycheck-mode-hook #'rdg/set-flycheck-eslint-executable)
-  )
-
-;; (defun rdg/eslint-fix-buffer ()
-;;   (rdg/use-eslint-from-node-modules
-;;    (lambda (eslint)
-;;      (let ((file (buffer-file-name (current-buffer))))
-;;        (call-process eslint nil nil nil "--fix" file)
-;;        (revert-buffer t t t)))))
-
-;; (defun rdg/add-eslint-fix-buffer-hook ()
-;;   (remove-hook 'after-save-hook 'rdg/eslint-fix-buffer t)
-;;   (add-hook 'after-save-hook 'rdg/eslint-fix-buffer nil t))
+          '(js-mode-hook js2-mode-hook rjsx-mode-hook))))
 
 (use-package rubocop
   :custom
-  (rubocop-prefer-system-executable t)
-  (rubocop-format-on-save t))
+  (rubocop-prefer-system-executable t))
 
 (use-package ruby-tools)
 (use-package ruby-hash-syntax)
@@ -1009,4 +982,4 @@
   :straight (solarized-theme :host github :repo "sellout/emacs-color-theme-solarized")
   :init
   (when window-system
-      (load-theme 'solarized t)))
+    (load-theme 'solarized t)))
