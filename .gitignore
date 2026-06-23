@@ -38,3 +38,5 @@ persp-confs/
 amx-items
 tree-sitter/
 history
+eln-cache
+projectile-frecency.eld

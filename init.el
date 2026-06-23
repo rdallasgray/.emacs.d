@@ -30,6 +30,10 @@
   (setq auto-package-update-hide-results t)
   (auto-package-update-maybe))
 
+(use-package trust-manager
+  :config
+  (trust-manager-mode))
+
 (use-package dash)
 (use-package s)
 (use-package org)
@@ -42,14 +46,6 @@
 
 (use-package vlf
   :config (require 'vlf-setup))
-
-;; (use-package structured-log-mode
-;;   :straight (:host github :repo "lgfang/structured-log-mode" :files ("*.el"))
-;;   :ensure t
-;;   :commands structured-log-mode)
-
-;; (use-package json-ts-mode
-;;   :mode "\\.jsonl?\\'")
 
 ;; (use-package tree-sitter
 ;;   :config
@@ -94,6 +90,8 @@
 
 (add-to-list 'custom-theme-load-path "~/.emacs.d/rdg/")
 
+(setopt isearch-lazy-count t)
+
 ;; No pop-ups
 (setq pop-up-frames nil
       pop-up-windows nil)
@@ -125,7 +123,8 @@
 
 ;; whitespace cleanup
 (use-package whitespace-cleanup-mode
-  :config (global-whitespace-cleanup-mode))
+  :config (global-whitespace-cleanup-mode)
+  :custom (whitespace-cleanup-mode-only-if-initially-clean nil))
 
 ;; midnight
 (setq clean-buffer-list-delay-general 7)
@@ -136,10 +135,6 @@
 (global-set-key (kbd "C-M--") 'default-text-scale-decrease)
 
 (defvar rdg/ignored-compilation-buffer-match '("*RuboCop"))
-
-;; (defun rdg/remove-fringe-and-margin ()
-;;   (fringe-mode nil)
-;;   (set-window-margins nil 0))
 
 (defun kill-zombie-buffers ()
   "Kill buffers no longer associated with a file."
@@ -274,7 +269,14 @@
 (use-package exec-path-from-shell)
 
 (use-package prescient
-  :config (prescient-persist-mode t))
+  :custom
+  (prescient-persist-mode t)
+  (prescient-sort-full-matches-first t)
+  (prescient-sort-length-enable t))
+
+(with-eval-after-load 'prescient
+  ;; Have `completion-preview-mode' use prescient's sorting algorithm
+  (setopt completion-preview-sort-function #'prescient-completion-sort))
 
 (use-package so-long
   :straight t
@@ -290,33 +292,56 @@
 
 (use-package cape
   :init
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-keyword))
+  (add-hook 'completion-at-point-functions #'cape-history)
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-language)
+  (add-hook 'completion-at-point-functions #'cape-keyword)
+  :custom
+  (cape-dabbrev-buffer-function 'cape-text-buffers))
+
+(defun rdg/eglot-capf ()
+  (setq-local completion-at-point-functions
+              (list (cape-capf-super
+                     #'eglot-completion-at-point
+                     #'cape-dabbrev
+                     #'cape-file
+                     #'cape-keyword
+                     #'tags-completion-at-point-function))))
 
 (use-package eglot
+  :custom
+  (eglot-autoshutdown t)
+  (eglot-sync-connect nil)
+  (eglot-events-buffer-config '(:size 0 :format short))
+  (eglot-max-file-watches 5000)
+  (eglot-report-progress nil)
+  (eglot-code-action-indications nil)
   :config
   (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
-  ;; (add-to-list 'eglot-server-programs
-  ;;              '((ruby-mode ruby-ts-mode). ("ruby-lsp")))
+  (setq-default eglot-workspace-configuration
+                '((:solargraph . (:formatting t :diagnostics t))))
+  (add-to-list 'eglot-ignored-server-capabilities :documentHighlightProvider)
   :hook
-  (prog-mode . eglot-ensure))
+  (prog-mode . eglot-ensure)
+  (eglot-managed-mode . rdg/eglot-capf))
+
+(setq tab-always-indent 'complete)
 
 (use-package corfu
-  ;; Optional customizations
   :custom
   (corfu-auto-delay 0.25)
   (corfu-auto t)
-  (corfu-auto-prefix 2)
+  (corfu-auto-prefix 1)
   (corfu-history-mode)
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  ;; (corfu-auto t)                 ;; Enable auto completion
   ;; (corfu-separator ?\s)          ;; Orderless field separator
-  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+  (corfu-quit-at-boundary t)
+  (corfu-quit-no-match t)
+  (corfu-preview-current t)
   ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
-  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  (corfu-on-exact-match 'insert)
+  (corfu-popupinfo-mode 1)
   ;; (corfu-scroll-margin 5)        ;; Use scroll margin
   ;; Enable Corfu only for certain modes.
   ;; :hook ((prog-mode . corfu-mode)
@@ -340,72 +365,25 @@
   :init
   (global-corfu-mode))
 
+(with-eval-after-load 'savehist
+    (corfu-history-mode 1)
+    (add-to-list 'savehist-additional-variables 'corfu-history))
+
 (use-package corfu-prescient
+  :demand t
+  :after corfu prescient
+  :custom
+  (corfu-prescient-enable-sorting t)
+  (corfu-prescient-override-sorting t)
+  (corfu-prescient-enable-filtering t)
   :config
-  (corfu-prescient-mode))
+  (corfu-prescient-mode 1))
 
 (use-package corfu-candidate-overlay)
 
-;; (use-package company-try-hard)
-;; (use-package company-prescient)
-;; (use-package company
-;;   :config
-;;   (global-company-mode t)
-;;   (define-key company-active-map (kbd "RET") nil)
-;;   (setq company-idle-delay 0.125
-;;         company-minimum-prefix-length 1
-;;         company-require-match nil
-;;         company-transformers '(company-sort-by-occurrence)
-;;         company-dabbrev-ignore-case nil
-;;         company-dabbrev-downcase nil
-;;         company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
-;;                             company-preview-frontend
-;;                             company-echo-metadata-frontend))
-;;   (defvar rdg/company-no-return-key-modes '(shell-mode))
-;;   (defun rdg/company-complete-on-return-p ()
-;;     (not (derived-mode-p 'comint-mode)))
-;;   (defun rdg/company-maybe-try-hard (buf win tick pos)
-;;     (when (and (not company-candidates)
-;;                (looking-back "[A-Za-z0-9_\-\/\.]" 1))
-;;       (company-try-hard)
-;;       (let ((this-command 'company-try-hard))
-;;         (company-post-command))))
-;;   (defun rdg/company-maybe-complete-on-return ()
-;;     (interactive)
-;;     (if (rdg/company-complete-on-return-p)
-;;         (company-complete-selection)
-;;       (if (functionp 'comint-send-input)
-;;           (comint-send-input)
-;;         (newline))))
-;;   (defun rdg/advise-company-try-hard ()
-;;     (advice-remove 'company-idle-begin
-;;                    #'rdg/company-maybe-try-hard)
-;;     (advice-add 'company-idle-begin :after
-;;                 #'rdg/company-maybe-try-hard))
-;;   (defvar rdg/company-default-backends
-;;     '(company-files company-dabbrev-code company-etags
-;;                     company-capf company-keywords
-;;                     company-dabbrev))
-;;   (defvar rdg/company-shell-backends
-;;     '(company-files company-native-complete company-capf
-;;                     company-dabbrev))
-;;   (defun rdg/company-set-mode-backends (backends)
-;;     "Set BACKENDS locally"
-;;     (set (make-local-variable 'company-backends)
-;;          (-uniq (append backends rdg/company-default-backends))))
-;;   (setq company-backends rdg/company-default-backends
-;;         company-idle-delay 0.15)
-;;   (rdg/advise-company-try-hard)
-;;   (company-prescient-mode t)
-;;   (define-key company-active-map (kbd "<tab>")
-;;     #'company-complete-selection)
-;;   (define-key company-active-map (kbd "C-<tab>")
-;;     #'company-try-hard)
-;;   (define-key company-active-map [return]
-;;     #'rdg/company-maybe-complete-on-return)
-;;   (define-key company-active-map (kbd "RET")
-;;     #'rdg/company-maybe-complete-on-return)
-;;   (add-to-list 'display-buffer-alist '("*shell*" display-buffer-same-window)))
+(global-completion-preview-mode 1)
+
+(setq case-replace nil)
 
 (use-package wgrep)
 
@@ -501,11 +479,19 @@
 (use-package treemacs-projectile
   :after (treemacs projectile))
 
-(use-package vertico-prescient)
+(use-package vertico-prescient
+  :demand t
+  :after vertico prescient
+  :custom
+  (vertico-prescient-enable-sorting t)
+  (vertico-prescient-override-sorting t)
+  (vertico-prescient-enable-filtering t)
+  :config
+  (vertico-prescient-mode 1))
+
 (use-package vertico
   :init
-  (vertico-mode)
-  (vertico-prescient-mode))
+  (vertico-mode))
 
 (use-package savehist
   :init
@@ -683,46 +669,13 @@
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
-(use-package orderless
-  :ensure t
-  :custom
-  (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles basic partial-completion)))))
-
-
-;; ---- OLD ----
-;; (use-package counsel
-;;   :bind
-;;   (("M-x" . counsel-M-x)
-;;    ("M-y" . counsel-yank-pop)
-;;    ("C-s" . counsel-grep-or-swiper)
-;;    ("C-r" . counsel-grep-or-swiper)
-;;    ("C-c ." . counsel-imenu)
-;;    ("C-x f" . counsel-recentf)
-;;    ("C-x C-f" . counsel-find-file)
-;;    ("C-h f" . counsel-describe-function)
-;;    ("C-c C-s" . isearch-forward)
-;;    ("C-c C-r" . isearch-backward)
-;;    ("C-c C-r" . ivy-resume)
-;;    ("C-c u" . counsel-unicode-char)
-;;    ("C-c g c" . counsel-git-checkout)
-;;    ("C-c g f" . counsel-git)
-;;    ("C-c g g" . counsel-git-grep)
-;;    ("C-c e f" . counsel-etags-find-tag)
-;;    ("C-c ! !" . counsel-flycheck)
-;;    ("C-c //" . counsel-tramp)))
-
-;; (use-package counsel-projectile
-;;  :after (counsel projectile))
-;; (use-package counsel-etags)
-;; (use-package counsel-tramp)
-
-;; (use-package ivy-prescient)
-;; (use-package ivy
-;;   :config
-;;   (ivy-mode t)
-;;   (ivy-prescient-mode t))
-;; ----------------------------
+;; (use-package orderless
+;;   :ensure t
+;;   :custom
+;;   (completion-styles '(orderless partial-completion basic))
+;;   (completion-category-overrides nil)
+;;   (completion-category-defaults nil)
+;;   (completion-pcm-leading-wildcard t))
 
 (use-package hydra)
 
@@ -778,10 +731,10 @@
       (set (make-local-variable 'completion-at-point-functions)
            '(cape-file native-complete-at-point cape-dabbrev)))))
 
-(use-package native-complete
-  :config
-  (native-complete-setup-bash)
-  :custom (native-complete-style-regex-alist '((".+*(pry|guard).*> " . tab))))
+;; (use-package native-complete
+;;   :config
+;;   (native-complete-setup-bash)
+;;   :custom (native-complete-style-regex-alist '((".+*(pry|guard).*> " . tab))))
 
 (use-package shell
   :hook
@@ -851,7 +804,22 @@
             (multi-vterm-dedicated-open)
           (multi-vterm)
           (set-window-dedicated-p (frame-selected-window) t)))))
-  (global-set-key (kbd "C-c `") 'rdg/multi-vterm-dwim))
+  (global-set-key (kbd "C-c `") 'rdg/multi-vterm-dwim)
+  )
+
+(use-package ghostel
+  :ensure t)
+
+(use-package popterm
+    :bind (("C-`"   . popterm-toggle)
+           ("C-~"   . popterm-toggle-cd)
+           ([f9]    . popterm-window-toggle))
+  :config
+  (setq popterm-backend 'ghostel
+        popterm-display-method 'window
+        popterm-scope 'project
+        popterm-auto-cd t)
+  (popterm-global-mode 1))
 
 (use-package sqlformat
   :custom (sqlformat-command 'pgformatter))
@@ -919,7 +887,11 @@
   (ruby-tools-mode)
   (rubocop-mode)
   (setq ruby-insert-encoding-magic-comment nil
-        ruby-align-chained-calls t
+        ruby-after-operator-indent nil
+        ruby-align-chained-calls nil
+        ruby-align-to-stmt-keywords nil
+        ruby-block-indent nil
+        ruby-bracketed-args-indent t
         ruby-use-smie t)
   (rdg/add-ruby-update-tags-hook)
   (require 'smartparens-ruby)
@@ -932,17 +904,17 @@
 (defun rdg/proxy-ruby-mode-hook ()
   (run-hooks 'ruby-mode-hook))
 
-;; (use-package ruby-ts-mode
-;;   :mode "\\.gemspec\\'"
-;;   :mode "\\.\\'"
-;;   :mode "Rakefile\\'"
-;;   :mode "Gemfile\\'"
-;;   :mode "Guardfile\\'"
-;;   :init
-;;   (setq treesit-font-lock-level 4)
-;;   (add-hook 'ruby-ts-mode-hook 'rdg/proxy-ruby-mode-hook)
-;;   :config
-;;   (rdg/ruby-mode-config))
+(use-package ruby-ts-mode
+  :mode "\\.gemspec\\'"
+  :mode "\\.\\'"
+  :mode "Rakefile\\'"
+  :mode "Gemfile\\'"
+  :mode "Guardfile\\'"
+  :init
+  (setq treesit-font-lock-level 4)
+  (add-hook 'ruby-ts-mode-hook 'rdg/proxy-ruby-mode-hook)
+  :config
+  (rdg/ruby-mode-config))
 
 ;; imenu
 (use-package imenu
@@ -975,8 +947,10 @@
 
 (use-package yaml-mode)
 
-(use-package smart-tab
-  :config (global-smart-tab-mode 1))
+;; (use-package smart-tab
+;;   :init (setq smart-tab-user-provided-completion-function 'corfu-expand
+;;               smart-tab-completion-functions-alist '())
+;;   :config (global-smart-tab-mode 1))
 
 (use-package solarized-theme
   :straight (solarized-theme :host github :repo "sellout/emacs-color-theme-solarized")
