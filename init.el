@@ -125,7 +125,8 @@
 
 ;; whitespace cleanup
 (use-package whitespace-cleanup-mode
-  :config (global-whitespace-cleanup-mode))
+  :config (global-whitespace-cleanup-mode)
+  :custom (whitespace-cleanup-mode-only-if-initially-clean nil))
 
 ;; midnight
 (setq clean-buffer-list-delay-general 7)
@@ -851,7 +852,22 @@
             (multi-vterm-dedicated-open)
           (multi-vterm)
           (set-window-dedicated-p (frame-selected-window) t)))))
-  (global-set-key (kbd "C-c `") 'rdg/multi-vterm-dwim))
+  (global-set-key (kbd "C-c `") 'rdg/multi-vterm-dwim)
+  )
+
+(use-package ghostel
+  :ensure t)
+
+(use-package popterm
+    :bind (("C-`"   . popterm-toggle)
+           ("C-~"   . popterm-toggle-cd)
+           ([f9]    . popterm-window-toggle))
+  :config
+  (setq popterm-backend 'ghostel
+        popterm-display-method 'window
+        popterm-scope 'project
+        popterm-auto-cd t)
+  (popterm-global-mode 1))
 
 (use-package sqlformat
   :custom (sqlformat-command 'pgformatter))
