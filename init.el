@@ -1,6 +1,11 @@
 ;; (setq debug-on-error t)
 
+(setq garbage-collection-messages nil)
+
+(setq load-prefer-newer t)
+
 (defvar bootstrap-version)
+
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
       (bootstrap-version 5))
@@ -24,6 +29,8 @@
   (require 'use-package-ensure)
   (setq use-package-always-ensure t))
 
+(use-package gcmh)
+
 (use-package auto-package-update
   :config
   (setq auto-package-update-delete-old-versions t)
@@ -36,7 +43,6 @@
 
 (use-package dash)
 (use-package s)
-(use-package org)
 
 (auto-compression-mode nil)
 
@@ -47,15 +53,12 @@
 (use-package vlf
   :config (require 'vlf-setup))
 
-;; (use-package tree-sitter
-;;   :config
-;;   (global-tree-sitter-mode)
-;;   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
-
-;; (use-package treesit-auto
-;;   :config
-;;   (setq treesit-auto-install-all t)
-;;   (global-treesit-auto-mode))
+(use-package tree-sitter
+  :custom
+  (treesit-auto-install-grammar 'always)
+  (treesit-enabled-modes t)
+  :config
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 
 (use-package which-key
   :config (which-key-mode))
@@ -268,15 +271,13 @@
 
 (use-package exec-path-from-shell)
 
-(use-package prescient
-  :custom
-  (prescient-persist-mode t)
-  (prescient-sort-full-matches-first t)
-  (prescient-sort-length-enable t))
-
-(with-eval-after-load 'prescient
-  ;; Have `completion-preview-mode' use prescient's sorting algorithm
-  (setopt completion-preview-sort-function #'prescient-completion-sort))
+;; (use-package prescient
+;;   :config
+;;   (setopt completion-preview-sort-function #'prescient-completion-sort)
+;;   :custom
+;;   (prescient-persist-mode t)
+;;   (prescient-sort-full-matches-first t)
+;;   (prescient-sort-length-enable t))
 
 (use-package so-long
   :straight t
@@ -295,7 +296,6 @@
   (add-hook 'completion-at-point-functions #'cape-history)
   (add-hook 'completion-at-point-functions #'cape-dabbrev)
   (add-hook 'completion-at-point-functions #'cape-file)
-  (add-hook 'completion-at-point-functions #'cape-language)
   (add-hook 'completion-at-point-functions #'cape-keyword)
   :custom
   (cape-dabbrev-buffer-function 'cape-text-buffers))
@@ -303,11 +303,12 @@
 (defun rdg/eglot-capf ()
   (setq-local completion-at-point-functions
               (list (cape-capf-super
-                     #'eglot-completion-at-point
+                     #'cape-history
                      #'cape-dabbrev
                      #'cape-file
                      #'cape-keyword
-                     #'tags-completion-at-point-function))))
+                     #'eglot-completion-at-point
+                     ))))
 
 (use-package eglot
   :custom
@@ -318,10 +319,11 @@
   (eglot-report-progress nil)
   (eglot-code-action-indications nil)
   :config
+  ;; (advice-add #'eglot-completion-at-point :around #'cape-wrap-noninterruptible)
   (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
-  (setq-default eglot-workspace-configuration
-                '((:solargraph . (:formatting t :diagnostics t))))
-  (add-to-list 'eglot-ignored-server-capabilities :documentHighlightProvider)
+  ;; (setq-default eglot-workspace-configuration
+  ;;               '((:solargraph . (:formatting t :diagnostics t :useFmt t :autoUseGemfile t))))
+  (add-to-list 'eglot-server-programs '((ruby-mode ruby-ts-mode) "ruby-lsp"))
   :hook
   (prog-mode . eglot-ensure)
   (eglot-managed-mode . rdg/eglot-capf))
@@ -338,7 +340,7 @@
   ;; (corfu-separator ?\s)          ;; Orderless field separator
   (corfu-quit-at-boundary t)
   (corfu-quit-no-match t)
-  (corfu-preview-current t)
+  (corfu-preview-current 'insert)
   ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
   (corfu-on-exact-match 'insert)
   (corfu-popupinfo-mode 1)
@@ -369,15 +371,15 @@
     (corfu-history-mode 1)
     (add-to-list 'savehist-additional-variables 'corfu-history))
 
-(use-package corfu-prescient
-  :demand t
-  :after corfu prescient
-  :custom
-  (corfu-prescient-enable-sorting t)
-  (corfu-prescient-override-sorting t)
-  (corfu-prescient-enable-filtering t)
-  :config
-  (corfu-prescient-mode 1))
+;; (use-package corfu-prescient
+;;   :demand t
+;;   :after corfu prescient
+;;   :custom
+;;   (corfu-prescient-enable-sorting t)
+;;   (corfu-prescient-override-sorting t)
+;;   (corfu-prescient-enable-filtering t)
+;;   :config
+;;   (corfu-prescient-mode 1))
 
 (use-package corfu-candidate-overlay)
 
@@ -479,15 +481,15 @@
 (use-package treemacs-projectile
   :after (treemacs projectile))
 
-(use-package vertico-prescient
-  :demand t
-  :after vertico prescient
-  :custom
-  (vertico-prescient-enable-sorting t)
-  (vertico-prescient-override-sorting t)
-  (vertico-prescient-enable-filtering t)
-  :config
-  (vertico-prescient-mode 1))
+;; (use-package vertico-prescient
+;;   :demand t
+;;   :after vertico prescient
+;;   :custom
+;;   (vertico-prescient-enable-sorting t)
+;;   (vertico-prescient-override-sorting t)
+;;   (vertico-prescient-enable-filtering t)
+;;   :config
+;;   (vertico-prescient-mode 1))
 
 (use-package vertico
   :init
@@ -710,41 +712,41 @@
   (define-key isearch-mode-map [remap isearch-query-replace-regexp]
               #'anzu-isearch-query-replace-regexp))
 
-(defun rdg/setup-shell ()
-  "Hook to set up shell modes."
-  (setq comint-prompt-read-only t
-        ;; comint-process-echoes t
-        comint-scroll-show-maximum-output t
-        comint-scroll-to-bottom-on-input 'this
-        comint-buffer-maximum-size 10000
-        comint-prompt-regexp "^.+[$%>] ")
-  ;; (ansi-color-for-comint-mode-on)
-  ;; (add-to-list 'comint-output-filter-functions
-  ;;              'ansi-color-process-output)
-  ;; (add-hook 'comint-output-filter-functions
-  ;;           'comint-truncate-buffer)
-  (unless (eq system-type 'windows-nt)
-    (let ((shell-name "bash"))
-      (setq explicit-shell-file-name shell-name
-            shell-file-name shell-name)
-      (setenv "SHELL" shell-name)
-      (set (make-local-variable 'completion-at-point-functions)
-           '(cape-file native-complete-at-point cape-dabbrev)))))
+;; (defun rdg/setup-shell ()
+;;   "Hook to set up shell modes."
+;;   (setq comint-prompt-read-only t
+;;         ;; comint-process-echoes t
+;;         comint-scroll-show-maximum-output t
+;;         comint-scroll-to-bottom-on-input 'this
+;;         comint-buffer-maximum-size 10000
+;;         comint-prompt-regexp "^.+[$%>] ")
+;;   ;; (ansi-color-for-comint-mode-on)
+;;   ;; (add-to-list 'comint-output-filter-functions
+;;   ;;              'ansi-color-process-output)
+;;   ;; (add-hook 'comint-output-filter-functions
+;;   ;;           'comint-truncate-buffer)
+;;   (unless (eq system-type 'windows-nt)
+;;     (let ((shell-name "bash"))
+;;       (setq explicit-shell-file-name shell-name
+;;             shell-file-name shell-name)
+;;       (setenv "SHELL" shell-name)
+;;       (set (make-local-variable 'completion-at-point-functions)
+;;            '(cape-file native-complete-at-point cape-dabbrev)))))
 
 ;; (use-package native-complete
 ;;   :config
 ;;   (native-complete-setup-bash)
 ;;   :custom (native-complete-style-regex-alist '((".+*(pry|guard).*> " . tab))))
 
-(use-package shell
-  :hook
-  (shell-mode . rdg/setup-shell))
+;; (use-package shell
+;;   :hook
+;;   (shell-mode . rdg/setup-shell))
 
 (use-package eat)
 
-(use-package coterm
-  :config
-  (coterm-mode))
+;; (use-package coterm
+;;   :config
+;;   (coterm-mode))
 
 ;; (use-package bash-completion
 ;;   :hook
@@ -752,11 +754,11 @@
 ;;                   (add-hook 'completion-at-point-functions
 ;;                             'bash-completion-capf-nonexclusive nil t))))
 
-(use-package eshell
-  :hook
-  (eshell-mode . eat-eshell-mode)
-  :custom
-  (eshell-banner-message ""))
+;; (use-package eshell
+;;   :hook
+;;   (eshell-mode . eat-eshell-mode)
+;;   :custom
+;;   (eshell-banner-message ""))
 
 (defun rdg/shell-pop-dwim ()
   (interactive)
@@ -807,28 +809,25 @@
   (global-set-key (kbd "C-c `") 'rdg/multi-vterm-dwim)
   )
 
-(use-package ghostel
-  :ensure t)
+;; (use-package ghostel
+;;   :ensure t)
 
-(use-package popterm
-    :bind (("C-`"   . popterm-toggle)
-           ("C-~"   . popterm-toggle-cd)
-           ([f9]    . popterm-window-toggle))
-  :config
-  (setq popterm-backend 'ghostel
-        popterm-display-method 'window
-        popterm-scope 'project
-        popterm-auto-cd t)
-  (popterm-global-mode 1))
+;; (use-package popterm
+;;     :bind (("C-`"   . popterm-toggle)
+;;            ("C-~"   . popterm-toggle-cd)
+;;            ([f9]    . popterm-window-toggle))
+;;   :config
+;;   (setq popterm-backend 'ghostel
+;;         popterm-display-method 'window
+;;         popterm-scope 'project
+;;         popterm-auto-cd t)
+;;   (popterm-global-mode 1))
 
 (use-package sqlformat
   :custom (sqlformat-command 'pgformatter))
 
 (use-package magit
   :custom (magit-status-buffer-switch-function 'switch-to-buffer))
-
-;; (use-package scss-mode
-;;   :custom (scss-compile-at-save nil))
 
 (use-package add-node-modules-path)
 
@@ -851,7 +850,6 @@
 
 (use-package js
   :config
-  ;; (defvar rdg/company-js-backends '())
   (let ((hook (lambda ()
                 (setq js-indent-level 2
                       sgml-basic-offset 2)
@@ -866,19 +864,7 @@
 (use-package ruby-tools)
 (use-package ruby-hash-syntax)
 
-(defun rdg/ruby-update-tags ()
-  (let ((root (locate-dominating-file default-directory ".git")))
-    (when root
-      (cd root)
-      (call-process-shell-command "ripper-tags -R -e --exclude=vendor"))))
-
-(defun rdg/add-ruby-update-tags-hook ()
-  (remove-hook 'after-save-hook 'rdg/ruby-update-tags t)
-  (add-hook 'after-save-hook 'rdg/ruby-update-tags nil t))
-
 (defun rdg/ruby-mode-config ()
-  (rdg/ruby-update-tags)
-  (rdg/add-ruby-update-tags-hook)
   (add-hook 'ruby-mode-hook 'rdg/ruby-mode-hook)
   (exec-path-from-shell-copy-env "GEM_HOME"))
 
@@ -893,7 +879,6 @@
         ruby-block-indent nil
         ruby-bracketed-args-indent t
         ruby-use-smie t)
-  (rdg/add-ruby-update-tags-hook)
   (require 'smartparens-ruby)
   (show-smartparens-mode))
 
@@ -939,18 +924,14 @@
   (define-key markdown-mode-map (kbd "C-c <left>") nil)
   (define-key markdown-mode-map (kbd "C-c <right>") nil))
 
-(use-package yasnippet)
-(use-package yasnippet-capf
-  :after cape
-  :config
-  (add-to-list 'completion-at-point-functions #'yasnippet-capf))
+;; (use-package yasnippet)
+
+;; (use-package yasnippet-capf
+;;   :after cape
+;;   :config
+;;   (add-to-list 'completion-at-point-functions #'yasnippet-capf))
 
 (use-package yaml-mode)
-
-;; (use-package smart-tab
-;;   :init (setq smart-tab-user-provided-completion-function 'corfu-expand
-;;               smart-tab-completion-functions-alist '())
-;;   :config (global-smart-tab-mode 1))
 
 (use-package solarized-theme
   :straight (solarized-theme :host github :repo "sellout/emacs-color-theme-solarized")
