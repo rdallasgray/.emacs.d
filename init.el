@@ -1,35 +1,20 @@
+;;; init.el -*- lexical-binding: t -*-
+
 ;; (setq debug-on-error t)
 
 (setq garbage-collection-messages nil)
 
 (setq load-prefer-newer t)
 
-(defvar bootstrap-version)
-
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-
 (require 'package)
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/"))
 
-(straight-use-package 'use-package)
+(require 'use-package-ensure)
+(setq use-package-always-ensure t)
 
-(eval-when-compile
-  (require 'use-package)
-  (require 'use-package-ensure)
-  (setq use-package-always-ensure t))
-
-(use-package gcmh)
+(use-package gcmh
+  :config (gcmh-mode 1))
 
 (use-package auto-package-update
   :config
@@ -41,10 +26,8 @@
   :config
   (trust-manager-mode))
 
-(use-package dash)
-(use-package s)
-
-(auto-compression-mode nil)
+(use-package dash :demand t)
+(use-package s :demand t)
 
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
@@ -53,23 +36,24 @@
 (use-package vlf
   :config (require 'vlf-setup))
 
-(use-package tree-sitter
+(use-package treesit
+  :ensure nil
   :custom
   (treesit-auto-install-grammar 'always)
   (treesit-enabled-modes t)
-  :config
-  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+  (treesit-font-lock-level 4))
 
 (use-package which-key
+  :ensure nil
   :config (which-key-mode))
 
-;; (use-package copilot
-;;   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-;;   :ensure t
-;;   :config
-;;   (add-to-list 'load-path "/path/to/copilot.el")
-;;   (require 'copilot)
-;;   (add-hook 'prog-mode-hook 'copilot-mode))
+(use-package claude-code-ide
+  :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
+  :bind
+  ("C-c /" . claude-code-ide-menu)
+  ("C-c C-/" . claude-code-ide-toggle)
+  :config
+  (claude-code-ide-emacs-tools-setup))
 
 (use-package apheleia
   :config
@@ -103,8 +87,6 @@
 
 (setq tags-revert-without-query 1)
 
-(setq-default bidi-display-reordering nil)
-
 (setq kill-do-not-save-duplicates t)
 
 ;; Scroll up and down a line at a time
@@ -132,10 +114,13 @@
 ;; midnight
 (setq clean-buffer-list-delay-general 7)
 (midnight-delay-set 'midnight-delay "12:00am")
+(midnight-mode 1)
 
 ;; text scaling
-(global-set-key (kbd "C-M-=") 'default-text-scale-increase)
-(global-set-key (kbd "C-M--") 'default-text-scale-decrease)
+(use-package default-text-scale
+  :bind
+  (("C-M-=" . default-text-scale-increase)
+   ("C-M--" . default-text-scale-decrease)))
 
 (defvar rdg/ignored-compilation-buffer-match '("*RuboCop"))
 
@@ -196,15 +181,6 @@
 (global-set-key (kbd "M-<down>") 'rdg/beginning-of-next-defun)
 (global-set-key (kbd "M-<up>") 'beginning-of-defun)
 
-;; No visible region on C-x C-x
-(defun exchange-point-and-mark-no-region ()
-  "Suppress region visibility when exchanging point and mark."
-  (interactive)
-  (exchange-point-and-mark)
-  (deactivate-mark nil))
-
-(define-key global-map [remap exchange-point-and-mark] 'exchange-point-and-mark-no-region)
-
 (defun rdg/maybe-write-and-close-compilation-buffer (buf str)
   (if (-any? (lambda (it) (s-contains? it (buffer-name buf)))
              rdg/ignored-compilation-buffer-match)
@@ -222,6 +198,7 @@
 (use-package bury-successful-compilation)
 
 (use-package server
+  :ensure nil
   :config
   (if (server-running-p)
       (message "Server is running")
@@ -263,24 +240,19 @@
    ("C-M-<backspace>" . rdg/unwrap-and-mark-sexp)))
 
 (use-package web-mode
+  :hook (web-mode . (lambda () (setq-local apheleia-inhibit t)))
   :custom
-  (apheleia-inhibit t)
   (web-mode-code-indent-offset 2)
   (web-mode-css-indent-offset 2)
   (web-mode-markup-indent-offset 2))
 
-(use-package exec-path-from-shell)
-
-;; (use-package prescient
-;;   :config
-;;   (setopt completion-preview-sort-function #'prescient-completion-sort)
-;;   :custom
-;;   (prescient-persist-mode t)
-;;   (prescient-sort-full-matches-first t)
-;;   (prescient-sort-length-enable t))
+(use-package exec-path-from-shell
+  :config
+  (when (memq window-system '(mac ns))
+    (exec-path-from-shell-initialize)))
 
 (use-package so-long
-  :straight t
+  :ensure nil
   :custom
   (so-long-threshold 500)
   (so-long-max-lines nil)
@@ -310,7 +282,13 @@
                      #'eglot-completion-at-point
                      ))))
 
+(defun rdg/maybe-eglot-ensure ()
+  "Start eglot, except in Lisp modes that have no language server."
+  (unless (derived-mode-p 'emacs-lisp-mode 'lisp-data-mode)
+    (eglot-ensure)))
+
 (use-package eglot
+  :ensure nil
   :custom
   (eglot-autoshutdown t)
   (eglot-sync-connect nil)
@@ -325,7 +303,7 @@
   ;;               '((:solargraph . (:formatting t :diagnostics t :useFmt t :autoUseGemfile t))))
   (add-to-list 'eglot-server-programs '((ruby-mode ruby-ts-mode) "ruby-lsp"))
   :hook
-  (prog-mode . eglot-ensure)
+  (prog-mode . rdg/maybe-eglot-ensure)
   (eglot-managed-mode . rdg/eglot-capf))
 
 (setq tab-always-indent 'complete)
@@ -335,7 +313,6 @@
   (corfu-auto-delay 0.25)
   (corfu-auto t)
   (corfu-auto-prefix 1)
-  (corfu-history-mode)
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   ;; (corfu-separator ?\s)          ;; Orderless field separator
   (corfu-quit-at-boundary t)
@@ -343,7 +320,6 @@
   (corfu-preview-current 'insert)
   ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
   (corfu-on-exact-match 'insert)
-  (corfu-popupinfo-mode 1)
   ;; (corfu-scroll-margin 5)        ;; Use scroll margin
   ;; Enable Corfu only for certain modes.
   ;; :hook ((prog-mode . corfu-mode)
@@ -351,6 +327,9 @@
   ;;        (eshell-mode . corfu-mode))
 
   :config
+  (corfu-history-mode 1)
+  (corfu-popupinfo-mode 1)
+
   (defun corfu-send-shell (&rest _)
     "Send completion candidate when inside comint/eshell."
     (cond
@@ -368,20 +347,7 @@
   (global-corfu-mode))
 
 (with-eval-after-load 'savehist
-    (corfu-history-mode 1)
-    (add-to-list 'savehist-additional-variables 'corfu-history))
-
-;; (use-package corfu-prescient
-;;   :demand t
-;;   :after corfu prescient
-;;   :custom
-;;   (corfu-prescient-enable-sorting t)
-;;   (corfu-prescient-override-sorting t)
-;;   (corfu-prescient-enable-filtering t)
-;;   :config
-;;   (corfu-prescient-mode 1))
-
-(use-package corfu-candidate-overlay)
+  (add-to-list 'savehist-additional-variables 'corfu-history))
 
 (global-completion-preview-mode 1)
 
@@ -461,12 +427,10 @@
   :init
   (persp-mode))
 
-;; (use-package treemacs-projectile)
-
 (defun rdg/after-switch-project-persp (project-to-switch)
   "Run after switching project perspective"
   (message "Switched perspective; project is %s" project-to-switch)
-  (when (not (eq rdg/current-project-root project-to-switch))
+  (unless (equal rdg/current-project-root project-to-switch)
     (projectile-switch-project-by-name project-to-switch)))
 
 (use-package persp-projectile
@@ -481,21 +445,12 @@
 (use-package treemacs-projectile
   :after (treemacs projectile))
 
-;; (use-package vertico-prescient
-;;   :demand t
-;;   :after vertico prescient
-;;   :custom
-;;   (vertico-prescient-enable-sorting t)
-;;   (vertico-prescient-override-sorting t)
-;;   (vertico-prescient-enable-filtering t)
-;;   :config
-;;   (vertico-prescient-mode 1))
-
 (use-package vertico
   :init
   (vertico-mode))
 
 (use-package savehist
+  :ensure nil
   :init
   (savehist-mode))
 
@@ -604,8 +559,8 @@
    consult-theme :preview-key '(:debounce 0.2 any)
    consult-ripgrep consult-git-grep consult-grep
    consult-bookmark consult-recent-file consult-xref
-   consult--source-bookmark consult--source-file-register
-   consult--source-recent-file consult--source-project-recent-file
+   consult-source-bookmark consult-source-file-register
+   consult-source-recent-file consult-source-project-recent-file
    ;; :preview-key "M-."
    :preview-key '(:debounce 0.4 any))
 
@@ -633,6 +588,7 @@
   )
 
 (use-package eldoc
+  :ensure nil
   :init
   (global-eldoc-mode))
 
@@ -671,14 +627,6 @@
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
-;; (use-package orderless
-;;   :ensure t
-;;   :custom
-;;   (completion-styles '(orderless partial-completion basic))
-;;   (completion-category-overrides nil)
-;;   (completion-category-defaults nil)
-;;   (completion-pcm-leading-wildcard t))
-
 (use-package hydra)
 
 (use-package expand-region
@@ -694,103 +642,30 @@
   (global-set-key (kbd "C-M-SPC") 'hydra-mark-begin))
 
 (use-package anzu
+  :custom
+  (anzu-mode-lighter "")
+  (anzu-deactivate-region t)
+  (anzu-replace-to-string-separator " => ")
   :config
   (global-anzu-mode +1)
   (set-face-attribute 'anzu-mode-line nil
                       :foreground 'unspecified
                       :inherit 'mode-line)
-  (custom-set-variables
-   '(anzu-mode-lighter "")
-   '(anzu-deactivate-region t)
-   '(anzu-replace-to-string-separator " => "))
   (define-key (current-global-map) [remap query-replace]
               #'anzu-query-replace)
   (define-key (current-global-map) [remap query-replace-regexp]
-              #'anzu-query-replace-regexg)
+              #'anzu-query-replace-regexp)
   (define-key isearch-mode-map [remap isearch-query-replace]
               #'anzu-isearch-query-replace)
   (define-key isearch-mode-map [remap isearch-query-replace-regexp]
               #'anzu-isearch-query-replace-regexp))
 
-;; (defun rdg/setup-shell ()
-;;   "Hook to set up shell modes."
-;;   (setq comint-prompt-read-only t
-;;         ;; comint-process-echoes t
-;;         comint-scroll-show-maximum-output t
-;;         comint-scroll-to-bottom-on-input 'this
-;;         comint-buffer-maximum-size 10000
-;;         comint-prompt-regexp "^.+[$%>] ")
-;;   ;; (ansi-color-for-comint-mode-on)
-;;   ;; (add-to-list 'comint-output-filter-functions
-;;   ;;              'ansi-color-process-output)
-;;   ;; (add-hook 'comint-output-filter-functions
-;;   ;;           'comint-truncate-buffer)
-;;   (unless (eq system-type 'windows-nt)
-;;     (let ((shell-name "bash"))
-;;       (setq explicit-shell-file-name shell-name
-;;             shell-file-name shell-name)
-;;       (setenv "SHELL" shell-name)
-;;       (set (make-local-variable 'completion-at-point-functions)
-;;            '(cape-file native-complete-at-point cape-dabbrev)))))
-
-;; (use-package native-complete
-;;   :config
-;;   (native-complete-setup-bash)
-;;   :custom (native-complete-style-regex-alist '((".+*(pry|guard).*> " . tab))))
-
-;; (use-package shell
-;;   :hook
-;;   (shell-mode . rdg/setup-shell))
-
 (use-package eat)
 
-;; (use-package coterm
-;;   :config
-;;   (coterm-mode))
-
-;; (use-package bash-completion
-;;   :hook
-;;   (shell-mode . (lambda ()
-;;                   (add-hook 'completion-at-point-functions
-;;                             'bash-completion-capf-nonexclusive nil t))))
-
-;; (use-package eshell
-;;   :hook
-;;   (eshell-mode . eat-eshell-mode)
-;;   :custom
-;;   (eshell-banner-message ""))
-
-(defun rdg/shell-pop-dwim ()
-  (interactive)
-  (if (not (boundp 'shell-pop-last-shell-buffer-name))
-      (progn
-        (shell-pop nil)
-        (set-window-dedicated-p (selected-window) t))
-    (if (string= (buffer-name) shell-pop-last-shell-buffer-name)
-        (progn
-          (shell-pop--switch-to-shell-buffer (+ 1 shell-pop-last-shell-buffer-index))
-          (set-window-dedicated-p (selected-window) t))
-      (progn
-        (shell-pop nil)
-        (set-window-dedicated-p (selected-window) t)))))
-
-(use-package shell-pop
-  :custom
-  (shell-pop-shell-type '("shell" "*shell*" (lambda () (shell))))
-  (shell-pop-window-size 30)
-  (shell-pop-full-span nil)
-  (shell-pop-window-position "bottom")
-  (shell-pop-autocd-to-working-dir t)
-  (shell-pop-restore-window-configuration t)
-  (shell-pop-cleanup-buffer-at-process-exit t)
-  ;; :bind
-  ;; (("C-c `" . rdg/shell-pop-dwim))
-  :hook
-  (shell-pop-in . (lambda ()
-                    (cd (or (rdg/get-project-root) default-directory)))))
+(use-package vterm
+  :custom (vterm-always-compile-module t))
 
 (use-package multi-vterm
-  :straight (multi-vterm :type git :host github :repo "suonlight/multi-vterm")
   :custom (multi-vterm-dedicated-window-height 20)
   :config
   (setq vterm-shell "screen"
@@ -806,22 +681,7 @@
             (multi-vterm-dedicated-open)
           (multi-vterm)
           (set-window-dedicated-p (frame-selected-window) t)))))
-  (global-set-key (kbd "C-c `") 'rdg/multi-vterm-dwim)
-  )
-
-;; (use-package ghostel
-;;   :ensure t)
-
-;; (use-package popterm
-;;     :bind (("C-`"   . popterm-toggle)
-;;            ("C-~"   . popterm-toggle-cd)
-;;            ([f9]    . popterm-window-toggle))
-;;   :config
-;;   (setq popterm-backend 'ghostel
-;;         popterm-display-method 'window
-;;         popterm-scope 'project
-;;         popterm-auto-cd t)
-;;   (popterm-global-mode 1))
+  (global-set-key (kbd "C-c `") 'rdg/multi-vterm-dwim))
 
 (use-package sqlformat
   :custom (sqlformat-command 'pgformatter))
@@ -849,6 +709,7 @@
   (add-hook 'flycheck-mode-hook 'add-node-modules-path))
 
 (use-package js
+  :ensure nil
   :config
   (let ((hook (lambda ()
                 (setq js-indent-level 2
@@ -883,6 +744,7 @@
   (show-smartparens-mode))
 
 (use-package ruby-mode
+  :ensure nil
   :config
   (rdg/ruby-mode-config))
 
@@ -890,19 +752,20 @@
   (run-hooks 'ruby-mode-hook))
 
 (use-package ruby-ts-mode
+  :ensure nil
   :mode "\\.gemspec\\'"
-  :mode "\\.\\'"
+  :mode "\\.rb\\'"
   :mode "Rakefile\\'"
   :mode "Gemfile\\'"
   :mode "Guardfile\\'"
   :init
-  (setq treesit-font-lock-level 4)
   (add-hook 'ruby-ts-mode-hook 'rdg/proxy-ruby-mode-hook)
   :config
   (rdg/ruby-mode-config))
 
 ;; imenu
 (use-package imenu
+  :ensure nil
   :custom (imenu-auto-rescan t))
 
 (use-package cfn-mode)
@@ -924,17 +787,11 @@
   (define-key markdown-mode-map (kbd "C-c <left>") nil)
   (define-key markdown-mode-map (kbd "C-c <right>") nil))
 
-;; (use-package yasnippet)
-
-;; (use-package yasnippet-capf
-;;   :after cape
-;;   :config
-;;   (add-to-list 'completion-at-point-functions #'yasnippet-capf))
-
 (use-package yaml-mode)
 
 (use-package solarized-theme
-  :straight (solarized-theme :host github :repo "sellout/emacs-color-theme-solarized")
+  :vc (:url "https://github.com/sellout/emacs-color-theme-solarized"
+            :main-file "solarized-theme.el")
   :init
   (when window-system
     (load-theme 'solarized t)))
