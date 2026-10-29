@@ -401,9 +401,6 @@
         ("<right>" . treemacs-toggle-node)))
 
 (defvar rdg/current-project-root nil)
-(defun rdg/get-project-root (&rest args)
-  "Return the current project root"
-  rdg/current-project-root)
 
 (use-package projectile
   :init
@@ -415,7 +412,6 @@
           (treemacs-add-and-display-current-project-exclusively)
           (rdg/setup-treemacs)))
   (projectile-mode)
-  ;; (add-to-list 'projectile-project-root-functions 'rdg/get-project-root)
   :bind
   ("C-c p" . projectile-command-map))
 
