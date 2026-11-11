@@ -308,6 +308,13 @@
 
 (setq tab-always-indent 'complete)
 
+(use-package prescient
+  :config (prescient-persist-mode))
+
+(use-package corfu-prescient
+  :after corfu
+  :config (corfu-prescient-mode))
+
 (use-package corfu
   :custom
   (corfu-auto-delay 0.25)
@@ -440,6 +447,10 @@
 ;; (use-package treemacs-magit)
 (use-package treemacs-projectile
   :after (treemacs projectile))
+
+(use-package vertico-prescient
+  :after vertico
+  :config (vertico-prescient-mode))
 
 (use-package vertico
   :init
@@ -787,7 +798,11 @@
 
 (use-package solarized-theme
   :vc (:url "https://github.com/sellout/emacs-color-theme-solarized"
+            :branch "master"
             :main-file "solarized-theme.el")
   :init
   (when window-system
     (load-theme 'solarized t)))
+
+(provide 'init)
+;;; init.el ends here
