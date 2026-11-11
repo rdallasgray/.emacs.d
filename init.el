@@ -6,6 +6,10 @@
 
 (setq load-prefer-newer t)
 
+(setq custom-file "~/.emacs.d/custom.el")
+(when (file-exists-p custom-file)
+  (load custom-file))
+
 (require 'package)
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/"))
@@ -64,10 +68,6 @@
           "--force-exclusion"))
   (setf (alist-get 'ruby-mode apheleia-mode-alist)
         '(rubocop)))
-
-(setq custom-file "~/.emacs.d/custom.el")
-(when (file-exists-p custom-file)
-  (load custom-file))
 
 (add-to-list 'load-path "~/.emacs.d/rdg/")
 (require 'rdg-helper-functions)
@@ -796,11 +796,15 @@
 
 (use-package yaml-mode)
 
-(use-package solarized-theme
+(use-package emacs-color-theme-solarized
   :vc (:url "https://github.com/sellout/emacs-color-theme-solarized"
             :branch "master"
             :main-file "solarized-theme.el")
+  :no-require t
   :init
+  (add-to-list 'custom-theme-load-path
+               "~/.emacs.d/elpa/emacs-color-theme-solarized")
+  :config
   (when window-system
     (load-theme 'solarized t)))
 
